@@ -20,6 +20,16 @@
 # production
 /build
 
+# local study data and user uploads
+/data/*.db
+/data/*.db-*
+/data/uploads/*
+!/data/uploads/.gitkeep
+
+# local browser verification artifacts
+/.playwright-cli/
+/output/
+
 # misc
 .DS_Store
 *.pem

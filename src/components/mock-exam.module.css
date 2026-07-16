@@ -1,0 +1,298 @@
+.briefing {
+  min-height: 470px;
+  display: grid;
+  grid-template-columns: 1fr 410px;
+  align-items: center;
+  gap: 60px;
+  padding: 48px;
+}
+
+.briefing h2 {
+  max-width: 620px;
+  font-size: 42px;
+}
+
+.briefing p {
+  max-width: 640px;
+}
+
+.examSequence {
+  display: grid;
+  gap: 10px;
+}
+
+.examSequence > div {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.examSequence span {
+  color: #f1ad89;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.examSequence strong {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.examSequence small {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 8px;
+}
+
+.examRoom {
+  width: min(100%, 1500px);
+  margin: 0 auto;
+}
+
+.examToolbar {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: 200px 1fr 100px;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  color: #fff;
+  background: #122f26;
+  border-radius: 15px;
+}
+
+.examToolbar strong,
+.examToolbar small {
+  display: block;
+}
+
+.examToolbar strong {
+  font-size: 11px;
+}
+
+.examToolbar small {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.43);
+  font-size: 8px;
+  text-transform: capitalize;
+}
+
+.examToolbar nav {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+}
+
+.examToolbar nav span {
+  padding: 7px 10px;
+  color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 9px;
+  font-size: 8px;
+}
+
+.examToolbar nav span[data-state="current"] {
+  color: #18362b;
+  background: #f1ad89;
+}
+
+.examToolbar nav span[data-state="done"] {
+  color: #b8d8c5;
+}
+
+.examToolbar time {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+.mockSplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.mockScroll {
+  max-height: calc(100vh - 125px);
+  overflow-y: auto;
+}
+
+.audioExam {
+  min-height: calc(100vh - 125px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.audioExam > div {
+  width: 110px;
+  height: 110px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #173b2f;
+  border-radius: 50%;
+  box-shadow: 0 20px 40px rgba(21, 58, 45, 0.2);
+}
+
+.audioExam h1 {
+  margin: 24px 0 5px;
+  font-family: Georgia, serif;
+  font-weight: 500;
+}
+
+.mockQuestions {
+  display: grid;
+  gap: 11px;
+  margin-bottom: 18px;
+}
+
+.mockQuestions fieldset {
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+
+.mockQuestions legend {
+  padding-bottom: 9px;
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.mockQuestions fieldset > div {
+  display: grid;
+  gap: 6px;
+}
+
+.mockQuestions label {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  color: #536059;
+  background: #f4f1ea;
+  border-radius: 8px;
+  font-size: 8px;
+}
+
+.mockPassage {
+  color: #37443d !important;
+  font-family: Georgia, serif;
+  font-size: 12px !important;
+  line-height: 1.85 !important;
+}
+
+.writingExam {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 18px;
+  min-height: calc(100vh - 125px);
+}
+
+.writingExam > div:first-child {
+  grid-row: 1 / 3;
+  padding: 20px;
+  background: #eeebe3;
+  border-radius: 14px;
+}
+
+.writingExam h1 {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.writingExam > div:first-child > span {
+  display: inline-flex;
+  margin-top: 20px;
+  padding: 7px 9px;
+  color: #315e49;
+  background: #dcebe2;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.writingExam textarea {
+  width: 100%;
+  min-height: 570px;
+  resize: none;
+  padding: 26px;
+  color: #26342d;
+  background:
+    repeating-linear-gradient(
+      #fffefb,
+      #fffefb 27px,
+      #e9ece9 28px
+    );
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  line-height: 28px;
+}
+
+.writingExam > button {
+  justify-self: end;
+}
+
+.resultHero {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 18px;
+  padding: 31px;
+}
+
+.resultHero > div:first-child small,
+.resultHero > div:first-child strong {
+  display: block;
+}
+
+.resultHero > div:first-child small {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.resultHero > div:first-child strong {
+  margin-top: 4px;
+  font-family: Georgia, serif;
+  font-size: 52px;
+  font-weight: 500;
+}
+
+.resultSkills {
+  display: flex;
+  gap: 11px;
+}
+
+.resultSkills span {
+  min-width: 120px;
+  padding: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 11px;
+  font-size: 8px;
+}
+
+.resultSkills b {
+  display: block;
+  margin-top: 4px;
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 21px;
+  font-weight: 500;
+}
+

@@ -1,5 +1,8 @@
-import { LearningDashboard } from "@/components/learning-dashboard";
+import { Dashboard } from "@/components/dashboard";
+import { getDashboardSnapshot } from "@/server/store";
+
+export const dynamic = "force-dynamic";
 
 export default function Home() {
-  return <LearningDashboard />;
+  return <Dashboard initial={getDashboardSnapshot()} />;
 }

@@ -1,70 +1,75 @@
 # ISTS — IELTS Study OS
 
-ISTS is an open-source, desktop-first IELTS learning workspace for a single
-learner. It combines daily planning, vocabulary review, Listening/Reading/
-Writing practice, mock exams, mistake review, and an AI English coach in one
-long-lived system.
+ISTS is an open-source, desktop-first IELTS learning workspace for one learner.
+It combines a durable study history, spaced-repetition vocabulary, objective
+Listening/Reading practice, Writing feedback, full computer mock flows,
+mistake review, material import, analytics, and a persistent AI English coach.
 
-The first milestone is a working learning cockpit. Later milestones will add a
-local database, spaced repetition, material import, computer-based mock exams,
-AI writing feedback, and optional Notion backup.
+Speaking practice is intentionally out of scope.
 
-## Current milestone
+## What is implemented
 
-- Desktop-first learning dashboard
-- Interactive daily study loop
-- Weighted study progress
-- Vocabulary review preview
-- Mock-exam runway
-- 小C coach interaction preview
-- Accessible focus states and reduced-motion support
-- Unit-tested study progress calculation
+- Daily Study Loop with persistent completion and weighted minutes
+- 女仆小C AI coach for Chinese, English, and mixed-language questions
+- Natural-English rewrites and ordered AI provider fallback
+- SQLite vocabulary deck with Again / Hard / Good / Easy SRS
+- Original Academic Reading and Listening drills with timing and evidence
+- Browser-based English audio playback and imported audio playback
+- Task 1/2 writing editor, timer, word count, AI criteria feedback, and history
+- Listening → Reading → Writing computer mock with combined results
+- Automatic mistake-to-review queue
+- Attempt, writing, and mock analytics
+- Text, PDF, DOCX, image, and audio material import
+- AI generation of editable practice sets from imported text
+- Full JSON export and optional one-way Notion backup
+- Desktop UI designed for a private, single-user deployment
 
-## Product principles
-
-1. **One learner, one durable history.** No multi-tenant coaching-centre
-   complexity.
-2. **Practice before decoration.** Every module must create a useful learning
-   signal or review item.
-3. **English by default, Chinese when blocked.** The coach helps the learner
-   turn Chinese intent into natural English.
-4. **Private material import.** The application stores only original, licensed,
-   public-domain, or user-supplied learning material.
-5. **Local-first data.** The core learning history must remain usable without
-   Notion or a third-party database.
-
-## Planned modules
-
-- AI coach and expression correction
-- Vocabulary decks and spaced repetition
-- Listening practice with audio playback
-- Reading practice and evidence review
-- Writing Task 1/2 workspace and structured evaluation
-- Full computer-based mock exams
-- Progress analytics and mistake patterns
-- PDF/Word/audio material importer
-- Optional Notion backup and export
-
-Speaking practice is intentionally out of scope for the first product.
+The repository includes only original sample exercises. Bring your own
+licensed, public-domain, or personally created learning material.
 
 ## Technology
 
-- Next.js App Router
-- React + TypeScript
-- Tailwind CSS 4 plus scoped CSS Modules
+- Next.js App Router, React, TypeScript
+- SQLite through `better-sqlite3`
+- Zod validation
+- CSS Modules and Tailwind CSS 4
 - Vitest
-- Planned: SQLite and an OpenAI-compatible model provider
+- OpenAI Responses API or Chat Completions-compatible providers
+- Optional Notion API backup
 
-## Development
+## Quick start
+
+Requirements: Node.js 22+ and pnpm.
 
 ```bash
 pnpm install
+cp .env.example .env.local
 pnpm dev
 ```
 
 Open `http://localhost:3000`.
 
-Validation:
+The database is created automatically at `data/ists.db`. It is excluded from
+Git.
+
+## AI provider configuration
+
+Providers are tried in this order:
+
+1. `AI_PROVIDERS_JSON`
+2. `AI_BASE_URL`, `AI_API_KEY`, and `AI_MODEL`
+3. the active Codex configuration under `CODEX_HOME` or `~/.codex`
+
+Example ordered list:
+
+```env
+AI_PROVIDERS_JSON=[{"name":"primary","baseUrl":"https://api.example.com/v1","apiKey":"...","model":"gpt-5","wireApi":"responses"},{"name":"backup","baseUrl":"https://backup.example.com/v1","apiKey":"...","model":"model-name","wireApi":"chat-completions"}]
+```
+
+Keys stay server-side. If every provider fails, coach and writing modules use a
+deterministic local fallback instead of losing saved work.
+
+## Validation
 
 ```bash
 pnpm test
@@ -73,17 +78,34 @@ pnpm lint
 pnpm build
 ```
 
-## Configuration
+The test suite covers study progress, SRS scheduling, objective scoring,
+estimated bands, mock overall rounding, and provider fallback order.
 
-Copy `.env.example` to `.env.local`. Do not commit real API keys.
+## Data and backup
+
+- SQLite: `data/ists.db`
+- Uploaded private files: `data/uploads/`
+- JSON export: Settings → **Download JSON backup**
+- Optional Notion snapshot: Settings → **Backup to Notion now**
+
+See [`docs/BACKUP.md`](./docs/BACKUP.md).
+
+## Deployment
+
+See [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) for a production deployment
+using a dedicated process, persistent data directory, and Nginx Basic
+Authentication.
 
 ## Architecture
 
 - Product vocabulary: [`CONTEXT.md`](./CONTEXT.md)
-- Initial architecture decision:
+- Product specification: [`docs/PRODUCT.md`](./docs/PRODUCT.md)
+- Local-first decision:
   [`docs/adr/0001-local-first-single-user-web-app.md`](./docs/adr/0001-local-first-single-user-web-app.md)
 - Learning-material policy:
   [`docs/adr/0002-user-supplied-learning-materials.md`](./docs/adr/0002-user-supplied-learning-materials.md)
+- AI fallback:
+  [`docs/adr/0003-ai-provider-fallback.md`](./docs/adr/0003-ai-provider-fallback.md)
 
 ## License
 
