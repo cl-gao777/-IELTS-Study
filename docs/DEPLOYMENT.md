@@ -42,6 +42,8 @@ AI_API_KEY=
 AI_MODEL=
 NOTION_TOKEN=
 NOTION_PARENT_PAGE_ID=
+ISTS_BASIC_AUTH_USER=aimer
+ISTS_BASIC_AUTH_PASSWORD=use-a-long-random-password
 ```
 
 If the server already has a working Codex configuration, ISTS can discover it
@@ -55,9 +57,9 @@ as systemd or PM2. Configure automatic restart and load
 
 ## Nginx
 
-Proxy a dedicated hostname to `127.0.0.1:3210`. Because ISTS is a single-user
-workspace without public registration, protect the site with Basic
-Authentication or another private access layer.
+Proxy a dedicated hostname to `127.0.0.1:3210`. The application-level Basic
+Authentication variables above protect pages, APIs, exports, and uploaded
+files. Nginx authentication can be added as a second layer if desired.
 
 ```nginx
 server {
@@ -90,4 +92,3 @@ Validate Nginx configuration before reloading it.
 4. Build.
 5. Restart only the ISTS process.
 6. Check `/`, `/coach`, `/practice/reading`, `/writing`, and `/settings`.
-

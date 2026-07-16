@@ -69,6 +69,10 @@ AI_PROVIDERS_JSON=[{"name":"primary","baseUrl":"https://api.example.com/v1","api
 Keys stay server-side. If every provider fails, coach and writing modules use a
 deterministic local fallback instead of losing saved work.
 
+For an internet-reachable single-user deployment, set
+`ISTS_BASIC_AUTH_USER` and `ISTS_BASIC_AUTH_PASSWORD`. The app then protects
+pages, APIs, exports, and uploaded files with HTTP Basic Authentication.
+
 ## Validation
 
 ```bash
