@@ -58,7 +58,14 @@ export async function importMaterialFile(input: {
     throw new Error("File size must be between 1 byte and 25 MB.");
   }
   const buffer = Buffer.from(await input.file.arrayBuffer());
-  const uploadDirectory = path.join(process.cwd(), "data", "uploads");
+  const configuredUploadDirectory =
+    process.env.UPLOAD_DIR?.trim() || "./data/uploads";
+  const uploadDirectory = path.isAbsolute(configuredUploadDirectory)
+    ? configuredUploadDirectory
+    : path.join(
+        /* turbopackIgnore: true */ process.cwd(),
+        configuredUploadDirectory,
+      );
   await mkdir(uploadDirectory, { recursive: true });
   const storedName = `${randomUUID()}${safeExtension(input.file.name)}`;
   const storedPath = path.join(uploadDirectory, storedName);

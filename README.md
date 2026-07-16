@@ -94,6 +94,9 @@ estimated bands, mock overall rounding, and provider fallback order.
 
 See [`docs/BACKUP.md`](./docs/BACKUP.md).
 
+Both locations can be moved outside the checkout with `DATABASE_URL` and
+`UPLOAD_DIR`.
+
 ## Deployment
 
 See [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) for a production deployment

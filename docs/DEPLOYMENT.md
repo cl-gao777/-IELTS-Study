@@ -35,6 +35,7 @@ NODE_ENV=production
 PORT=3210
 HOSTNAME=127.0.0.1
 DATABASE_URL=file:./data/ists.db
+UPLOAD_DIR=/www/wwwroot/ists/shared/data/uploads
 APP_TIME_ZONE=Asia/Shanghai
 AI_PROVIDERS_JSON=
 AI_BASE_URL=
