@@ -52,8 +52,10 @@ from `CODEX_HOME` or the service user's `~/.codex`.
 
 ## Process
 
-Run `pnpm start -- -H 127.0.0.1 -p 3210` under a dedicated process manager such
-as systemd or PM2. Configure automatic restart and load
+`pnpm build` also creates `.next/standalone`, which is useful when the target
+server has slow package-registry access. Copy `public` and `.next/static` into
+that directory, transfer the artifact, then run `node server.js` under a
+dedicated process manager. Configure automatic restart and load
 `shared/.env.production`.
 
 ## Nginx
