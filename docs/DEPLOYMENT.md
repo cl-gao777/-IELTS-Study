@@ -53,10 +53,39 @@ from `CODEX_HOME` or the service user's `~/.codex`.
 ## Process
 
 `pnpm build` also creates `.next/standalone`, which is useful when the target
-server has slow package-registry access. Copy `public` and `.next/static` into
-that directory, transfer the artifact, then run `node server.js` under a
-dedicated process manager. Configure automatic restart and load
-`shared/.env.production`.
+server has slow package-registry access. Build the artifact for the same
+operating system and CPU architecture as the server because `better-sqlite3`
+contains a native binary.
+
+Do not build the standalone directory directly on Windows and copy it to Linux.
+That also breaks pnpm's platform-specific symlink layout. On Windows with Docker
+Desktop, export a Linux artifact instead:
+
+```powershell
+.\scripts\export-linux-standalone.ps1
+```
+
+The script builds the `runner` stage from `Dockerfile`, copies `public` and
+`.next/static` into the standalone runtime, and writes a Linux tarball plus its
+SHA-256 digest under `output/`.
+
+On the server:
+
+```bash
+mkdir -p /www/wwwroot/ists/releases/RELEASE_ID
+sha256sum /tmp/ists-linux-standalone-COMMIT.tar.gz
+tar -xzf /tmp/ists-linux-standalone-COMMIT.tar.gz \
+  -C /www/wwwroot/ists/releases/RELEASE_ID
+cd /www/wwwroot/ists/releases/RELEASE_ID
+set -a
+source /www/wwwroot/ists/shared/.env.production
+set +a
+node server.js
+```
+
+Run `node server.js` under a dedicated process manager for automatic restart.
+The database and uploads must remain in `shared/data`, outside the release
+directory.
 
 ## Nginx
 
