@@ -3,9 +3,11 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import mammoth from "mammoth";
-import pdf from "pdf-parse/lib/pdf-parse.js";
+import { getPath } from "pdf-parse/worker";
+import { PDFParse } from "pdf-parse";
 
 import type { SourceMaterial } from "@/lib/domain";
 import { htmlToPlainText } from "@/lib/material-text";
@@ -22,7 +24,7 @@ function safeExtension(fileName: string) {
     .slice(0, 12);
 }
 
-async function extractText(buffer: Buffer, file: File) {
+export async function extractMaterialText(buffer: Buffer, file: File) {
   const extension = path.extname(file.name).toLocaleLowerCase("en");
   if ([".html", ".htm"].includes(extension) || file.type === "text/html") return htmlToPlainText(buffer.toString("utf8"));
   if (
@@ -32,7 +34,12 @@ async function extractText(buffer: Buffer, file: File) {
     return buffer.toString("utf8");
   }
   if (file.type === "application/pdf" || extension === ".pdf") {
-    return (await pdf(buffer)).text.trim();
+    // Use the package's local worker, never a CDN. A separate Uint8Array avoids
+    // transferring a pooled Node Buffer's backing store on modern Node/Windows.
+    PDFParse.setWorker(pathToFileURL(getPath()).href);
+    const parser = new PDFParse({ data: new Uint8Array(buffer), isEvalSupported: false });
+    try { return (await parser.getText({ pageJoiner: "\n\n" })).text.trim(); }
+    finally { await parser.destroy(); }
   }
   if (
     file.type ===
@@ -60,7 +67,7 @@ export async function importMaterialFile(input: {
     throw new Error("File size must be between 1 byte and 25 MB.");
   }
   const buffer = Buffer.from(await input.file.arrayBuffer());
-  const content = await extractText(buffer, input.file);
+  const content = await extractMaterialText(buffer, input.file);
   const configuredUploadDirectory =
     process.env.UPLOAD_DIR?.trim() || "./data/uploads";
   const uploadDirectory = path.isAbsolute(configuredUploadDirectory)
