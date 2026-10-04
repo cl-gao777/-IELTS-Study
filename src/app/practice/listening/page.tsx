@@ -1,13 +1,9 @@
-import { notFound } from "next/navigation";
-
-import { PracticeRunner } from "@/components/practice-runner";
-import { listPracticeSets } from "@/server/store";
+import { PracticeLibrary } from "@/components/practice-library";
+import { listPracticeSets, listMaterials } from "@/server/store";
 
 export const dynamic = "force-dynamic";
 
 export default function ListeningPracticePage() {
-  const set = listPracticeSets("listening")[0];
-  if (!set) notFound();
-  return <PracticeRunner set={set} />;
+  return <PracticeLibrary kind="listening" sets={listPracticeSets("listening")} materials={listMaterials().filter((material) => material.kind === "listening")} />;
 }
 

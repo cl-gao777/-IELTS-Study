@@ -15,7 +15,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const parsed = materialSchema.safeParse(await request.json());
+  const parsed = materialSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(
       { error: "The material is incomplete." },

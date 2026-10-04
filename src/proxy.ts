@@ -12,6 +12,15 @@ function unauthorized() {
 }
 
 export function proxy(request: NextRequest) {
+  if (!['GET','HEAD','OPTIONS'].includes(request.method)) {
+    const origin = request.headers.get('origin');
+    const host = request.headers.get('host');
+    try {
+      if (request.headers.get('sec-fetch-site') === 'cross-site' || (origin && new URL(origin).host !== host)) {
+        return new NextResponse('Cross-origin writes are not allowed.', { status: 403 });
+      }
+    } catch { return new NextResponse('Invalid origin.', {status:403}); }
+  }
   const expectedUser = process.env.ISTS_BASIC_AUTH_USER?.trim();
   const expectedPassword = process.env.ISTS_BASIC_AUTH_PASSWORD?.trim();
   if (!expectedUser || !expectedPassword) {

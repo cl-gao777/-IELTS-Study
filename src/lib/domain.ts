@@ -35,7 +35,18 @@ export type PracticeKind = "reading" | "listening";
 export type QuestionKind =
   | "short-answer"
   | "multiple-choice"
-  | "true-false-not-given";
+  | "true-false-not-given"
+  | "yes-no-not-given"
+  | "matching-headings"
+  | "matching-information"
+  | "matching-features"
+  | "sentence-completion"
+  | "summary-completion"
+  | "table-completion"
+  | "form-completion"
+  | "note-completion"
+  | "matching"
+  | "map-labelling";
 
 export interface PracticeQuestion {
   id: string;
@@ -44,6 +55,9 @@ export interface PracticeQuestion {
   options?: string[];
   answers: string[];
   explanation: string;
+  evidence?: string;
+  imageUrl?: string;
+  maxWords?: number;
 }
 
 export interface PracticeSet {
@@ -127,6 +141,9 @@ export interface ReviewItem {
   answer: string;
   resolved: boolean;
   createdAt: string;
+  category?: string;
+  mistakeCount?: number;
+  reviewedAt?: string;
 }
 
 export interface DashboardSnapshot {
@@ -144,4 +161,8 @@ export interface DashboardSnapshot {
     overall: number;
   };
   streak: number;
+  dailyMinutes: number;
+  todayMinutes: number;
+  targetBand: number;
+  displayName: string;
 }

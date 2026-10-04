@@ -10,7 +10,7 @@ const globalDatabase = globalThis as typeof globalThis & {
   istsDatabase?: Database.Database;
 };
 
-function databasePath() {
+export function databasePath() {
   const configured = process.env.DATABASE_URL ?? "file:./data/ists.db";
   const filePath = configured.startsWith("file:")
     ? configured.slice("file:".length)
@@ -22,7 +22,7 @@ function databasePath() {
   return resolved;
 }
 
-function migrate(database: Database.Database) {
+export function migrate(database: Database.Database) {
   database.exec(`
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
@@ -192,13 +192,14 @@ function migrate(database: Database.Database) {
 }
 
 function seed(database: Database.Database) {
+  if (database.prepare("SELECT 1 FROM studio_migrations WHERE id='initial-seed'").get()) return;
   const now = new Date().toISOString();
 
   database
     .prepare(
       `INSERT OR IGNORE INTO settings
        (id, display_name, target_band, daily_minutes, notion_database_id, updated_at)
-       VALUES (1, 'Aimer', 7.0, 90, '', ?)`,
+       VALUES (1, '学习者', 6.5, 60, '', ?)`,
     )
     .run(now);
 
@@ -252,6 +253,7 @@ function seed(database: Database.Database) {
         now,
       );
     }
+    database.prepare("INSERT OR IGNORE INTO studio_migrations(id) VALUES ('initial-seed')").run();
   })();
 }
 
@@ -259,9 +261,23 @@ export function getDatabase() {
   if (!globalDatabase.istsDatabase) {
     const database = new Database(databasePath());
     migrate(database);
+    migrateStudio(database);
     seed(database);
     globalDatabase.istsDatabase = database;
   }
 
   return globalDatabase.istsDatabase;
+}
+
+function migrateStudio(database: Database.Database) {
+  const columns = new Set((database.prepare('PRAGMA table_info(review_items)').all() as {name:string}[]).map(c => c.name));
+  for (const [name, definition] of [['category', "TEXT NOT NULL DEFAULT ''"], ['mistake_count', 'INTEGER NOT NULL DEFAULT 1'], ['reviewed_at', "TEXT NOT NULL DEFAULT ''"]]) {
+    if (!columns.has(name)) database.exec(`ALTER TABLE review_items ADD COLUMN ${name} ${definition}`);
+  }
+  database.exec(`CREATE TABLE IF NOT EXISTS study_sessions (
+    id TEXT PRIMARY KEY, study_date TEXT NOT NULL, area TEXT NOT NULL,
+    duration_seconds INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL
+  ); CREATE TABLE IF NOT EXISTS studio_preferences (
+    id INTEGER PRIMARY KEY CHECK(id=1), value_json TEXT NOT NULL
+  ); CREATE TABLE IF NOT EXISTS studio_migrations (id TEXT PRIMARY KEY);`);
 }

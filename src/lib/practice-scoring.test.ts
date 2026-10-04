@@ -42,7 +42,28 @@ describe("calculateAcademicBand", () => {
     expect(calculateAcademicBand(23, 40, "listening")).toBe(6);
   });
 
-  it("scales shorter original practice sets to a forty-question equivalent", () => {
-    expect(calculateAcademicBand(6, 8, "reading")).toBe(7);
+  it("does not invent a band from a short drill", () => {
+    expect(calculateAcademicBand(6, 8, "reading")).toBe(0);
   });
+});
+
+it('scores missing, alternate, punctuation, spelling and word-limit cases explicitly', () => {
+  const questions = [
+    {id:'a',answers:['native flowers'],maxWords:2},
+    {id:'b',answers:['False']},
+    {id:'c',answers:['20','twenty']},
+    {id:'d',answers:['economy']},
+    {id:'e',answers:['the local council'],maxWords:2},
+  ];
+  const result=scoreObjectiveAnswers({a:' Native   Flowers. ',c:'TWENTY',d:'econmy',e:'the local council'},questions);
+  expect(result.correct).toBe(2);
+  expect(result.details.find(d=>d.id==='b')?.correct).toBe(false);
+});
+
+it('uses different full-test reading and listening conversion thresholds',()=>{
+ expect(calculateAcademicBand(15,40,'reading')).toBe(5);
+ expect(calculateAcademicBand(15,40,'listening')).toBe(4.5);
+ expect(calculateAcademicBand(40,40,'reading')).toBe(9);
+ expect(calculateAcademicBand(0,40,'listening')).toBe(0);
+ expect(calculateAcademicBand(1,0,'reading')).toBe(0);
 });

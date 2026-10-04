@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import {retrieveTutorContext} from "@/server/tutor-context";
 import { createCoachReply } from "@/server/ai";
 import { listCoachMessages, saveCoachTurn } from "@/server/store";
 
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const reply = await createCoachReply(parsed.data.message);
+  const reply = await createCoachReply(parsed.data.message,retrieveTutorContext(parsed.data.message));
   saveCoachTurn({
     user: parsed.data.message,
     assistant: reply.answer,

@@ -16,9 +16,9 @@ interface LiveMessage {
 }
 
 export function CoachWorkspace({
-  initialMessages,
+  initialMessages, initialInput="",
 }: {
-  initialMessages: CoachMessage[];
+  initialMessages: CoachMessage[]; initialInput?:string;
 }) {
   const [messages, setMessages] = useState<LiveMessage[]>(
     initialMessages.map((message) => ({
@@ -26,7 +26,7 @@ export function CoachWorkspace({
       id: String(message.id),
     })),
   );
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(initialInput);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -47,7 +47,6 @@ export function CoachWorkspace({
         provider: "",
       },
     ]);
-    setInput("");
     setBusy(true);
     setError("");
 
@@ -67,9 +66,10 @@ export function CoachWorkspace({
         };
       };
       if (!response.ok || !payload.reply) {
-        throw new Error(payload.error ?? "小C暂时没有收到这条消息。");
+        throw new Error(payload.error ?? "Tutor暂时没有收到这条消息。");
       }
       const reply = payload.reply;
+      setInput((current) => current.trim() === message ? "" : current);
       setMessages((current) => [
         ...current,
         {
@@ -83,6 +83,7 @@ export function CoachWorkspace({
         },
       ]);
     } catch (caught) {
+      setMessages((current) => current.filter((item) => item.id !== optimisticId));
       setError(caught instanceof Error ? caught.message : "Request failed.");
     } finally {
       setBusy(false);
@@ -100,13 +101,13 @@ export function CoachWorkspace({
     <div className={ui.page}>
       <header className={ui.pageHeader}>
         <div>
-          <p className={ui.eyebrow}>Persistent English companion</p>
-          <h1>女仆小C · IELTS Coach</h1>
+          <p className={ui.eyebrow}>CONTEXTUAL IELTS TUTOR</p>
+          <h1>IELTS Tutor · IELTS Coach</h1>
           <p>
             直接说你的真实问题。中文会被转换成可复制的自然英文，英文会被轻量纠正，然后继续对话。
           </p>
         </div>
-        <span className={ui.statusPill}>Provider fallback enabled</span>
+        <span className={ui.statusPill}>按需使用 AI</span>
       </header>
 
       <div className={styles.coachLayout}>
@@ -116,7 +117,7 @@ export function CoachWorkspace({
               <div className={styles.welcomeMessage}>
                 <span>C</span>
                 <div>
-                  <strong>女仆小C</strong>
+                  <strong>IELTS Tutor</strong>
                   <p>
                     晚上好。试着用英语问我；卡住时直接输入中文，我会告诉你自然表达。
                   </p>
@@ -133,7 +134,7 @@ export function CoachWorkspace({
                 key={message.id}
               >
                 <header>
-                  {message.role === "user" ? "You" : "🎀 女仆小C回复"}
+                  {message.role === "user" ? "You" : "IELTS Tutor"}
                   {message.provider && <small>{message.provider}</small>}
                 </header>
                 {message.correction && (
@@ -152,7 +153,7 @@ export function CoachWorkspace({
                 <i />
                 <i />
                 <i />
-                小C正在整理表达和回答…
+                Tutor正在整理表达和回答…
               </div>
             )}
           </div>
@@ -163,18 +164,18 @@ export function CoachWorkspace({
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter" && !event.shiftKey) {
+                if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
                   event.preventDefault();
                   formRef.current?.requestSubmit();
                 }
               }}
-              placeholder="Ask in English — 中文也可以。Enter 发送，Shift + Enter 换行。"
+              placeholder="Ask in English — 中文也可以。Ctrl + Enter 发送。"
               rows={4}
             />
             <div>
               <small>{input.length}/8000</small>
               <button type="submit" disabled={busy || !input.trim()}>
-                {busy ? "Thinking…" : "Send to 小C ↑"}
+                {busy ? "Thinking…" : "Send to Tutor ↑"}
               </button>
             </div>
           </form>
@@ -209,7 +210,7 @@ export function CoachWorkspace({
             <p className={ui.eyebrow}>How feedback works</p>
             <h2>不打断表达</h2>
             <p>
-              小C只优先改最影响自然度或准确性的部分，并保留你的原意。更系统的错误会进入写作反馈或错题复盘。
+              Tutor只优先改最影响自然度或准确性的部分，并保留你的原意。更系统的错误会进入写作反馈或错题复盘。
             </p>
           </section>
         </aside>

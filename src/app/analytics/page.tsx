@@ -1,139 +1,73 @@
+import Link from "next/link";
 import ui from "@/components/page-ui.module.css";
-import {
-  listAttempts,
-  listMockExams,
-  listWritingSubmissions,
-} from "@/server/store";
+import styles from "@/components/analytics.module.css";
+import { QUESTION_TYPES } from "@/lib/question-types";
+import type { QuestionTypeMetric } from "@/lib/learning-analytics";
+import { getLearningAnalytics } from "@/server/analytics";
 
 export const dynamic = "force-dynamic";
-
-function average(values: number[]) {
-  return values.length
-    ? values.reduce((sum, value) => sum + value, 0) / values.length
-    : 0;
+const percent = (value: number | null) => value === null ? "—" : `${value.toFixed(0)}%`;
+function typeLabel(kind: string) { return kind in QUESTION_TYPES ? QUESTION_TYPES[kind as keyof typeof QUESTION_TYPES].label : "历史未标注题型"; }
+function TypeTable({ rows }: { rows: QuestionTypeMetric[] }) {
+  return rows.length ? <div className={styles.tableWrap}><table className={ui.table}><thead><tr><th>题型</th><th>正确 / 总题数</th><th>正确率</th><th>估计秒 / 题</th></tr></thead><tbody>{rows.map((row) => <tr key={row.kind}><td>{typeLabel(row.kind)}</td><td>{row.correct}/{row.total}</td><td>{percent(row.accuracy)}</td><td>{row.secondsPerQuestion.toFixed(0)}</td></tr>)}</tbody></table></div> : <div className={ui.empty}>提交实际题目后，按题型显示强项与弱项。</div>;
+}
+function Distribution({ rows, empty }: { rows: { label: string; count: number }[]; empty: string }) {
+  const max = Math.max(1, ...rows.map((row) => row.count));
+  return rows.length ? <div className={styles.distribution}>{rows.map((row) => <div key={row.label}><span>{row.label}</span><div className={styles.track}><i style={{ width: `${row.count / max * 100}%` }} /></div><strong>{row.count}</strong></div>)}</div> : <div className={ui.empty}>{empty}</div>;
 }
 
 export default function AnalyticsPage() {
-  const attempts = listAttempts(30);
-  const writing = listWritingSubmissions(20);
-  const mocks = listMockExams(10);
-  const reading = attempts.filter((attempt) => attempt.kind === "reading");
-  const listening = attempts.filter((attempt) => attempt.kind === "listening");
-
-  return (
-    <div className={ui.page}>
-      <header className={ui.pageHeader}>
-        <div>
-          <p className={ui.eyebrow}>Learning signals</p>
-          <h1>Progress analytics</h1>
-          <p>
-            只根据你在 ISTS 中提交的练习计算。数据少时显示基线，而不是制造虚假的精确度。
-          </p>
-        </div>
-      </header>
-
-      <section className={ui.grid3}>
-        <div className={ui.metric}>
-          <small>Listening average</small>
-          <strong>
-            {listening.length
-              ? average(listening.map((item) => item.bandScore)).toFixed(1)
-              : "—"}
-          </strong>
-          <span>{listening.length} submitted attempts</span>
-        </div>
-        <div className={ui.metric}>
-          <small>Reading average</small>
-          <strong>
-            {reading.length
-              ? average(reading.map((item) => item.bandScore)).toFixed(1)
-              : "—"}
-          </strong>
-          <span>{reading.length} submitted attempts</span>
-        </div>
-        <div className={ui.metric}>
-          <small>Writing average</small>
-          <strong>
-            {writing.length
-              ? average(writing.map((item) => item.overallBand)).toFixed(1)
-              : "—"}
-          </strong>
-          <span>{writing.length} evaluated drafts</span>
-        </div>
-      </section>
-
-      <br />
-      <div className={ui.grid2}>
-        <section className={ui.panel}>
-          <div className={ui.panelHeader}>
-            <div>
-              <p className={ui.eyebrow}>Objective practice</p>
-              <h2>Recent attempts</h2>
-            </div>
-          </div>
-          {attempts.length ? (
-            <table className={ui.table}>
-              <thead>
-                <tr>
-                  <th>Skill</th>
-                  <th>Raw</th>
-                  <th>Band</th>
-                  <th>Duration</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attempts.map((attempt) => (
-                  <tr key={attempt.id}>
-                    <td>{attempt.kind}</td>
-                    <td>
-                      {attempt.rawScore}/{attempt.totalQuestions}
-                    </td>
-                    <td>{attempt.bandScore.toFixed(1)}</td>
-                    <td>{Math.round(attempt.durationSeconds / 60)} min</td>
-                    <td>
-                      {new Date(attempt.submittedAt).toLocaleDateString(
-                        "zh-CN",
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className={ui.empty}>No submitted practice yet.</div>
-          )}
-        </section>
-
-        <section className={ui.panel}>
-          <div className={ui.panelHeader}>
-            <div>
-              <p className={ui.eyebrow}>Full simulations</p>
-              <h2>Mock history</h2>
-            </div>
-          </div>
-          {mocks.length ? (
-            <div className={ui.list}>
-              {mocks.map((mock) => (
-                <div className={ui.listItem} key={mock.id}>
-                  <strong>
-                    Mock #{mock.id} · Estimated{" "}
-                    {Number(mock.overall_band).toFixed(1)}
-                  </strong>
-                  <small>
-                    {new Date(mock.submitted_at).toLocaleString("zh-CN")}
-                  </small>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className={ui.empty}>
-              Complete the full computer mock to create a report.
-            </div>
-          )}
-        </section>
-      </div>
+  const data = getLearningAnalytics();
+  const recentWriting = data.writing.slice(0, 12);
+  const date = (value: string) => new Intl.DateTimeFormat("zh-CN", { timeZone: data.timeZone, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+  const grammar = data.writing.length ? data.writing.reduce((sum, row) => sum + row.criteria.grammarAccuracy, 0) / data.writing.length : null;
+  const unfinishedBaseline = !data.reading.total || !data.listening.total || !data.completedDrafts;
+  const reasonCount = (rows: { count: number }[]) => rows.reduce((sum, row) => sum + row.count, 0);
+  const maxMinutes = Math.max(1, ...data.study.minutesByDay.map((day) => day.minutes));
+  return <div className={ui.page}>
+    <header className={ui.pageHeader}><div><p className={ui.eyebrow}>Learning signals</p><h1>学习分析</h1><p>根据本地练习、复习与学习记录，决定下一次把时间投在哪里。所有百分比按真实答题数量计算。</p></div><Link href="/" className={ui.buttonSecondary}>返回 Today</Link></header>
+    <section className={`${ui.panel} ${styles.focus}`}>
+      <div><p className={ui.eyebrow}>Next focus</p><h2>{data.focus.text}</h2><p>样本较少、重复作答或材料难度不同，都可能影响正确率。这些记录用于安排训练，不据此推算 IELTS 总分。</p></div><Link href={data.focus.href} className={ui.button}>开始针对练习</Link>
+    </section>
+    <div className={styles.metrics}>
+      <div className={ui.metric}><small>Reading 正确率</small><strong>{percent(data.reading.accuracy)}</strong><span>{data.reading.correct}/{data.reading.total} 题 · {data.reading.attempts} 次练习</span></div>
+      <div className={ui.metric}><small>Listening 正确率</small><strong>{percent(data.listening.accuracy)}</strong><span>{data.listening.correct}/{data.listening.total} 题 · {data.listening.attempts} 次练习</span></div>
+      <div className={ui.metric}><small>今日学习</small><strong>{data.study.todayMinutes.toFixed(1)} <small className={styles.inlineUnit}>min</small></strong><span>近 7 天 {data.study.weekMinutes.toFixed(0)} 分钟 · {data.study.daysThisWeek}/7 天</span></div>
+      <div className={ui.metric}><small>连续学习</small><strong>{data.study.streak} <small className={styles.inlineUnit}>天</small></strong><span>依据实际记录的前台学习时长</span></div>
     </div>
-  );
+    <section className={`${ui.panel} ${styles.section}`}><p className={ui.eyebrow}>Initial assessment</p><h2>{unfinishedBaseline ? "建立你的实际学习基线" : "已收集阅读、听力与写作样本"}</h2>
+      <div className={styles.baseline}><Link href="/practice/reading">Reading · {data.reading.total ? `已有 ${data.reading.total} 道作答` : "待完成第一组题目"}</Link><Link href="/practice/listening">Listening · {data.listening.total ? `已有 ${data.listening.total} 道作答` : "待完成第一组题目"}</Link><Link href="/writing">Writing · {data.completedDrafts ? `已完成 ${data.completedDrafts} 个版本` : "待完成首篇作文"}</Link></div>
+      <p>无需填写 CET 或考研成绩。首轮样本帮助选择训练方向；之后用新的材料持续验证。今日已完成写作 {data.completedWritingToday} 个版本。</p>
+    </section>
+    <div className={`${ui.grid2} ${styles.section}`}>
+      {([ ["Reading", data.reading, data.readingReasons], ["Listening", data.listening, data.listeningReasons] ] as const).map(([label, stats, reasons]) => <section className={ui.panel} key={label}>
+        <p className={ui.eyebrow}>{label} profile</p><h2>{label} · 按题型定位弱项</h2><TypeTable rows={stats.byType} />
+        <p>估计每题用时 = 该次练习总时长 ÷ 题数，不是逐题计时；该模块平均 {stats.secondsPerQuestion === null ? "—" : stats.secondsPerQuestion.toFixed(0)} 秒 / 题。</p>
+        <h3 className={styles.subheading}>错因分布</h3><Distribution rows={reasons} empty="在练习反馈中为错题选择原因，形成个人错误档案。" />
+        <p>已归因 {reasonCount(reasons)} 题；尚未归因 {Math.max(0, stats.total - stats.correct - reasonCount(reasons))} 题。</p>
+      </section>)}
+    </div>
+    <div className={`${ui.grid2} ${styles.section}`}>
+      <section className={ui.panel}><p className={ui.eyebrow}>Intensive listening</p><h2>听写差异 · {data.dictationAttempts} 次练习</h2>
+        <Distribution rows={data.dictationAttempts ? [{ label: "Missing word · 漏词", count: data.dictationErrors.missing }, { label: "Extra word · 多词", count: data.dictationErrors.extra }, { label: "Wrong word · 听错", count: data.dictationErrors.wrong }, { label: "Spelling · 拼写", count: data.dictationErrors.spelling }] : []} empty="导入音频与 transcript，完成听写后查看词语级差异。" /><p>拼写分类基于字符差异启发式；可在 Mistakes 对照原文复习。</p><Link href="/review" className={ui.buttonSecondary}>进入 Mistakes</Link>
+      </section>
+      <section className={ui.panel}><p className={ui.eyebrow}>Vocabulary retention</p><h2>词汇状态与实际回忆</h2>
+        <div className={styles.vocabularyStats}>{[["Known · 稳定卡", data.vocabulary.known], ["Learning · 学习中", data.vocabulary.learning], ["New · 未复习", data.vocabulary.new], ["Due · 当前到期", data.vocabulary.due]].map(([label, value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>
+        <p>稳定卡定义：已复习且当前间隔 ≥ 21 天；这是复习状态，不代表永久掌握。到期数包含新词。</p>
+        <p><strong>回忆成功率 {percent(data.vocabulary.retention)}</strong> · {data.vocabulary.reviews} 次自评中非 Again 的比例。答题型复习准确率 {percent(data.vocabulary.objectiveAccuracy)}。</p>
+        <h3 className={styles.subheading}>近 7 天复习量</h3><Distribution rows={data.vocabulary.reviewsByDay.map((day) => ({ label: day.date.slice(5), count: day.count }))} empty="暂无复习记录。" />
+      </section>
+    </div>
+    <section className={`${ui.panel} ${styles.section}`}><p className={ui.eyebrow}>Academic writing</p><h2>AI Estimated Band · 写作变化</h2><p>{data.writingDrafts} 个本地版本 · {data.writing.length} 次有 AI 来源的完整评估。{grammar !== null ? `GRA 平均 ${grammar.toFixed(1)}。` : "尚无 AI 评估。"}训练估分，不是官方成绩；Task 1 / Task 2 应分别比较。</p>
+      {recentWriting.length ? <div className={styles.tableWrap}><table className={ui.table}><thead><tr><th>时间</th><th>任务</th><th>AI Estimated Band</th><th>TA / TR</th><th>CC</th><th>LR</th><th>GRA</th><th>字数</th></tr></thead><tbody>{recentWriting.map((item) => <tr key={item.id}><td>{date(item.submittedAt)}</td><td>{item.taskType.toUpperCase()}</td><td><strong>{item.overallBand.toFixed(1)}</strong></td><td>{item.criteria.taskResponse.toFixed(1)}</td><td>{item.criteria.coherenceCohesion.toFixed(1)}</td><td>{item.criteria.lexicalResource.toFixed(1)}</td><td>{item.criteria.grammarAccuracy.toFixed(1)}</td><td>{item.wordCount}</td></tr>)}</tbody></table></div> : <div className={ui.empty}>无 AI 时仍可保存作文、改写和对比版本。配置 AI 后，真实反馈会形成这里的时间序列。</div>}
+      <h3 className={styles.subheading}>最常出现的写作错误</h3><Distribution rows={data.writingErrors} empty="结构化写作反馈中的语法与用词错误会自动进入 Mistakes，并按类别汇总。" />
+    </section>
+    <section className={`${ui.panel} ${styles.section}`}><p className={ui.eyebrow}>Study rhythm</p><h2>近 14 天学习分钟数</h2><p>仅累计页面前台活跃时长；离开页面、隐藏窗口或长时间无操作不会持续计时。</p>
+      <div className={styles.days}>{data.study.minutesByDay.map((day) => <div key={day.date}><span>{day.minutes.toFixed(1)}</span><div className={styles.dayTrack}><i style={{ height: `${day.minutes / maxMinutes * 100}%` }} /></div><small>{day.date.slice(5)}</small></div>)}</div>
+    </section>
+    <div className={`${ui.grid2} ${styles.section}`}>
+      <section className={ui.panel}><h2>最近 Reading / Listening</h2>{data.attempts.length ? <div className={styles.tableWrap}><table className={ui.table}><thead><tr><th>练习</th><th>正确 / 题数</th><th>时长</th><th>时间</th></tr></thead><tbody>{data.attempts.map((attempt) => <tr key={attempt.id}><td>{attempt.kind}<br />{attempt.title}</td><td>{attempt.correct}/{attempt.total}</td><td>{(attempt.seconds / 60).toFixed(1)} min</td><td>{date(attempt.submittedAt)}</td></tr>)}</tbody></table></div> : <div className={ui.empty}>完成首组练习后，实际结果会出现在这里。</div>}</section>
+      <section className={ui.panel}><h2>最近学习活动</h2>{data.activity.length ? <div className={ui.list}>{data.activity.map((item, index) => <Link href={item.href} className={`${ui.listItem} ${styles.activity}`} key={`${item.date}-${index}`}><strong>{item.label}</strong><small>{item.detail} · {date(item.date)}</small></Link>)}</div> : <div className={ui.empty}>尚无完成的练习。先从 Today 选择一个学习任务。</div>}</section>
+    </div>
+  </div>;
 }
-

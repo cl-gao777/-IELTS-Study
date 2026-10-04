@@ -139,6 +139,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
     questions: [
       {
         id: "r1",
+        evidence: "This urban heat island effect is partly caused by dark surfaces that absorb solar energy during the day and release it slowly at night.",
         kind: "short-answer",
         prompt:
           "What kind of surfaces absorb solar energy and release it at night?",
@@ -148,6 +149,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
       },
       {
         id: "r2",
+        evidence: "A single pocket park may have only a modest effect, but several connected sites can create corridors through which cooler air moves.",
         kind: "true-false-not-given",
         prompt:
           "A single pocket park always causes a major reduction in neighbourhood temperature.",
@@ -158,6 +160,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
       },
       {
         id: "r3",
+        evidence: "A tree that thrives today may struggle after two decades of hotter summers.",
         kind: "multiple-choice",
         prompt: "Why should tree species be chosen for future conditions?",
         options: [
@@ -174,6 +177,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
       },
       {
         id: "r4",
+        evidence: "Some municipalities now combine satellite temperature maps with public-health data.",
         kind: "short-answer",
         prompt:
           "Which two types of data are combined to locate vulnerable districts?",
@@ -186,6 +190,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
       },
       {
         id: "r5",
+        evidence: "Critics warn that new greenery may raise local property values and displace the residents it was intended to help, so cooling policies increasingly include affordable-housing protections.",
         kind: "true-false-not-given",
         prompt:
           "All critics oppose the creation of new urban green spaces.",
@@ -196,6 +201,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
       },
       {
         id: "r6",
+        evidence: "Reflective roofs, efficient transport, shade, ventilation and social policy work best as a coordinated system.",
         kind: "multiple-choice",
         prompt: "What is the writer’s main conclusion?",
         options: [
@@ -210,6 +216,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
       },
       {
         id: "r7",
+        evidence: "Critics warn that new greenery may raise local property values and displace the residents it was intended to help, so cooling policies increasingly include affordable-housing protections.",
         kind: "short-answer",
         prompt:
           "What housing measure may accompany urban cooling policies?",
@@ -219,6 +226,7 @@ The emerging lesson is that no single intervention is sufficient. Reflective roo
       },
       {
         id: "r8",
+        evidence: "The coolest city is not necessarily the one with the most trees, but the one that places the right measures where vulnerable people need them most.",
         kind: "true-false-not-given",
         prompt:
           "The city with the greatest number of trees is necessarily the coolest.",
@@ -267,6 +275,7 @@ Daniel: Right. We will make that clear in the final report.`,
     questions: [
       {
         id: "l1",
+        evidence: "We decided that was too broad, so we selected the four busiest cafés instead.",
         kind: "short-answer",
         prompt: "How many cafés will the students study?",
         answers: ["four", "4"],
@@ -274,6 +283,7 @@ Daniel: Right. We will make that clear in the final report.`,
       },
       {
         id: "l2",
+        evidence: "Then the café managers showed us their disposal records, which were much more reliable. We are using those records as our main source of data.",
         kind: "multiple-choice",
         prompt: "What is their main source of data?",
         options: [
@@ -287,6 +297,7 @@ Daniel: Right. We will make that clear in the final report.`,
       },
       {
         id: "l3",
+        evidence: "The largest amount of waste is produced on Fridays.",
         kind: "short-answer",
         prompt: "On which day is the most waste produced?",
         answers: ["Friday", "Fridays"],
@@ -294,6 +305,7 @@ Daniel: Right. We will make that clear in the final report.`,
       },
       {
         id: "l4",
+        evidence: "Sandwiches account for the greatest volume.",
         kind: "short-answer",
         prompt: "Which food creates the greatest volume of waste?",
         answers: ["sandwiches", "sandwich"],
@@ -301,6 +313,7 @@ Daniel: Right. We will make that clear in the final report.`,
       },
       {
         id: "l5",
+        evidence: "Instead, we want the cafés to offer a discount during the final hour before closing.",
         kind: "multiple-choice",
         prompt: "What solution will they recommend?",
         options: [
@@ -314,6 +327,7 @@ Daniel: Right. We will make that clear in the final report.`,
       },
       {
         id: "l6",
+        evidence: "We will test the idea in the library café because it stays open latest.",
         kind: "short-answer",
         prompt: "Where will the trial take place?",
         answers: ["library café", "library cafe", "the library café", "the library cafe"],
@@ -321,6 +335,7 @@ Daniel: Right. We will make that clear in the final report.`,
       },
       {
         id: "l7",
+        evidence: "The trial should last six weeks, although the managers first suggested four.",
         kind: "short-answer",
         prompt: "How long should the trial last?",
         answers: ["six weeks", "6 weeks"],
@@ -328,6 +343,7 @@ Daniel: Right. We will make that clear in the final report.`,
       },
       {
         id: "l8",
+        evidence: "Disposal records show the amount of waste, but they do not explain why customers leave food.",
         kind: "true-false-not-given",
         prompt:
           "Disposal records reveal the reasons customers leave food.",

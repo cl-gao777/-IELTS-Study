@@ -1,13 +1,14 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, unlink } from "node:fs/promises";
 import path from "node:path";
 
 import mammoth from "mammoth";
 import pdf from "pdf-parse/lib/pdf-parse.js";
 
 import type { SourceMaterial } from "@/lib/domain";
+import { htmlToPlainText } from "@/lib/material-text";
 
 import { addFileMaterial } from "./store";
 
@@ -23,6 +24,7 @@ function safeExtension(fileName: string) {
 
 async function extractText(buffer: Buffer, file: File) {
   const extension = path.extname(file.name).toLocaleLowerCase("en");
+  if ([".html", ".htm"].includes(extension) || file.type === "text/html") return htmlToPlainText(buffer.toString("utf8"));
   if (
     file.type.startsWith("text/") ||
     [".txt", ".md", ".csv", ".tsv", ".json"].includes(extension)
@@ -39,13 +41,13 @@ async function extractText(buffer: Buffer, file: File) {
   ) {
     return (await mammoth.extractRawText({ buffer })).value.trim();
   }
-  if (file.type.startsWith("audio/")) {
-    return "Audio source saved. Add or paste a transcript to turn it into an editable listening exercise.";
+  if (file.type.startsWith("audio/") || [".mp3", ".wav", ".m4a", ".ogg", ".webm"].includes(extension)) {
+    return "";
   }
   if (file.type.startsWith("image/")) {
     return "Image source saved. Paste any relevant text or questions into the content field for editing.";
   }
-  return "Binary source saved without automatic text extraction.";
+  throw new Error("支持 TXT、Markdown、HTML、PDF、DOCX、图片和 MP3/WAV/M4A 音频。");
 }
 
 export async function importMaterialFile(input: {
@@ -58,6 +60,7 @@ export async function importMaterialFile(input: {
     throw new Error("File size must be between 1 byte and 25 MB.");
   }
   const buffer = Buffer.from(await input.file.arrayBuffer());
+  const content = await extractText(buffer, input.file);
   const configuredUploadDirectory =
     process.env.UPLOAD_DIR?.trim() || "./data/uploads";
   const uploadDirectory = path.isAbsolute(configuredUploadDirectory)
@@ -70,15 +73,15 @@ export async function importMaterialFile(input: {
   const storedName = `${randomUUID()}${safeExtension(input.file.name)}`;
   const storedPath = path.join(uploadDirectory, storedName);
   await writeFile(storedPath, buffer);
-  const content = await extractText(buffer, input.file);
-
-  return addFileMaterial({
+  const audioMime: Record<string, string> = { ".mp3": "audio/mpeg", ".wav": "audio/wav", ".m4a": "audio/mp4", ".ogg": "audio/ogg", ".webm": "audio/webm" };
+  const mimeType = audioMime[safeExtension(input.file.name)] || input.file.type || "application/octet-stream";
+  try { return addFileMaterial({
     title: input.title || input.file.name,
-    kind: input.kind,
+    kind: mimeType.startsWith("audio/") ? "listening" : input.kind,
     content,
     sourceUrl: input.sourceUrl,
     fileName: input.file.name,
-    mimeType: input.file.type || "application/octet-stream",
+    mimeType,
     filePath: storedPath,
-  });
+  }); } catch (error) { await unlink(storedPath).catch(() => undefined); throw error; }
 }

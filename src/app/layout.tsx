@@ -1,36 +1,8 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-
-import { AppShell } from "@/components/app-shell";
-
-import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "ISTS — IELTS Study OS",
-  description:
-    "A single-user IELTS learning cockpit for vocabulary, practice, mock exams, and AI coaching.",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>
-        <AppShell>{children}</AppShell>
-      </body>
-    </html>
-  );
-}
+import type {Metadata} from 'next';
+import {AppShell} from '@/components/app-shell';
+import {product} from '@/lib/product';
+import {getPreferences} from '@/server/preferences';
+import './globals.css';
+export const dynamic='force-dynamic';
+export const metadata:Metadata={title:product.name,description:product.subtitle};
+export default function RootLayout({children}:{children:React.ReactNode}){const prefs=getPreferences();return <html lang="zh-CN" data-theme={prefs.theme} suppressHydrationWarning><body><AppShell theme={prefs.theme}>{children}</AppShell></body></html>;}

@@ -1,11 +1,12 @@
 import { WritingWorkspace } from "@/components/writing-workspace";
-import { listWritingSubmissions } from "@/server/store";
+import { listMaterials } from "@/server/store";
+import { listWritingDrafts } from "@/server/writing-drafts";
 
 export const dynamic = "force-dynamic";
 
 export default function WritingPage() {
   return (
-    <WritingWorkspace initialSubmissions={listWritingSubmissions(5)} />
+    <WritingWorkspace initialDrafts={listWritingDrafts()} materials={listMaterials().filter((item) => item.kind === "writing")} />
   );
 }
 

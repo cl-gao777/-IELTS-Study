@@ -1,12 +1,12 @@
 import { VocabularyWorkspace } from "@/components/vocabulary-workspace";
-import { listVocabulary } from "@/server/store";
+import { listVocabularyEntries } from "@/server/vocabulary";
 
 export const dynamic = "force-dynamic";
 
 export default function VocabularyPage() {
   return (
     <VocabularyWorkspace
-      initialWords={listVocabulary()}
+      initialWords={listVocabularyEntries()}
       nowIso={new Date().toISOString()}
     />
   );

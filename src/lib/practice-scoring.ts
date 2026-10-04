@@ -1,6 +1,7 @@
 export interface ObjectiveQuestionAnswer {
   id: string;
   answers: string[];
+  maxWords?: number;
 }
 
 export interface ObjectiveAnswerDetail {
@@ -26,7 +27,8 @@ export function scoreObjectiveAnswers(
   const details = questions.map((question) => {
     const submittedAnswer = submitted[question.id] ?? "";
     const normalized = normalizeAnswer(submittedAnswer);
-    const correct = question.answers.some(
+    const withinLimit = !question.maxWords || submittedAnswer.trim().split(/\s+/).filter(Boolean).length <= question.maxWords;
+    const correct = Boolean(normalized) && withinLimit && question.answers.some(
       (answer) => normalizeAnswer(answer) === normalized,
     );
 
@@ -92,7 +94,8 @@ export function calculateAcademicBand(
   total: number,
   skill: ObjectiveSkill,
 ) {
-  if (total <= 0) {
+  // Conversion only applies to a full forty-question test, never a short drill.
+  if (total !== 40 || !Number.isFinite(correct)) {
     return 0;
   }
 

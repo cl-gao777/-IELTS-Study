@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { evaluateWriting } from "@/server/ai";
-import { calculateMockOverallBand } from "@/lib/practice-scoring";
+import {randomUUID} from "node:crypto";
+import {saveWritingDraft} from "@/server/writing-drafts";
 import {
   saveMockExam,
   saveWritingSubmission,
@@ -46,8 +47,10 @@ export async function POST(request: Request) {
     );
   }
 
+  const draftId=randomUUID();
+  saveWritingDraft({id:draftId,groupId:draftId,version:1,...parsed.data.writing,category:parsed.data.writing.taskType === "task-1"?"Line":"Opinion",image:"",elapsedSeconds:0,timeLimitMinutes:40,status:"completed",updatedAt:new Date().toISOString()});
   const writingFeedback = await evaluateWriting(parsed.data.writing);
-  const writing = saveWritingSubmission({
+  const content = {
     ...parsed.data.writing,
     wordCount: parsed.data.writing.essay.split(/\s+/).filter(Boolean).length,
     overallBand: writingFeedback.overallBand,
@@ -55,12 +58,9 @@ export async function POST(request: Request) {
     strengths: writingFeedback.strengths,
     improvements: writingFeedback.improvements,
     rewrite: writingFeedback.rewrite,
-  });
-  const overallBand = calculateMockOverallBand([
-    listening.bandScore,
-    reading.bandScore,
-    writing.overallBand,
-  ]);
+  };
+  const writing = writingFeedback.provider === "local-fallback" ? {...content,id:0,submittedAt:new Date().toISOString()} : saveWritingSubmission(content);
+  const overallBand = 0; // No Speaking and short sample tests: no overall IELTS estimate.
   const mock = saveMockExam({
     listeningAttemptId: listening.id,
     readingAttemptId: reading.id,

@@ -1,100 +1,14 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-import styles from "./app-shell.module.css";
-
-const navSections = [
-  {
-    label: "Study",
-    items: [
-      { href: "/", label: "Today", icon: "⌂" },
-      { href: "/coach", label: "女仆小C", icon: "C" },
-      { href: "/vocabulary", label: "Vocabulary", icon: "Aa" },
-      { href: "/practice", label: "Practice", icon: "✓" },
-      { href: "/writing", label: "Writing", icon: "✎" },
-    ],
-  },
-  {
-    label: "Exam",
-    items: [
-      { href: "/mock-exam", label: "Mock exam", icon: "◫" },
-      { href: "/review", label: "Review", icon: "↺" },
-      { href: "/analytics", label: "Analytics", icon: "↗" },
-    ],
-  },
-  {
-    label: "Library",
-    items: [
-      { href: "/materials", label: "Materials", icon: "≡" },
-      { href: "/settings", label: "Settings", icon: "⚙" },
-    ],
-  },
-];
-
-function isCurrent(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
+'use client';
+import Link from 'next/link';
+import {usePathname} from 'next/navigation';
+import {useState} from 'react';
+import {product} from '@/lib/product';
+import {VocabularyCapture} from './vocabulary-capture';
+import {StudyHeartbeat} from './study-heartbeat';
+import styles from './app-shell.module.css';
+const groups=[{label:'每日学习',items:[['/','Today · 今日','⌂'],['/practice/reading','Reading · 阅读','▤'],['/practice/listening','Listening · 听力','◉'],['/vocabulary','Vocabulary · 词汇','Aa'],['/writing','Writing · 写作','✎']]},{label:'复盘与资料',items:[['/review','Mistakes · 错题','↺'],['/materials','Materials · 材料','▥'],['/analytics','Analytics · 分析','↗']]},{label:'工具',items:[['/coach','AI Tutor · 助教','✧'],['/mock-exam','Mock · 模拟练习','◫'],['/settings','Settings · 设置','⚙']]}];
+export function AppShell({children,theme:initial}:{children:React.ReactNode,theme:'light'|'dark'}){
+ const pathname=usePathname();const [theme,setTheme]=useState(initial);
+ async function toggleTheme(){const next=theme==='light'?'dark':'light';setTheme(next);document.documentElement.dataset.theme=next;try{const r=await fetch('/api/settings');const p=await r.json();await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...p.preferences,theme:next})});}catch{}}
+ return <div className={styles.shell}><a href="#main-content" className="skip-link">跳至主要内容</a><aside className={styles.sidebar}><Link className={styles.brand} href="/"><span className={styles.brandMark}>i.</span><span><strong>{product.name}</strong><small>PERSONAL LEARNING OS</small></span></Link><nav className={styles.nav} aria-label="主要导航">{groups.map(g=><div className={styles.navSection} key={g.label}><p>{g.label}</p>{g.items.map(([href,label,icon])=>{const current=pathname===href||(href!=='/'&&pathname.startsWith(href+'/'));return <Link className={`${styles.navItem} ${current?styles.current:''}`} href={href} key={href} aria-current={current?'page':undefined}><span>{icon}</span>{label}</Link>})}</div>)}</nav><div className={styles.footer}><button type="button" className={styles.themeButton} onClick={toggleTheme}>{theme==='light'?'☾ 深色外观':'☀ 浅色外观'}</button><div className={styles.localBadge}><i/><span><strong>本地工作台</strong><small>你的材料，你的学习记录</small></span></div></div></aside><main className={styles.main} id="main-content">{children}</main><VocabularyCapture/><StudyHeartbeat/></div>;
 }
-
-export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
-  return (
-    <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <Link className={styles.brand} href="/">
-          <span className={styles.brandMark}>I</span>
-          <span>
-            <strong>ISTS</strong>
-            <small>IELTS Study OS</small>
-          </span>
-        </Link>
-
-        <nav className={styles.nav} aria-label="Primary navigation">
-          {navSections.map((section) => (
-            <div className={styles.navSection} key={section.label}>
-              <p>{section.label}</p>
-              {section.items.map((item) => {
-                const current = isCurrent(pathname, item.href);
-                return (
-                  <Link
-                    className={`${styles.navItem} ${current ? styles.current : ""}`}
-                    href={item.href}
-                    key={item.href}
-                    aria-current={current ? "page" : undefined}
-                  >
-                    <span>{item.icon}</span>
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
-        </nav>
-
-        <div className={styles.footer}>
-          <div className={styles.localBadge}>
-            <i />
-            <span>
-              <strong>Private workspace</strong>
-              <small>SQLite · server-side AI</small>
-            </span>
-          </div>
-          <div className={styles.profile}>
-            <span>A</span>
-            <div>
-              <strong>Aimer</strong>
-              <small>Target band 7.0</small>
-            </div>
-          </div>
-        </div>
-      </aside>
-      <main className={styles.main} id="main-content">
-        {children}
-      </main>
-    </div>
-  );
-}
-

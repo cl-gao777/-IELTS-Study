@@ -151,10 +151,12 @@ export function MockExam({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy) return;
     sectionDurations.current.writing = elapsed;
     setBusy(true);
     setError("");
-    const response = await fetch("/api/mock-exam", {
+    try {
+      const response = await fetch("/api/mock-exam", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -176,14 +178,15 @@ export function MockExam({
         },
       }),
     });
-    const payload = (await response.json()) as MockResult & { error?: string };
-    if (response.ok) {
+      const payload = (await response.json()) as MockResult & { error?: string };
+      if (!response.ok || !payload.mock) throw new Error(payload.error ?? "模拟提交失败，答案已保留，请重试。");
       setResult(payload);
       move("result");
-    } else {
-      setError(payload.error ?? "Mock submission failed.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "本地服务连接失败，答案和作文仍保留在页面中，请重试。");
+    } finally {
+      setBusy(false);
     }
-    setBusy(false);
   }
 
   if (stage === "briefing") {
@@ -240,18 +243,18 @@ export function MockExam({
         </header>
         <section className={`${ui.panel} ${ui.panelDark} ${styles.resultHero}`}>
           <div>
-            <small>Estimated overall</small>
-            <strong>{result.mock.overallBand.toFixed(1)}</strong>
+            <small>模拟流程完成</small>
+            <strong>已保存</strong>
           </div>
           <div className={styles.resultSkills}>
             <span>
-              Listening <b>{result.listening.bandScore.toFixed(1)}</b>
+              Listening <b>{result.listening.rawScore}/{result.listening.totalQuestions}</b>
             </span>
             <span>
-              Reading <b>{result.reading.bandScore.toFixed(1)}</b>
+              Reading <b>{result.reading.rawScore}/{result.reading.totalQuestions}</b>
             </span>
             <span>
-              Writing <b>{result.writing.overallBand.toFixed(1)}</b>
+              Writing <b>{result.provider === "local-fallback" ? "未评估" : `AI Estimated Band ${result.writing.overallBand.toFixed(1)}`}</b>
             </span>
           </div>
           <Link className={ui.buttonSecondary} href="/review">

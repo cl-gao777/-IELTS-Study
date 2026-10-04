@@ -23,6 +23,7 @@ import {
 } from "@/lib/srs";
 
 import { getDatabase } from "./db";
+import { getPreferences, studyDate } from "./preferences";
 
 type Row = Record<string, unknown>;
 
@@ -121,45 +122,40 @@ function writingFromRow(row: Row): WritingSubmission {
 
 function ensureDailyTasks(date = localDate()) {
   const database = getDatabase();
-  const count = database
-    .prepare("SELECT COUNT(*) AS count FROM study_tasks WHERE study_date = ?")
-    .get(date) as { count: number };
-
-  if (count.count > 0) {
-    return;
-  }
-
+  const budget = getPreferences().dailyMinutes;
+  const portions = [Math.floor(budget*.2),Math.floor(budget*.25),Math.floor(budget*.3)];
+  portions.push(budget-portions.reduce((a,b)=>a+b,0));
   const tasks = [
     {
       id: `${date}-vocabulary`,
       area: "Vocabulary",
-      title: "Review today’s due words",
-      detail: "Active recall · spaced repetition",
-      minutes: 20,
+      title: "复习到期词汇，学习 5 个新词",
+      detail: "主动回忆 · FSRS 间隔复习",
+      minutes: portions[0],
       href: "/vocabulary",
     },
     {
       id: `${date}-listening`,
       area: "Listening",
-      title: "Complete one listening drill",
-      detail: "Predict answers before playback",
-      minutes: 20,
+      title: "完成一段精听或听写",
+      detail: "先读题预测，再听音频定位",
+      minutes: portions[1],
       href: "/practice/listening",
     },
     {
       id: `${date}-reading`,
       area: "Reading",
-      title: "Finish one timed passage",
-      detail: "Evidence first · 18 minute limit",
-      minutes: 25,
+      title: "阅读一篇文章并寻找证据",
+      detail: "定位原文 · 归因错题",
+      minutes: portions[2],
       href: "/practice/reading",
     },
     {
       id: `${date}-writing`,
       area: "Writing",
-      title: "Write or revise one response",
-      detail: "Structure, precision and correction",
-      minutes: 30,
+      title: "完成或改写一篇作文",
+      detail: "组织观点 · 修改句子 · 对比版本",
+      minutes: portions[3],
       href: "/writing",
     },
   ] as const;
@@ -167,7 +163,7 @@ function ensureDailyTasks(date = localDate()) {
   const insert = database.prepare(`
     INSERT INTO study_tasks (
       id, study_date, area, title, detail, estimated_minutes, completed, href, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,detail=excluded.detail,estimated_minutes=excluded.estimated_minutes,href=excluded.href
   `);
   const now = new Date().toISOString();
 
@@ -203,7 +199,7 @@ function latestBand(kind: "reading" | "listening") {
   const row = getDatabase()
     .prepare(
       `SELECT band_score FROM practice_attempts
-       WHERE kind = ? ORDER BY submitted_at DESC LIMIT 1`,
+       WHERE kind = ? AND total_questions = 40 ORDER BY submitted_at DESC LIMIT 1`,
     )
     .get(kind) as { band_score: number } | undefined;
   return row ? Number(row.band_score) : 0;
@@ -212,7 +208,7 @@ function latestBand(kind: "reading" | "listening") {
 function latestWritingBand() {
   const row = getDatabase()
     .prepare(
-      `SELECT overall_band FROM writing_submissions
+      `SELECT overall_band FROM writing_submissions WHERE overall_band > 0
        ORDER BY submitted_at DESC LIMIT 1`,
     )
     .get() as { overall_band: number } | undefined;
@@ -279,6 +275,10 @@ export function getDashboardSnapshot(): DashboardSnapshot {
         : 0,
     },
     streak: calculateStreak(),
+    dailyMinutes: getPreferences().dailyMinutes,
+    targetBand: getPreferences().targetBand,
+    displayName: getPreferences().displayName,
+    todayMinutes: Math.round(Number((database.prepare("SELECT COALESCE(SUM(duration_seconds),0) AS seconds FROM study_sessions WHERE study_date=?").get(studyDate()) as {seconds:number}).seconds)/60),
   };
 }
 
@@ -521,7 +521,7 @@ export function submitPracticeAttempt(input: {
           String(attemptId),
           set.kind,
           question.prompt,
-          `${question.answers.join(" / ")} — ${question.explanation}`,
+          `你的答案：${detail.submitted || "（未作答）"}\n正确答案：${question.answers.join(" / ")}\n题型：${question.kind}\n证据：${question.evidence || "材料未提供逐字证据"}\n解析：${question.explanation}`,
           submittedAt,
         );
       }
@@ -805,7 +805,7 @@ export function listReviewItems(): ReviewItem[] {
   return (
     getDatabase()
       .prepare(
-        "SELECT * FROM review_items WHERE resolved = 0 ORDER BY created_at DESC",
+        "SELECT r.*, (SELECT COUNT(*) FROM review_items p WHERE p.prompt=r.prompt AND p.skill=r.skill) AS repeat_count FROM review_items r ORDER BY created_at DESC",
       )
       .all() as Row[]
   ).map((row) => ({
@@ -816,6 +816,9 @@ export function listReviewItems(): ReviewItem[] {
     prompt: String(row.prompt),
     answer: String(row.answer),
     resolved: Boolean(row.resolved),
+    category: String(row.category || ""),
+    mistakeCount: Number(row.repeat_count || row.mistake_count || 1),
+    reviewedAt: String(row.reviewed_at || ""),
     createdAt: String(row.created_at),
   }));
 }

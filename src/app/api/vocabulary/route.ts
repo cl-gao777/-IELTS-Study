@@ -1,38 +1,21 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-
-import {
-  addVocabularyWord,
-  getNextDueVocabulary,
-  listVocabulary,
-} from "@/server/store";
-
-const wordSchema = z.object({
-  term: z.string().trim().min(1).max(100),
-  pronunciation: z.string().trim().max(100).default(""),
-  partOfSpeech: z.string().trim().max(50).default(""),
-  meaningZh: z.string().trim().min(1).max(300),
-  definitionEn: z.string().trim().min(1).max(600),
-  example: z.string().trim().min(1).max(800),
-  tags: z.array(z.string().trim().max(40)).max(10).default([]),
-});
+import { vocabularyInputSchema } from "@/lib/vocabulary";
+import { listVocabularyEntries, saveVocabularyEntry } from "@/server/vocabulary";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  return NextResponse.json({
-    words: listVocabulary(url.searchParams.get("q") ?? ""),
-    nextDue: getNextDueVocabulary(),
-  });
+  const words = listVocabularyEntries(url.searchParams.get("q") ?? "");
+  return NextResponse.json({ words, nextDue: words.find((word) => Date.parse(word.dueAt) <= Date.now()) ?? null });
 }
 
 export async function POST(request: Request) {
-  const parsed = wordSchema.safeParse(await request.json());
+  const parsed = vocabularyInputSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "The vocabulary entry is incomplete." },
+      { error: "请输入有效单词；词条内容过长或格式不正确。" },
       { status: 400 },
     );
   }
-  return NextResponse.json({ word: addVocabularyWord(parsed.data) });
+  return NextResponse.json(saveVocabularyEntry(parsed.data));
 }
 
