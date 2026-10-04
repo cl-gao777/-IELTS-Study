@@ -1,16 +1,16 @@
 {
-  "name": "ists",
-  "version": "0.1.0",
+  "name": "ielts-studio",
+  "version": "0.2.0",
   "private": true,
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "npm@11.19.0",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --hostname 127.0.0.1",
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm test && pnpm typecheck && pnpm lint && pnpm build"
+    "check": "npm test && npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
@@ -21,6 +21,7 @@
     "react-dom": "19.2.4",
     "server-only": "^0.0.1",
     "smol-toml": "^1.7.0",
+    "ts-fsrs": "^5.4.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -35,10 +36,5 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "better-sqlite3"
-    ]
   }
 }
