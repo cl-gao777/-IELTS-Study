@@ -76,7 +76,9 @@ Settings 可导出完整 JSON（应用表和附件）、数据库快照，恢复
 - API 实测：上传原创合成 WAV、编辑 Transcript、创建无 AI 精听练习、Range 206/44 字节、听写漏词保存、工作台草稿 GET 恢复均成功。
 - 真实浏览器：阅读列表及双栏正常；本地 WAV 实际播放，0.75×、AB 0–0.7 秒持续循环、暂停及听写核对显示正常。
 
-完整项目的最终 test / lint / typecheck / build、Windows 启动与安装位置以本次交付结尾补记为准；上面的模块验证不等价于声称已经验证全部外部 AI Provider。
+最终完整验证：68 tests / 16 files 全部通过，lint、typecheck、production build 均通过。生产 HTTP 验证 PDF/DOCX 解析、25 表含附件备份恢复、无 AI 作文保留；真实浏览器验证 MP3/WAV、AB 循环、阅读错题、收词、FSRS 和写作版本。停止并重启后 25 表记录数保持。外部 AI Provider 未使用真实 API Key 调用。
+
+正式安装已完成于 `D:\Codex_ws\IELTS_Study`，通过 Windows PowerShell 5.1 启动脚本完成新目录生产构建，服务为 `http://127.0.0.1:3000`，实际数据路径为该目录 `data/ists.db`。正式安装未携带开发测试记录。详细证据见 [docs/VALIDATION.md](docs/VALIDATION.md)。
 
 ## 后续范围
 

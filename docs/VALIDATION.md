@@ -43,6 +43,16 @@
 
 Windows 启动脚本和等待浏览器 helper 均通过真实 Windows PowerShell 5.1 语法解析。启动会核对运行目录，防止误用另一个安装目录的数据；日常启动只在锁文件变化时重装依赖。
 
+## D 盘交付验收
+
+- 正式目录：`D:\Codex_ws\IELTS_Study`，分支 `feat/ielts-studio-local`；保留 MIT 许可和上游 Git 历史。
+- 从已提交版本创建独立 Git checkout，复制已验证依赖，未复制开发数据库、导入材料或测试练习记录。
+- 在该目录实际执行 Windows PowerShell 5.1 `start.ps1 -Port 3000 -NoBrowser`：重新生产构建成功、SQLite 初始化成功、服务器 Ready。
+- `/api/health` 返回 `instanceRoot: D:\Codex_ws\IELTS_Study`；实际数据库位于 `D:\Codex_ws\IELTS_Study\data\ists.db`。
+- 初始化备份含全部 25 个表，attempts / writing drafts / imported materials / attachments 均为零；内置原创样题和词汇可直接开始练习。
+- 再次启动返回“already running from this folder”，没有重新安装或构建。
+- 正式首页在 1366×768 的 DOM 宽度为 1366，无横向溢出，控制台无 warning/error；已保存交付截图。
+
 ## 验证边界
 
 - 没有使用用户 API Key 调用外部模型。已验证结构化反馈解析、Provider 配置边界、无 AI / AI 失败的保存流程；外部模型实际质量与服务可用性取决于用户配置。
