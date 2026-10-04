@@ -1,3 +1,9 @@
+# IELTS Studio
+
+Windows 本地版请阅读 [README_LOCAL.md](README_LOCAL.md)。使用 npm 与 start.bat；下方保留上游 ISTS 说明以便追溯，旧 pnpm / Linux 分发命令不适用于本分支。
+
+---
+
 # ISTS — IELTS Study OS
 
 ISTS is an open-source, desktop-first IELTS learning workspace for one learner.

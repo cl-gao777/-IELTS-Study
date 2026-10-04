@@ -1,0 +1,51 @@
+# 本地验收记录
+
+验证日期：2026-10-04。环境：Windows、Node.js 24.21.0、npm 11.19.0、Windows PowerShell 5.1、Chromium 内嵌浏览器。
+
+## 基线与自动检查
+
+原版 ISTS 在改动前完成依赖安装、HTTP 200 和 10 个原有测试。交付分支保留 Next.js / React / SQLite 基础设施。
+
+本次核心测试覆盖阅读/听力评分、完整 40 题 band 估算边界、FSRS 历史与持久化、写作反馈校验、草稿多版本、AI 失败保存、题型/听写/材料、备份恢复的完整性和事务回滚。最终命令结果见文末。
+
+## 实际 HTTP 与数据验证
+
+- Today、Reading、Listening、Materials、Vocabulary、Writing、Mistakes、Analytics、Tutor、Settings 十个页面均返回 HTTP 200。
+- 原创 PDF 和 DOCX 经生产版真实 multipart 上传后正确提取正文。
+- 完成稿先保存，再请求未配置的 AI：返回 503，并能通过草稿 API 读回完全相同的正文；不生成虚假 band。
+- 完整 JSON 包含 25 个应用数据表及附件原始字节，不包含 API Key。
+- 导出后增加临时词条，再恢复：词条数与草稿数恢复，附件字节一致。
+- 完全停止服务器后通过 `start.ps1` 启动，25 个表的行数均与停止前一致。
+- 测试记录保留在开发副本；日常安装使用独立的新数据库。
+
+## 浏览器学习流程
+
+- 1366×768：阅读分屏、导航与操作区域可用，无横向溢出。
+- 粘贴原创文章、选中 Urban、收词并保存中文释义成功。
+- 手工创建阅读题，提交错误答案后显示正确答案、得分与逐字证据；Find Evidence 定位原文；保存“粗心”错因。
+- 导入原创合成 WAV：实际播放、暂停、0.75 倍速、AB 0–0.7 秒持续循环；HTTP Range 206 和片段字节正确。
+- 听写核对展示漏词差异并保存记录；重新读取练习草稿成功。
+- 词汇 Recognition 显示释义与例句；点击 Good 后到期数量减少，显示 FSRS 下次时间。
+- 原创 5 秒 MP3 在生产版上传成功；完整文件与 Range 字节一致，越界返回 416。浏览器解码 5.04 秒，0.75 倍速、1–3 秒 AB 循环持续播放且无音频错误，暂停正常。
+- 写作界面实际输入原创文本，39 词计数、计时与自动保存正常；完成 Draft 1 后创建 Draft 2，原稿和改写对照均可见。
+- 1920×1080 深色 Today 和 1366×768 写作界面可用；DOM 宽度检查无水平溢出；生产页面控制台无 warning/error。
+
+## 最终自动检查
+
+`npm run check` 在 PDF 修复后完整通过：
+
+| 命令 | 结果 |
+|---|---|
+| `npm test` | 16 个测试文件，68 个测试全部通过 |
+| `npm run typecheck` | 通过，无 TypeScript 错误 |
+| `npm run lint` | 通过，无 warning/error |
+| `npm run build` | Next.js 16.2.10 生产构建成功，全部路由生成完成 |
+
+Windows 启动脚本和等待浏览器 helper 均通过真实 Windows PowerShell 5.1 语法解析。启动会核对运行目录，防止误用另一个安装目录的数据；日常启动只在锁文件变化时重装依赖。
+
+## 验证边界
+
+- 没有使用用户 API Key 调用外部模型。已验证结构化反馈解析、Provider 配置边界、无 AI / AI 失败的保存流程；外部模型实际质量与服务可用性取决于用户配置。
+- 浏览器 TTS 依赖 Windows 已安装的语音。音频兼容性取决于实际编码；扩展名本身不保证可解码。
+- 扫描 PDF OCR、Whisper、Speaking、完整考试套卷及桌面安装包属于后续范围。
+- 内置短样题用于熟悉工作台，不构成正式 IELTS 能力诊断。Reading/Listening 仅完整 40 题估算 band；转换参考 [IELTS 官方评分说明](https://ielts.org/take-a-test/your-results/ielts-scoring-in-detail)，实际考次阈值可能不同。
