@@ -35,7 +35,7 @@ export function ReadingPaper({ resource, passage, scrollRoot, onLayoutReady }: {
       <label>缩放<select className={ui.select} value={zoom} aria-label="阅读材料缩放" onChange={(event) => changeZoom(Number(event.target.value))}>{[100, 125, 150, 200].map((value) => <option value={value} key={value}>{value === 100 ? "适应宽度" : value + "%"}</option>)}</select></label>
     </div>
     {resource.issues.map((issue) => <p className={ui.notice + " " + styles.readingIssue} key={issue}>{issue}</p>)}
-    <ContinuousPdf key={passage.id} documents={passage.documents} scrollRoot={scrollRoot} zoom={zoom} onLayoutReady={onLayoutReady} />
+    <ContinuousPdf key={passage.id} documents={passage.documents} headingLabel={passage.label} scrollRoot={scrollRoot} zoom={zoom} onLayoutReady={onLayoutReady} />
     <details className={styles.resourceDetails}>
       <summary>资料信息与原文件 · {resourceLabel(resource)}</summary>
       <p>{resource.provider}</p><p>{resource.copyright}</p>

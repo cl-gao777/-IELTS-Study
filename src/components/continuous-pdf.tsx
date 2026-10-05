@@ -14,6 +14,7 @@ type SizedPage = PdfPageLocation & PageSize & { total: number; cacheKey: string 
 
 export type ContinuousPdfProps = {
   documents: ReadingDocument[];
+  headingLabel?: string;
   scrollRoot: RefObject<HTMLElement | null>;
   zoom?: number;
   onLayoutReady?: () => void;
@@ -159,7 +160,7 @@ export function ContinuousPdf(props: ContinuousPdfProps) {
   return <PdfDocumentSession key={JSON.stringify(props.documents)} {...props} />;
 }
 
-function PdfDocumentSession({ documents, scrollRoot, zoom = 100, onLayoutReady }: ContinuousPdfProps) {
+function PdfDocumentSession({ documents, headingLabel, scrollRoot, zoom = 100, onLayoutReady }: ContinuousPdfProps) {
   const [ranges] = useState(() => documents);
   const layoutReady = useRef(onLayoutReady);
   useLayoutEffect(() => { layoutReady.current = onLayoutReady; }, [onLayoutReady]);
@@ -183,6 +184,7 @@ function PdfDocumentSession({ documents, scrollRoot, zoom = 100, onLayoutReady }
     return () => cancelAnimationFrame(frame);
   }, [metadata]);
   const safeZoom = Number.isFinite(zoom) ? Math.max(50, Math.min(300, zoom)) : 100;
+  const parentHeading = headingLabel?.trim();
 
   if (!ranges.length) return <p className={styles.message}>本篇暂未关联 PDF。</p>;
   if (error) return <div className={styles.message}><p role="alert">{error}</p><button className={ui.buttonGhost} type="button" onClick={retry}>重新加载 PDF 信息</button></div>;
@@ -191,7 +193,7 @@ function PdfDocumentSession({ documents, scrollRoot, zoom = 100, onLayoutReady }
   return <section className={styles.viewer} aria-label="当前篇阅读材料和题目" data-continuous-pdf>
     <div className={styles.pageStrip} style={{ width: safeZoom + "%" }}>
       {pages.map((page, index) => <div key={page.key}>
-        {(index === 0 || pages[index - 1].documentIndex !== page.documentIndex) && <div className={styles.sourceHeading}><h3>{page.label}</h3><span>PDF 第 {ranges[page.documentIndex].page}–{ranges[page.documentIndex].endPage} 页</span></div>}
+        {(index === 0 || pages[index - 1].documentIndex !== page.documentIndex) && <div className={styles.sourceHeading}>{(!parentHeading || page.label.trim() !== parentHeading) && <h3>{page.label}</h3>}<span>PDF 第 {ranges[page.documentIndex].page}–{ranges[page.documentIndex].endPage} 页</span></div>}
         <PdfPage page={page} active={active.has(index)} state={states.get(page.cacheKey)} register={(node) => registerPage(index, node)} onRetry={() => retryPage(page.cacheKey)} onImageError={() => imageFailed(page.cacheKey)} />
       </div>)}
     </div>
