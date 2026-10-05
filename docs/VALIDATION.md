@@ -70,3 +70,4 @@ Windows 启动脚本和等待浏览器 helper 均通过真实 Windows PowerShell
 - 原生 PDF 在内嵌浏览器没有成功显示，改为服务端本地 PDF.js 逐页渲染，保留原文件入口。PNG、原文本、总页数均通过 HTTP 核验，无效/越界页码返回 400。
 - 完整 25 表、31 个附件（含开发原有材料）的约 36 MB JSON 备份实际 HTTP 恢复成功；恢复后全部官方文件 SHA-256 与题组数据一致，SQLite integrity_check=ok。修正 Next.js proxy 默认 10 MB 截断与旧 Base64 正则处理大录音的栈溢出；新增 8 MB 附件恢复回归测试。
 - 85 tests / 16 files 通过；lint、typecheck、production build 通过。
+- 正式 D 盘部署完成：30 组练习（原有 2 组 + 新增 28 组）、21 个原始附件，全部官方资源题目/文件哈希与清单一致；所有升级前记录逐条保留，包括 1 份写作草稿和 2 份练习草稿。再次导入显示 28 组 already installed / 0 新文件。正式 PDF preview 返回 200，官方 MP3 Range 返回 206；正式阅读/听力列表与数量实测、控制台无 warning/error。统计明确区分完整 40 题样题和专项练习。

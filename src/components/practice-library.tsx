@@ -21,6 +21,7 @@ export function PracticeLibrary({ kind, sets, materials }: { kind: "reading" | "
   const reading = kind === "reading";
   const searchText = search.trim().toLocaleLowerCase();
   const officialCount = sets.filter((set) => set.resource).length;
+  const officialFullCount = sets.filter((set) => set.resource && set.questions.length === 40).length;
   const questionCount = sets.reduce((total, set) => total + set.questions.length, 0);
   const visibleSets = sets.filter((set) => {
     if (filter === "official" && !set.resource) return false;
@@ -43,7 +44,7 @@ export function PracticeLibrary({ kind, sets, materials }: { kind: "reading" | "
     <section className={styles.libraryControls} aria-label="筛选练习">
       <label className={ui.field}>搜索练习或资料<input className={ui.input} type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="标题、来源、题型…" /></label>
       <div className={styles.libraryFilters} aria-label="练习来源">{filters.map((item) => <button type="button" key={item.value} className={filter === item.value ? ui.button : ui.buttonSecondary} aria-pressed={filter === item.value} onClick={() => setFilter(item.value)}>{item.label}</button>)}</div>
-      <p className={styles.libraryCount} role="status">共 {sets.length} 套 · {questionCount} 题 · 其中 {officialCount} 套官方资源{searchText || filter !== "all" ? ` · 当前显示 ${visibleSets.length} 套 / ${visibleSets.reduce((total, set) => total + set.questions.length, 0)} 题` : ""}</p>
+      <p className={styles.libraryCount} role="status">共 {sets.length} 组 · {questionCount} 题 · 官方资源：{officialFullCount} 套完整 40 题样题 / {officialCount - officialFullCount} 组专项{searchText || filter !== "all" ? ` · 当前显示 ${visibleSets.length} 组 / ${visibleSets.reduce((total, set) => total + set.questions.length, 0)} 题` : ""}</p>
     </section>
 
     <div className={styles.libraryGrid}>{visibleSets.map((set) => <article key={set.id} className={`${ui.panel} ${styles.libraryCard}`}>
@@ -53,6 +54,7 @@ export function PracticeLibrary({ kind, sets, materials }: { kind: "reading" | "
         <span className={ui.pill}>{set.questions.length ? `${set.questions.length} 道题` : "自由学习"}</span>
         <span className={ui.pill}>{set.durationMinutes} min</span>
         {set.resource && <span className={ui.pill}>原版 PDF</span>}
+        {set.resource && <span className={ui.pill}>{set.questions.length === 40 ? "完整样题" : "专项练习"}</span>}
         {!reading && <span className={ui.pill}>{set.resource ? set.resource.audioTracks.length ? `${set.resource.audioTracks.length} 段本地音频` : "未附音频" : set.audioUrl ? "本地音频" : set.transcript ? "系统 TTS" : "未附音频"}</span>}
       </div>
       <p>{set.instructions}</p>
@@ -60,6 +62,6 @@ export function PracticeLibrary({ kind, sets, materials }: { kind: "reading" | "
     </article>)}</div>
     {!visibleSets.length && <div className={ui.empty}>没有符合筛选条件的练习。可以清空搜索或切换到「全部」。</div>}
 
-    {filter === "all" && materials.length > 0 && <section className={`${ui.panel} ${styles.dictation}`}><h2>我的{reading ? "阅读" : "听力"}资料</h2><p>打开资料开始{reading ? "纯阅读" : "精听听写"}，或添加自定义题目。资料不计入上方练习套数。</p><div className={styles.libraryGrid}>{visibleMaterials.map((material) => <Link className={ui.buttonGhost} key={material.id} href={`/materials/${material.id}`}>{material.title} →</Link>)}</div>{!visibleMaterials.length && <p>没有符合搜索条件的个人资料。</p>}</section>}
+    {filter === "all" && materials.length > 0 && <section className={`${ui.panel} ${styles.dictation}`}><h2>我的{reading ? "阅读" : "听力"}资料</h2><p>打开资料开始{reading ? "纯阅读" : "精听听写"}，或添加自定义题目。资料不计入上方练习组数。</p><div className={styles.libraryGrid}>{visibleMaterials.map((material) => <Link className={ui.buttonGhost} key={material.id} href={`/materials/${material.id}`}>{material.title} →</Link>)}</div>{!visibleMaterials.length && <p>没有符合搜索条件的个人资料。</p>}</section>}
   </div>;
 }
