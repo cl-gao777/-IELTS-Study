@@ -2,6 +2,8 @@ export interface ObjectiveQuestionAnswer {
   id: string;
   answers: string[];
   maxWords?: number;
+  answerGroup?: string;
+  answerGroupTargets?: string[][];
 }
 
 export interface ObjectiveAnswerDetail {
@@ -20,17 +22,100 @@ export function normalizeAnswer(answer: string) {
     .replace(/\s+/g, " ");
 }
 
+/** Validate aliases for one slot; cross-slot consistency is checked below. */
+export function answerGroupTargetIssues(question: ObjectiveQuestionAnswer): string[] {
+  const targets = question.answerGroupTargets;
+  if (targets === undefined) return [];
+  if (!question.answerGroup?.trim()) return ["答案别名组必须同时指定 answerGroup。"];
+  if (targets.length !== question.answers.length) return ["别名组数量必须与 answers 中的正确目标数量一致。"];
+  const seen = new Map<string, number>();
+  const issues: string[] = [];
+  targets.forEach((aliases, targetIndex) => {
+    const normalized = aliases.map(normalizeAnswer);
+    if (!normalized.length || normalized.some((alias) => !alias)) issues.push("每个正确目标必须至少包含一个非空别名。");
+    if (!normalized.includes(normalizeAnswer(question.answers[targetIndex]))) issues.push("每个别名组必须包含对应的 canonical answer。");
+    for (const alias of normalized) {
+      if (seen.has(alias) && seen.get(alias) !== targetIndex) issues.push("不同正确目标的别名不能重叠，否则无法确定唯一得分目标。");
+      seen.set(alias, targetIndex);
+    }
+    if (question.maxWords && aliases.some((alias) => alias.trim().split(/\s+/).filter(Boolean).length > question.maxWords!)) {
+      issues.push("官方别名超过了所设的最多词数，请调整答案或限制。");
+    }
+  });
+  return [...new Set(issues)];
+}
+
+/**
+ * Grouped answers enumerate distinct canonical targets. Optional answerGroupTargets
+ * lists official aliases for each target; an alias never earns an additional mark.
+ * All slots in a group share the same targets and word limit. The number of targets
+ * equals the number of numbered slots, preserving one mark per question number.
+ */
+export function groupedAnswerIssues(questions: readonly ObjectiveQuestionAnswer[]) {
+  const groups = new Map<string, number[]>();
+  const issues: { index: number; message: string }[] = [];
+  questions.forEach((question, index) => {
+    for (const message of answerGroupTargetIssues(question)) issues.push({ index, message });
+    if (question.answerGroup === undefined) return;
+    const indices = groups.get(question.answerGroup) ?? [];
+    indices.push(index);
+    groups.set(question.answerGroup, indices);
+  });
+  for (const [group, indices] of groups) {
+    if (issues.some((issue) => indices.includes(issue.index))) continue;
+    const first = questions[indices[0]];
+    const expected = new Set(first.answers.map(normalizeAnswer));
+    let message = "";
+    if (!group.trim() || indices.length < 2) {
+      message = "乱序答案组至少包含两个编号，且必须有非空组名。";
+    } else if (expected.has("") || expected.size !== first.answers.length || expected.size !== indices.length) {
+      message = "乱序组 answers 必须列出互不重复的正确选项，选项数须等于本组编号数；不能在此列同义答案。";
+    } else if (indices.some((index) => {
+      const normalized = questions[index].answers.map(normalizeAnswer);
+      return normalized.length !== expected.size || new Set(normalized).size !== normalized.length || normalized.some((answer) => !expected.has(answer));
+    })) {
+      message = "同一乱序组内每个编号必须使用相同的完整正确选项列表。";
+    } else if (indices.some((index) => questions[index].maxWords !== first.maxWords)) {
+      message = "同一乱序组内每个编号必须使用相同的最多词数限制。";
+    } else if (first.maxWords && first.answers.some((answer) => answer.trim().split(/\s+/).filter(Boolean).length > first.maxWords!)) {
+      message = "乱序组参考答案超过了最多词数限制。";
+    } else if (indices.some((index) => Boolean(questions[index].answerGroupTargets) !== Boolean(first.answerGroupTargets))) {
+      message = "同一乱序组必须为每个编号提供相同的官方别名组。";
+    } else if (first.answerGroupTargets) {
+      const targetAliases = new Map(first.answers.map((answer, index) => [normalizeAnswer(answer), new Set(first.answerGroupTargets![index].map(normalizeAnswer))]));
+      if (indices.some((index) => questions[index].answers.some((answer, targetIndex) => {
+        const expectedAliases = targetAliases.get(normalizeAnswer(answer))!;
+        const aliases = new Set(questions[index].answerGroupTargets![targetIndex].map(normalizeAnswer));
+        return aliases.size !== expectedAliases.size || [...aliases].some((alias) => !expectedAliases.has(alias));
+      }))) message = "同一乱序组的每个正确目标必须使用相同的完整官方别名列表。";
+    }
+    if (message) for (const index of indices) issues.push({ index, message });
+  }
+  return issues;
+}
+
 export function scoreObjectiveAnswers(
   submitted: Record<string, string>,
   questions: readonly ObjectiveQuestionAnswer[],
 ) {
+  const groupIssues = groupedAnswerIssues(questions);
+  if (groupIssues.length) throw new Error(groupIssues[0].message);
+  const credited = new Map<string, Set<string>>();
   const details = questions.map((question) => {
     const submittedAnswer = submitted[question.id] ?? "";
     const normalized = normalizeAnswer(submittedAnswer);
     const withinLimit = !question.maxWords || submittedAnswer.trim().split(/\s+/).filter(Boolean).length <= question.maxWords;
-    const correct = Boolean(normalized) && withinLimit && question.answers.some(
-      (answer) => normalizeAnswer(answer) === normalized,
-    );
+    const targetIndex = question.answerGroupTargets
+      ? question.answerGroupTargets.findIndex((aliases) => aliases.some((answer) => normalizeAnswer(answer) === normalized))
+      : question.answers.findIndex((answer) => normalizeAnswer(answer) === normalized);
+    let correct = Boolean(normalized) && withinLimit && targetIndex >= 0;
+    if (correct && question.answerGroup) {
+      const used = credited.get(question.answerGroup) ?? new Set<string>();
+      const target = normalizeAnswer(question.answers[targetIndex]);
+      correct = !used.has(target);
+      if (correct) used.add(target);
+      credited.set(question.answerGroup, used);
+    }
 
     return {
       id: question.id,

@@ -38,6 +38,7 @@ export type QuestionKind =
   | "true-false-not-given"
   | "yes-no-not-given"
   | "matching-headings"
+  | "matching-sentence-endings"
   | "matching-information"
   | "matching-features"
   | "sentence-completion"
@@ -46,10 +47,13 @@ export type QuestionKind =
   | "form-completion"
   | "note-completion"
   | "matching"
-  | "map-labelling";
+  | "map-labelling"
+  | "flow-chart-completion"
+  | "diagram-label-completion";
 
 export interface PracticeQuestion {
   id: string;
+  originalQuestionNumber?: number;
   kind: QuestionKind;
   prompt: string;
   options?: string[];
@@ -58,6 +62,10 @@ export interface PracticeQuestion {
   evidence?: string;
   imageUrl?: string;
   maxWords?: number;
+  /** Shared unordered answer pool: each distinct correct answer earns credit once. */
+  answerGroup?: string;
+  /** Official variants for each canonical target in answers, in the same order. */
+  answerGroupTargets?: string[][];
 }
 
 export interface PracticeSet {
@@ -71,6 +79,7 @@ export interface PracticeSet {
   audioUrl: string;
   durationMinutes: number;
   questions: PracticeQuestion[];
+  resource?: import("./official-resources").OfficialPracticeResource;
 }
 
 export interface AttemptAnswer {

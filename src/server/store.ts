@@ -24,6 +24,7 @@ import {
 
 import { getDatabase } from "./db";
 import { getPreferences, studyDate } from "./preferences";
+import { parseOfficialResource } from "@/lib/official-resources";
 
 type Row = Record<string, unknown>;
 
@@ -87,6 +88,7 @@ function practiceSetFromRow(row: Row): PracticeSet {
     audioUrl: String(row.audio_url),
     durationMinutes: Number(row.duration_minutes),
     questions: JSON.parse(String(row.questions_json)) as PracticeQuestion[],
+    resource: parseOfficialResource(JSON.parse(String(row.resource_json || "{}"))),
   };
 }
 
@@ -480,7 +482,7 @@ export function submitPracticeAttempt(input: {
     return null;
   }
   const score = scoreObjectiveAnswers(input.answers, set.questions);
-  const band = calculateAcademicBand(score.correct, score.total, set.kind);
+  const band = set.resource?.bandEstimateAllowed === false ? 0 : calculateAcademicBand(score.correct, score.total, set.kind);
   const database = getDatabase();
   const submittedAt = new Date().toISOString();
 

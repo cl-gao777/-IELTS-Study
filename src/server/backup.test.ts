@@ -78,6 +78,44 @@ afterEach(() => {
 });
 
 describe("complete local backup and restore", () => {
+  it("restores a full-recording-sized attachment without exhausting the regex stack", () => {
+    const bytes = Buffer.alloc(8 * 1024 * 1024, 0x5a);
+    writeFileSync(originalFile, bytes);
+    const backup = createBackup();
+    restoreBackup(backup);
+    const restored = holder.database!.prepare("SELECT file_path FROM source_materials WHERE id=1").get() as { file_path: string };
+    expect(readFileSync(restored.file_path).equals(bytes)).toBe(true);
+    for (const invalid of ["A===", "====", "AAAA=AAA", "AA_A", "AAA"]) {
+      const broken = structuredClone(backup); broken.files[0].base64 = invalid;
+      expect(() => validateBackup(broken)).toThrow("文件格式");
+    }
+  });
+
+  it("upgrades the known pre-resource v1 field without losing prior attempts", () => {
+    const older = createBackup();
+    delete older.data.practice_sets[0].resource_json;
+    restoreBackup(older);
+    const restored = createBackup();
+    expect(restored.data.practice_sets[0].resource_json).toBe("{}");
+    expect(restored.data.practice_attempts).toEqual(older.data.practice_attempts);
+  });
+
+  it("round-trips official document references and rejects missing referenced files", () => {
+    const resource = {
+      provider: "IELTS Partners", classification: "official-practice", sourceUrl: "https://ielts.org/test", licenseUrl: "https://ielts.org/legal", copyright: "IELTS Partners", verifiedAt: "2026-10-04", notes: "",
+      questionDocuments: [{ label: "Original paper", url: "/api/uploads/1", sourceUrl: "https://ielts.org/test.pdf", page: 2 }], answerDocuments: [], audioTracks: [], transcriptDocuments: [],
+    };
+    holder.database!.prepare("UPDATE practice_sets SET resource_json=?").run(JSON.stringify(resource));
+    const original = createBackup();
+    restoreBackup(original);
+    expect(JSON.parse(String(createBackup().data.practice_sets[0].resource_json))).toEqual(resource);
+    const broken = structuredClone(original);
+    broken.data.practice_sets[0].resource_json = JSON.stringify({ ...resource, questionDocuments: [{ ...resource.questionDocuments[0], url: "/api/uploads/999" }] });
+    expect(() => validateBackup(broken)).toThrow("缺少关联");
+    broken.data.practice_sets[0].resource_json = "null";
+    expect(() => validateBackup(broken)).toThrow("资源信息格式无效");
+  });
+
   it("round-trips every table and attachment byte, preserves old files, and excludes provider secrets", () => {
     const backup = createBackup();
     const tables = holder.database!.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[];

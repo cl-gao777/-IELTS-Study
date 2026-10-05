@@ -171,6 +171,8 @@ export function migrate(database: Database.Database) {
     );
   `);
 
+  const practiceColumns = new Set((database.prepare("PRAGMA table_info(practice_sets)").all() as { name: string }[]).map((column) => column.name));
+  if (!practiceColumns.has("resource_json")) database.exec("ALTER TABLE practice_sets ADD COLUMN resource_json TEXT NOT NULL DEFAULT '{}' ");
   const sourceColumns = new Set(
     (
       database.prepare("PRAGMA table_info(source_materials)").all() as Array<{

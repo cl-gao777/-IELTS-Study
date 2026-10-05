@@ -59,3 +59,14 @@ Windows 启动脚本和等待浏览器 helper 均通过真实 Windows PowerShell
 - 浏览器 TTS 依赖 Windows 已安装的语音。音频兼容性取决于实际编码；扩展名本身不保证可解码。
 - 扫描 PDF OCR、Whisper、Speaking、完整考试套卷及桌面安装包属于后续范围。
 - 内置短样题用于熟悉工作台，不构成正式 IELTS 能力诊断。Reading/Listening 仅完整 40 题估算 band；转换参考 [IELTS 官方评分说明](https://ielts.org/take-a-test/your-results/ielts-scoring-in-detail)，实际考次阈值可能不同。
+
+## 官方资源扩充验收（2026-10-05）
+
+- 新增 19 组 Reading / 116 题、9 组 Listening / 84 题，合计 28 组 / 200 题；每科 1 套完整无障碍样题，其余为独立专项。
+- 12 份不同原 PDF、9 段 MP3。每个题组的文件、角色、起始页与下载原文件 SHA-256 逐一匹配；同一下载 ZIP 中的不同 PDF 按哈希分别保存。
+- 实际题型 schema 校验全部 200 题、官方参考答案与别名。开发 HTTP 逐组提交 28 次，每组得分等于题数，总计 200/200；无障碍样题与专项 Band 为 0，页面显示不估分。
+- 浏览器：Cambridge 交通 PDF 文章与第 4 页题目成功渲染，答题卡为原编号 14–19；一次 5/6 提交与错误答案显示正确。搜索“Matching Features”同时找到相应专项及包含该题型的完整套。
+- 浏览器：官方 Listening 专项 3 MP3 时长 92.628 秒，实际播放、0.75 倍速、AB 5–8 秒持续循环正常；专项原题号 11–16、题本/听力稿/答案入口显示正确。
+- 原生 PDF 在内嵌浏览器没有成功显示，改为服务端本地 PDF.js 逐页渲染，保留原文件入口。PNG、原文本、总页数均通过 HTTP 核验，无效/越界页码返回 400。
+- 完整 25 表、31 个附件（含开发原有材料）的约 36 MB JSON 备份实际 HTTP 恢复成功；恢复后全部官方文件 SHA-256 与题组数据一致，SQLite integrity_check=ok。修正 Next.js proxy 默认 10 MB 截断与旧 Base64 正则处理大录音的栈溢出；新增 8 MB 附件恢复回归测试。
+- 85 tests / 16 files 通过；lint、typecheck、production build 通过。

@@ -15,7 +15,7 @@ export async function GET(
   try {
     const bytes = await readFile(material.file_path);
     const activeDocument = /html|svg|xml|javascript/i.test(material.mime_type);
-    const headers = { "Content-Type": material.mime_type || "application/octet-stream", "Content-Disposition": `${activeDocument ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(material.file_name)}`, "Accept-Ranges": "bytes", "Cache-Control": "private, max-age=3600", "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "sandbox; default-src 'none'" };
+    const headers = { "Content-Type": material.mime_type || "application/octet-stream", "Content-Disposition": `${activeDocument ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(material.file_name)}`, "Accept-Ranges": "bytes", "Cache-Control": "private, max-age=3600", "X-Content-Type-Options": "nosniff", "Content-Security-Policy": material.mime_type === "application/pdf" ? "frame-ancestors 'self'" : "sandbox; default-src 'none'" };
     const range = request.headers.get("range");
     if (range) {
       const match = /^bytes=(\d*)-(\d*)$/.exec(range);
