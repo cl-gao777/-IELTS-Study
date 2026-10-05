@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { resourceLabel, type OfficialDocument, type OfficialPracticeResource } from "@/lib/official-resources";
+import { isOfficialResource, resourceLabel, type OfficialDocument, type OfficialPracticeResource } from "@/lib/official-resources";
 import { ListeningPlayer } from "./listening-player";
 import ui from "./page-ui.module.css";
 import styles from "./practice.module.css";
@@ -12,22 +12,26 @@ export function OfficialPaper({ resource, listening, onRange }: { resource: Offi
   const [trackIndex, setTrackIndex] = useState(0);
   const audioPanel = useRef<HTMLElement>(null);
   const track = resource.audioTracks[trackIndex];
+  const official = isOfficialResource(resource);
 
   return <div className={styles.officialPaper}>
     <div className={styles.libraryMeta}><span className={ui.statusPill}>{resourceLabel(resource)}</span><span className={ui.pill}>{resource.provider}</span></div>
-    <div><p className={styles.paperHint}>{resource.copyright}</p><a className={styles.sourceLink} href={resource.sourceUrl} target="_blank" rel="noreferrer">官方出处 ↗</a></div>
+    <div><p className={styles.paperHint}>{resource.copyright}</p>{resource.sourceUrl && <a className={styles.sourceLink} href={resource.sourceUrl} target="_blank" rel="noreferrer">{official ? "官方出处" : "资料来源"} ↗</a>}</div>
+    {resource.issues.map((issue) => <p className={ui.notice} key={issue}>{issue}</p>)}
     <details className={styles.resourceDetails}><summary>来源与使用说明</summary>
       {resource.notes && <p className={styles.resourceNotes}>{resource.notes}</p>}
-      <p>来源核对日期：{resource.verifiedAt}</p>
-      <div className={styles.libraryActions}><a className={styles.sourceLink} href={resource.sourceUrl} target="_blank" rel="noreferrer">官方出处 ↗</a><a className={styles.sourceLink} href={resource.licenseUrl} target="_blank" rel="noreferrer">版权 / 使用条款 ↗</a></div>
+      {resource.originalFileName && <p>原文件：{resource.originalFileName}</p>}
+      {resource.originalPath && <p className={styles.resourceNotes}>导入位置：{resource.originalPath}</p>}
+      <p>{official ? "来源" : "导入"}核对日期：{resource.verifiedAt}</p>
+      <div className={styles.libraryActions}>{resource.sourceUrl && <a className={styles.sourceLink} href={resource.sourceUrl} target="_blank" rel="noreferrer">{official ? "官方出处" : "资料来源"} ↗</a>}{resource.licenseUrl && <a className={styles.sourceLink} href={resource.licenseUrl} target="_blank" rel="noreferrer">版权 / 使用条款 ↗</a>}</div>
     </details>
 
-    {listening && track && <section ref={audioPanel} className={styles.officialAudio} aria-label="官方听力音频">
+    {listening && track && <section ref={audioPanel} className={styles.officialAudio} aria-label="听力音频">
       <label className={ui.field}>音频 / Part<select className={ui.select} value={trackIndex} onChange={(event) => { audioPanel.current?.querySelector("audio")?.pause(); setTrackIndex(Number(event.target.value)); onRange({}); }}>{resource.audioTracks.map((item, index) => <option value={index} key={item.url + index}>{item.label}</option>)}</select></label>
       <details open><summary>播放与 AB 循环 · {track.label}</summary><ListeningPlayer key={trackIndex + ":" + track.url} audioUrl={track.url} transcript="" onRange={onRange} /></details>
-      <a className={styles.sourceLink} href={track.sourceUrl} target="_blank" rel="noreferrer">音频官方出处 ↗</a>
+      {track.sourceUrl && <a className={styles.sourceLink} href={track.sourceUrl} target="_blank" rel="noreferrer">音频{official ? "官方出处" : "来源"} ↗</a>}
     </section>}
-    {listening && !track && <p className={ui.notice}>这份官方资源未附本地音频，请参阅官方出处说明。</p>}
+    {listening && !track && <p className={ui.notice}>这份资料未附本地音频，请参阅来源说明。</p>}
 
     <DocumentViewer documents={resource.questionDocuments} label="试卷 PDF" />
     <p className={styles.paperHint}>题目与选项以原版 PDF 为准；在右侧按对应题号作答。学习笔记在下方自动保存。</p>
@@ -75,7 +79,7 @@ function DocumentViewer({ documents, label }: { documents: OfficialDocument[]; l
       <label className={ui.field}>{label}<select className={ui.select} value={index} onChange={(event) => { const next = Number(event.target.value); const firstPage = documents[next].page || 1; setIndex(next); setPage(firstPage); setPageInput(String(firstPage)); }}>{documents.map((item, itemIndex) => <option value={itemIndex} key={item.url + itemIndex}>{item.label}</option>)}</select></label>
       <div className={styles.documentPage}><label className={ui.field}>PDF 页码<input className={ui.input} type="text" inputMode="numeric" maxLength={5} aria-label={label + "页码"} value={pageInput} onChange={(event) => setPageInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); goToPage(); } }} /></label><button className={ui.buttonGhost} type="button" onClick={goToPage}>跳转</button></div>
     </div>
-    <div className={styles.documentLinks}><a className={styles.sourceLink} href={url} target="_blank" rel="noreferrer">在新窗口打开 PDF ↗</a><a className={styles.sourceLink} href={document.sourceUrl} target="_blank" rel="noreferrer">该文件官方出处 ↗</a></div>
+    <div className={styles.documentLinks}><a className={styles.sourceLink} href={url} target="_blank" rel="noreferrer">在新窗口打开 PDF ↗</a>{document.sourceUrl && <a className={styles.sourceLink} href={document.sourceUrl} target="_blank" rel="noreferrer">文件来源 ↗</a>}</div>
     <div className={styles.pageControls}><button className={ui.buttonGhost} type="button" disabled={page <= 1} onClick={() => { setPage(page - 1); setPageInput(String(page - 1)); }}>上一页</button><span>{page} / {preview?.total || "…"}</span><button className={ui.buttonGhost} type="button" disabled={!preview || page >= preview.total} onClick={() => { setPage(page + 1); setPageInput(String(page + 1)); }}>下一页</button><label>缩放<select className={ui.select} value={zoom} onChange={(event) => setZoom(Number(event.target.value))}>{[100, 125, 150, 200].map((value) => <option value={value} key={value}>{value}%</option>)}</select></label></div>
     <div className={styles.pdfFrame} aria-busy={!loaded && !error}>
       {error ? <p role="alert">{error}</p> : loaded ? <>{/* eslint-disable-next-line @next/next/no-img-element */}

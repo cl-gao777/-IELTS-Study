@@ -104,6 +104,10 @@ Settings → 选择本应用导出的 JSON → 输入 `RESTORE` → 恢复。恢
 
 ## Upgrade
 
+个人阅读题库可在 Reading →「我的题库」按资料年份搜索，切换原 PDF 的三个
+Passage 并按原题号作答。原文件、附带答案与缺页说明保存在私人资料库。
+来源与批量导入说明见 [docs/PRIVATE_RESOURCES.md](docs/PRIVATE_RESOURCES.md)。
+
 1. 在 Settings 导出完整 JSON。
 2. 停止服务器。
 3. 更新代码，保留 `data/`、`.env.local` 和未提交的个人改动。
