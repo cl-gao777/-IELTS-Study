@@ -5,7 +5,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const Database = require('better-sqlite3');
-const { manualPracticeSchema, officialResourceSchema } = require('./practice-schema.cjs');
+const { manualPracticeSchema, officialResourceSchema, validateReadingPassages } = require('./practice-schema.cjs');
+const { manifestReadingPassages, reviewedDocument } = require('./reading-passages.cjs');
 
 const hash = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');
 const descriptorKey = { questions: 'questionDocuments', answers: 'answerDocuments' };
@@ -37,13 +38,21 @@ async function main() {
       if (document.sha256 !== sha256) throw new Error('PDF changed since review: ' + document.localPath);
       files.set(sha256, { ...document, bytes, content: document.content || files.get(sha256)?.content || '' });
     }
+    const placeholderIds = new Map();
+    const descriptors = set.documents.map((document) => {
+      if (!placeholderIds.has(document.sha256)) placeholderIds.set(document.sha256, placeholderIds.size + 1);
+      return reviewedDocument(document, '/api/uploads/' + placeholderIds.get(document.sha256));
+    });
     set.resource = officialResourceSchema.parse({
       provider: set.provider, classification: 'user-supplied', copyright: set.copyright,
       verifiedAt: set.verifiedAt, notes: set.notes || '', issues: set.issues || [],
       collectionYear: set.collectionYear, originalFileName: path.basename(set.documents[0].localPath),
       originalPath: set.documents[0].localPath, bandEstimateAllowed: false,
-      questionDocuments: set.documents.filter((d) => d.role === 'questions').map((d) => ({ label: d.label, url: '/api/uploads/1', page: d.page, sha256: d.sha256 })),
+      questionDocuments: descriptors.filter((d) => d.role === 'questions'),
+      answerDocuments: descriptors.filter((d) => d.role === 'answers'),
+      readingPassages: manifestReadingPassages(set.readingPassages, descriptors),
     });
+    validateReadingPassages({ kind: set.kind, questions: set.questions, resource: set.resource });
     if (set.questions.length && !set.documents.some((d) => d.role === 'answers')) throw new Error('Scored practice must retain its answer PDF.');
   }
 
@@ -90,6 +99,7 @@ async function main() {
       db.transaction(() => {
         for (const set of pending) {
           const resource = { ...set.resource, questionDocuments: [], answerDocuments: [] };
+          const descriptors = [];
           for (const document of set.documents) {
             let materialId = localFiles.get(document.sha256);
             if (!materialId) {
@@ -99,9 +109,14 @@ async function main() {
               materialId = Number(insertMaterial.run(set.title, 'reading', '用户提供，原文件与来源保存在本机。\nOriginal: ' + document.localPath + '\nSHA256: ' + document.sha256 + '\n\n' + reviewed.content, '', path.basename(document.localPath), 'application/pdf', stored, now).lastInsertRowid);
               localFiles.set(document.sha256, materialId);
             }
-            resource[descriptorKey[document.role]].push({ label: document.label, url: '/api/uploads/' + materialId, sourceUrl: '', page: document.page, sha256: document.sha256 });
+            const descriptor = reviewedDocument(document, '/api/uploads/' + materialId);
+            descriptors.push(descriptor);
+            const { role, ...asset } = descriptor;
+            resource[descriptorKey[role]].push(asset);
           }
+          resource.readingPassages = manifestReadingPassages(set.readingPassages, descriptors);
           officialResourceSchema.parse(resource);
+          validateReadingPassages({ kind: set.kind, questions: set.questions, resource });
           insertSet.run(set.id, 'reading', set.title, set.subtitle || '用户提供的阅读资料', set.instructions || '阅读原 PDF，按题号作答。', '', '', '', set.durationMinutes, JSON.stringify(set.questions), JSON.stringify(resource), now);
           report.push({ id: set.id, status: 'installed', questions: set.questions.length });
         }

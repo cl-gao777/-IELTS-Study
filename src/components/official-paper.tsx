@@ -40,7 +40,7 @@ export function OfficialPaper({ resource, listening, onRange }: { resource: Offi
   </div>;
 }
 
-function RevealDocuments({ documents, label }: { documents: OfficialDocument[]; label: string }) {
+export function RevealDocuments({ documents, label }: { documents: OfficialDocument[]; label: string }) {
   const [open, setOpen] = useState(false);
   if (!documents.length) return null;
   return <details className={styles.resourceDetails} onToggle={(event) => setOpen(event.currentTarget.open)}>

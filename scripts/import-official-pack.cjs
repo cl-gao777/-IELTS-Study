@@ -7,7 +7,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const Database = require('better-sqlite3');
-const { manualPracticeSchema, officialResourceSchema } = require('./practice-schema.cjs');
+const { manualPracticeSchema, officialResourceSchema, validateReadingPassages } = require('./practice-schema.cjs');
+const { manifestReadingPassages, reviewedDocument } = require('./reading-passages.cjs');
 
 async function main() {
   const manifestPath = path.resolve(process.argv[2] || '');
@@ -49,6 +50,20 @@ async function main() {
     const validated = manualPracticeSchema.parse({ questions: set.questions, durationMinutes: set.durationMinutes });
     set.questions = validated.questions;
     set.durationMinutes = validated.durationMinutes;
+    const placeholderIds = new Map();
+    const descriptors = set.documents.map((document) => {
+      const identity = document.sourceUrl + ':' + document.sha256;
+      if (!placeholderIds.has(identity)) placeholderIds.set(identity, placeholderIds.size + 1);
+      return reviewedDocument(document, '/api/uploads/' + placeholderIds.get(identity));
+    });
+    const resource = officialResourceSchema.parse({
+      provider: set.provider, classification: set.classification, sourceUrl: set.sourceUrl, licenseUrl: set.licenseUrl,
+      copyright: set.copyright, verifiedAt: set.verifiedAt, notes: set.notes || '', bandEstimateAllowed: set.bandEstimateAllowed !== false,
+      questionDocuments: descriptors.filter((d) => d.role === 'questions'), answerDocuments: descriptors.filter((d) => d.role === 'answers'),
+      audioTracks: descriptors.filter((d) => d.role === 'audio'), transcriptDocuments: descriptors.filter((d) => d.role === 'transcript'),
+      readingPassages: manifestReadingPassages(set.readingPassages, descriptors),
+    });
+    validateReadingPassages({ kind: set.kind, questions: set.questions, resource });
   }
 
   const databasePath = path.resolve((process.env.DATABASE_URL || 'file:./data/ists.db').replace(/^file:/, ''));
@@ -73,6 +88,7 @@ async function main() {
       for (const set of pack.sets) {
         if (database.prepare('SELECT 1 FROM practice_sets WHERE id=?').get(set.id)) { report.push({ id: set.id, status: 'already installed' }); continue; }
         const resource = { provider: set.provider, classification: set.classification, sourceUrl: set.sourceUrl, licenseUrl: set.licenseUrl, copyright: set.copyright, verifiedAt: set.verifiedAt, notes: set.notes || '', bandEstimateAllowed: set.bandEstimateAllowed !== false, questionDocuments: [], answerDocuments: [], audioTracks: [], transcriptDocuments: [] };
+        const descriptors = [];
         for (const document of set.documents) {
           // A publisher ZIP can contain several different PDFs at one URL.
           const fileIdentity = document.sourceUrl + ':' + document.sha256;
@@ -85,10 +101,14 @@ async function main() {
             materialId = Number(insertMaterial.run(set.provider + ' · ' + set.title + ' · ' + document.label, set.kind, set.copyright + '\n官方原文件，保留全部版权标识，仅个人学习使用。\nSource: ' + document.sourceUrl + '\nSHA256: ' + document.sha256, document.sourceUrl, path.basename(document.localPath), mime, stored, now).lastInsertRowid);
             localBySource.set(fileIdentity, materialId);
           }
-          const descriptor = { label: document.label, url: '/api/uploads/' + materialId, sourceUrl: document.sourceUrl, ...(document.page ? { page: document.page } : {}) };
-          resource[{questions:'questionDocuments',answers:'answerDocuments',audio:'audioTracks',transcript:'transcriptDocuments'}[document.role]].push(descriptor);
+          const descriptor = reviewedDocument(document, '/api/uploads/' + materialId);
+          descriptors.push(descriptor);
+          const { role, ...asset } = descriptor;
+          resource[{questions:'questionDocuments',answers:'answerDocuments',audio:'audioTracks',transcript:'transcriptDocuments'}[role]].push(asset);
         }
+        resource.readingPassages = manifestReadingPassages(set.readingPassages, descriptors);
         officialResourceSchema.parse(resource);
+        validateReadingPassages({ kind: set.kind, questions: set.questions, resource });
         insertSet.run(set.id, set.kind, set.title, set.provider + ' · ' + (set.classification === 'authentic-practice' ? 'Authentic practice test' : '官方公开练习'), set.instructions || '在左侧阅读官方原版试卷，在右侧按相同题号作答。答案与学习记录保存在本机。', '', '', resource.audioTracks[0]?.url || '', set.durationMinutes, JSON.stringify(set.questions), JSON.stringify(resource), now);
         report.push({ id: set.id, status: 'installed', questions: set.questions.length, files: set.documents.length });
       }

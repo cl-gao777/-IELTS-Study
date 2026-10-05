@@ -138,6 +138,24 @@ describe("complete local backup and restore", () => {
     expect(readFileSync(path.join(directory, "ai-provider.secret.json"), "utf8")).toContain("test-secret-must-not-be-exported");
   });
 
+  it("round-trips Passage ranges and rejects a filtered backup that loses original question references", () => {
+    const resource = {
+      provider: "个人阅读资料", classification: "user-supplied", copyright: "Synthetic fixture", verifiedAt: now,
+      questionDocuments: [{ label: "原文与题目", url: "/api/uploads/1", page: 1 }],
+      answerDocuments: [{ label: "参考答案", url: "/api/uploads/1", page: 3 }],
+      readingPassages: [{ id: "passage-1", label: "Passage 1", documents: [{ label: "原文与题目", url: "/api/uploads/1", page: 1, endPage: 2 }], questionIds: ["q2"] }],
+    };
+    holder.database!.prepare("UPDATE practice_sets SET kind='reading', questions_json=?, resource_json=?").run(JSON.stringify([{ id: "q2", kind: "short-answer", prompt: "Synthetic", answers: ["sample"] }]), JSON.stringify(resource));
+    const original = createBackup(); restoreBackup(original);
+    expect(JSON.parse(String(createBackup().data.practice_sets[0].resource_json))).toEqual(resource);
+    const broken = structuredClone(original);
+    broken.data.practice_sets[0].resource_json = JSON.stringify({ ...resource, readingPassages: [{ ...resource.readingPassages[0], questionIds: ["q1"] }] });
+    expect(() => restoreBackup(broken)).toThrow("不存在的题目");
+    expect(createBackup().data).toEqual(original.data);
+    broken.data.practice_sets[0].resource_json = JSON.stringify({ ...resource, readingPassages: [{ ...resource.readingPassages[0], documents: [{ ...resource.readingPassages[0].documents[0], url: "/api/uploads/999" }] }] });
+    expect(() => restoreBackup(broken)).toThrow("资源信息格式无效");
+  });
+
   it("rejects missing tables, missing columns, malformed JSON, and invalid file bytes before mutation", () => {
     const original = createBackup();
     const missingTable = structuredClone(original); delete missingTable.data.vocabulary_reviews;

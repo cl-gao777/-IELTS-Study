@@ -35,6 +35,7 @@ function set(id = "user-reading-fixture") {
       { role: "answers", label: "答案", localPath: pdf, sha256, page: 2 },
     ],
     questions: [{ id: "q1", originalQuestionNumber: 1, kind: "short-answer", prompt: "Synthetic question", answers: ["sample"] }],
+    readingPassages: [{ id: "passage-1", label: "Synthetic Passage", questionIds: ["q1"], documents: [{ documentIndex: 0, page: 1, endPage: 1 }] }],
   };
 }
 function run(sets: ReturnType<typeof set>[]) {
@@ -55,6 +56,8 @@ describe("private PDF pack import", () => {
     expect(resource.sourceUrl).toBe(""); expect(resource.bandEstimateAllowed).toBe(false);
     expect(resource.questionDocuments[0].url).toBe(resource.answerDocuments[0].url);
     expect(resource.answerDocuments[0].page).toBe(2);
+    expect(resource.readingPassages[0].documents[0]).toMatchObject({ url: resource.questionDocuments[0].url, page: 1, endPage: 1 });
+    expect(resource.readingPassages[0].questionIds).toEqual(["q1"]);
     const material = db.prepare("SELECT file_path,content FROM source_materials").get() as { file_path: string; content: string };
     expect(readFileSync(material.file_path)).toEqual(bytes);
     expect(material.content).toContain("Synthetic source text");
@@ -70,6 +73,16 @@ describe("private PDF pack import", () => {
     expect(() => run([set()])).toThrow(/changed since review/);
     expect(readdirSync(uploads)).toHaveLength(0);
     const db = new Database(databasePath); expect(db.prepare("SELECT COUNT(*) AS n FROM practice_sets").get()).toEqual({ n: 0 }); db.close();
+  });
+  it("rejects answer-document references or incomplete Passage question coverage before importing", () => {
+    const answerReference = set(); answerReference.readingPassages[0].documents[0].documentIndex = 1;
+    expect(() => run([answerReference])).toThrow(/reviewed question document/);
+    const exposed = set(); exposed.readingPassages[0].documents[0].endPage = 2;
+    expect(() => run([exposed])).toThrow(/参考答案页/);
+    const missing = set(); missing.readingPassages[0].questionIds = [];
+    expect(() => run([missing])).toThrow(/全部题目/);
+    const db = new Database(databasePath); expect(db.prepare("SELECT COUNT(*) AS n FROM practice_sets").get()).toEqual({ n: 0 }); db.close();
+    expect(readdirSync(uploads)).toHaveLength(0);
   });
   it("refuses to silently replace answers for an installed paper", () => {
     run([set()]); const changed = set(); changed.questions[0].answers = ["different"];

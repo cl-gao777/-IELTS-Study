@@ -24,7 +24,7 @@ import {
 
 import { getDatabase } from "./db";
 import { getPreferences, studyDate } from "./preferences";
-import { parseOfficialResource } from "@/lib/official-resources";
+import { parseOfficialResource, validateReadingPassages } from "@/lib/official-resources";
 
 type Row = Record<string, unknown>;
 
@@ -77,7 +77,7 @@ function wordFromRow(row: Row): VocabularyWord {
 }
 
 function practiceSetFromRow(row: Row): PracticeSet {
-  return {
+  const set: PracticeSet = {
     id: String(row.id),
     kind: String(row.kind) as PracticeSet["kind"],
     title: String(row.title),
@@ -90,6 +90,8 @@ function practiceSetFromRow(row: Row): PracticeSet {
     questions: JSON.parse(String(row.questions_json)) as PracticeQuestion[],
     resource: parseOfficialResource(JSON.parse(String(row.resource_json || "{}"))),
   };
+  validateReadingPassages(set);
+  return set;
 }
 
 function attemptFromRow(row: Row): PracticeAttempt {

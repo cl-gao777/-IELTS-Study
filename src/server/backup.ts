@@ -6,7 +6,8 @@ import { getDatabase, databasePath } from "./db";
 import { ensureLearningTables } from "./learning-workspace-store";
 import { initializeWritingTables } from "./writing-drafts";
 import { ensureVocabularyTables } from "./vocabulary";
-import { officialResourceSchema } from "@/lib/official-resources";
+import { officialResourceSchema, validateReadingPassages } from "@/lib/official-resources";
+import type { PracticeSet } from "@/lib/domain";
 
 type Row = Record<string, string | number | null>;
 export interface StudioBackup {
@@ -109,7 +110,8 @@ export function validateBackup(input: unknown): StudioBackup {
     if (isRecord(resource) && Object.keys(resource).length === 0) continue;
     const parsed = officialResourceSchema.safeParse(resource);
     if (!parsed.success) throw new Error("官方练习的资源信息格式无效。");
-    for (const asset of [...parsed.data.questionDocuments, ...parsed.data.answerDocuments, ...parsed.data.audioTracks, ...parsed.data.transcriptDocuments]) {
+    validateReadingPassages({ kind: String(row.kind) as PracticeSet["kind"], questions: JSON.parse(String(row.questions_json)), resource: parsed.data });
+    for (const asset of [...parsed.data.questionDocuments, ...parsed.data.answerDocuments, ...parsed.data.audioTracks, ...parsed.data.transcriptDocuments, ...(parsed.data.readingPassages ?? []).flatMap((passage) => passage.documents)]) {
       const id = Number(asset.url.split("/").at(-1));
       if (!ids.has(id)) throw new Error("官方练习缺少关联的 PDF 或音频附件。");
     }

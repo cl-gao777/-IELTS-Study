@@ -8,8 +8,15 @@
 ## Reading workflow
 
 打开 Reading →「我的题库」，按资料年份或原文件编号搜索。打开练习后，
-左侧「试卷 PDF」可以切换三个 Passage，按原卷页码翻页、缩放；右侧保留
-原题号作答。参考答案另行展开，原文件入口保留全部排版与整理者标識。
+桌面宽屏左侧阅读材料与题目、右侧答题框约为 2:1，两栏独立滚动。顶部切换
+Passage，左侧仅将当前篇的原 PDF 页连续排列，上下滑动即可阅读；右侧仅显示
+该篇题目，保留原题号。默认适应宽度，可缩放并展开每页提取文字摘录词汇。
+
+答案始终保存在整卷草稿中，切篇不会丢失其他篇的输入或重置计时。每篇按钮
+显示已答数，顶部显示全卷进度，最后提交整卷统一评分。本次页面会话内切回
+某篇会恢复其两栏位置和所选题号；刷新后恢复 SQLite 已保存的答案、笔记和用时，
+从第一篇重新显示材料。参考答案另外展开，不放入当前篇默认阅读范围。
+原文件入口保留完整排版和整理者标识，也可能包含原卷附录或答案。
 
 Practice Attempts 使用附带答案表评分；多选题支持乱序但每个正确选项只计一次。
 可接受的括号、拼写或数量写法需要逐题整理，不能把原答案字符串直接当作一个答案。
@@ -24,7 +31,31 @@ Practice Attempts 使用附带答案表评分；多选题支持乱序但每个�
 真实 `manualPracticeSchema` 校验题型、答案、字数及乱序组。每套练习包含
 `user-reading-*` ID、标题、来源说明、资料年份、时长、题目数组和原始 PDF 描述。
 PDF 描述包含 `role`（questions / answers）、`label`、`localPath`、`sha256`、
-可选起始 `page` 与提取的 `content`。同一原文件可有多个 Passage 视图。
+可选起始 `page`、结束 `endPage` 与提取的 `content`。同一原文件可有多个 Passage 视图。
+
+每套清单可另含 `readingPassages`。其中 `documents[].documentIndex` 是该套
+`documents` 数组中从 0 开始的索引，必须指向 `role: questions`；导入时转换为
+本机上传 URL。范围使用 PDF 实际文件页码，首尾均包含，不能使用印刷页码替代。
+`questionIds` 引用已存在的原题 ID，各篇联合覆盖整套已导入题目且不能重复分配，
+同一乱序答案组必须留在同一篇。原文和题目位于不同 PDF 时，一篇可关联多个范围。
+
+以下是清单字段片段，只展示分组元数据，不含试题或答案内容：
+
+```json
+{
+  "readingPassages": [
+    {
+      "id": "passage-1",
+      "label": "Passage 1",
+      "documents": [
+        { "documentIndex": 0, "page": 2, "endPage": 4, "label": "阅读材料" },
+        { "documentIndex": 1, "page": 4, "endPage": 6, "label": "题目" }
+      ],
+      "questionIds": ["q1", "q2"]
+    }
+  ]
+}
+```
 
 ```powershell
 node scripts/import-private-pack.cjs C:\path\to\reviewed-private-pack.json
@@ -37,7 +68,29 @@ node scripts/import-private-pack.cjs C:\path\to\reviewed-private-pack.json
 发生变化会拒绝替换，保护既有 Practice Attempts。事务失败会回滚数据和新复制文件。
 
 原文件仍在用户提供的位置，工作台使用 `data/uploads` 内的私人副本。恢复完整
-JSON 备份时一并保留个人资料元数据、全部本地附件引用及学习记录。
+JSON 备份时一并保留个人资料元数据、全部本地附件引用及学习记录；恢复前校验
+篇章题目覆盖及嵌套 PDF 引用。未含分篇字段的旧资源仍可读取。
+
+## Reviewed metadata backfill
+
+已有套卷的题目和学习记录不通过重新导入来覆盖。为其添加分篇或修正页码，使用
+`scripts/backfill-reading-passages.cjs` 与私人核对映射。映射格式为
+`ielts-studio-reading-passages`、`version: 1`，每套包含：
+
+- `id` 与 `questionsSha256`：后者是数据库现存 `questions_json` 原样 UTF-8 字符串的 SHA-256。
+- `files: [{sha256, totalPages}]`：已核对原件的哈希及实际 PDF 总页数。
+- 可选 `questionDocuments: [{documentIndex, sha256, page, endPage}]`：修正现有题目视图的锚点；此索引对应已安装资源的 `questionDocuments`。
+- `readingPassages: [{id, label, questionIds, documents: [{sha256, page, endPage, label}]}]`：用原件哈希关联本机 PDF，适用于上传 ID 不同的安装目录。
+
+```powershell
+node scripts/backfill-reading-passages.cjs C:\path\to\reviewed-reading-metadata.json --dry-run
+node scripts/backfill-reading-passages.cjs C:\path\to\reviewed-reading-metadata.json
+```
+
+`--dry-run` 只验证并报告。正式回填先检查所有题目、原件哈希、页范围和题目归属，
+建立 SQLite 安全快照，然后在一个事务中只更新 `practice_sets.resource_json`。
+原题、答案、Attempt、草稿和附件均不重建；重复执行跳过相同映射。原件、题目
+或已有分篇映射变化时拒绝静默覆盖；事务失败会回滚。映射和提取文本留在私人存储。
 
 ## 2021 batch
 

@@ -1,6 +1,6 @@
 # IELTS Studio 架构
 
-记录日期：2026-10-04。面向 Windows、本地单用户、IELTS Academic。日常启动见 [README_LOCAL.md](../README_LOCAL.md)。沿用 ISTS 的 Study Loop、Study Task、Practice Attempt、Learning Signal、Review Item、Source Material 等领域定义，详见 [CONTEXT.md](../CONTEXT.md)。
+记录日期：2026-10-05。面向 Windows、本地单用户、IELTS Academic。日常启动见 [README_LOCAL.md](../README_LOCAL.md)。沿用 ISTS 的 Study Loop、Study Task、Practice Attempt、Learning Signal、Review Item、Source Material 等领域定义，详见 [CONTEXT.md](../CONTEXT.md)。
 
 ## 1. 运行边界
 
@@ -30,7 +30,7 @@ flowchart LR
 | 今日计划与偏好 | `settings`, `studio_preferences`, `study_tasks` | 学习时长、目标分、主题与当天可勾选任务 |
 | 实际学习时间 | `study_sessions` | 可见学习页面的活动 heartbeat；任务预计时长不冒充实际时长 |
 | 资料 | `source_materials`, `material_metadata` | 原文、文件、来源、标签、难度、Section、备注、使用权说明 |
-| 练习 | `practice_sets`, `practice_attempts` | 题目 JSON、来源文本快照、参考答案、作答与成绩 |
+| 练习 | `practice_sets`, `practice_attempts` | 题目 JSON、来源文本快照、参考答案、资源与篇章 JSON、作答与成绩 |
 | 阅读工作台 | `practice_drafts`, `practice_annotations` | 答案草稿、字号、计时、笔记、选区高亮/下划线 |
 | 错误原因 | `practice_mistake_reasons` | `attempt_id + question_id` 唯一，保存错题分类 |
 | 听写 | `dictation_attempts` | 参考文本、输入、AB 时间范围、结构化词级错误 |
@@ -52,11 +52,56 @@ SQLite 默认位置为 `data/ists.db`，通过 `DATABASE_URL` 可更改。上传
 
 有题练习保持原文与题目的历史快照，后续修改资料不更改旧评分依据。无题学习集可读取修正后的 Transcript。
 
+经过核对的官方、个人题库使用离线 pack 导入器，调用应用的题目和资源验证器，
+验证原件哈希并在事务前备份。清单的可选 `readingPassages.documents` 用
+`documentIndex` 引用同套 `documents` 数组；导入后转换为实际 `/api/uploads/ID`，
+支持同篇原文与题本来自不同 PDF。原卷、题干、答案和私人映射不进入代码仓库。
+
+已安装题库补分篇使用 `scripts/backfill-reading-passages.cjs`。私人映射记录现存
+`questions_json` 的 SHA-256、原文件哈希、已核对的总页数、页范围和原题 ID。
+脚本提供只读 dry-run，正式执行先建 SQLite 一致性备份，再事务更新
+`resource_json`；不重建题目、附件、草稿或 Attempt。相同映射重复执行无更新，
+哈希不匹配或已有分篇发生冲突则拒绝覆盖。
+
 ## 4. 阅读与听力
 
 `src/lib/question-types.ts` 是题型描述与输入校验的单一来源。14 个题型共用 text、choice、matching 三种答案控件；表格、摘要、地图的每个空格对应一个独立问题，便于客观评分及按题型聚合。图示题可以引用资料库中的本地图片。
 
-Reading 约 55:45 分栏，左右独立滚动，支持字号、全屏、导航、选区标记和 Notes。草稿及注释自动写入 SQLite；提交失败保留当前答案；重新练习保留历史 Practice Attempt。提交后的错误原因单独写入 durable 表。
+Reading 在桌面宽屏约 2:1 分栏，左右各一个纵向滚动区域，窄屏上下排列。
+顶部选择 Passage；左侧保留原 PDF 排版，连续展示本篇材料与题目，右侧根据
+原题 ID 只显示本篇答题框和导航。单篇专项没有多篇切换栏，原创文本练习继续
+使用文本渲染、字号和选区标记。两种材料均支持 Notes、全屏与计时。
+
+`resource_json` 保留来源、质量说明、原文件及可选
+`readingPassages: [{id, label, documents, questionIds}]`。其中 `documents` 复用
+`OfficialDocument`，但 `page` 与 `endPage` 必填；一篇可关联多个本地 PDF 范围。
+资源校验拒绝非法范围、未关联的题目文件与包含答案的范围。Practice Set 层校验
+引用题目存在、每题恰好分配一次、联合覆盖全套题目、同一乱序组不跨篇。
+旧资源不含此字段仍可读取，不能凭固定题数猜测分篇。
+
+切篇只过滤显示，不裁减 `draft.answers`、题目数组或评分输入。草稿及注释自动
+写入 SQLite，`POST /api/practice/attempts` 始终提交整卷答案和累计用时。当前篇
+题号导航与 N/P 使用原题的全卷索引，避免显示过滤后的重新编号。提交失败保留
+当前答案；重新练习保留历史 Practice Attempt；错误原因单独保存。
+
+每篇左右滚动位置与所选题号只存于当前组件会话的内存，切回时恢复，PDF 的
+等比例占位完成后再次恢复左侧位置。刷新从第一篇开始，但恢复 SQLite 中已保存
+的整卷答案、笔记和计时；阅读位置不作为长期学习记录。答案需显式展开，完整
+原文件入口仍允许用户查看含附录的整份 PDF。
+
+### PDF 连续预览
+
+`GET /api/uploads/[id]/preview?metadata=1` 返回 `{total, pages:[{page,width,height}]}`，
+仅提供页数和尺寸。原有 `?page=N` 返回 `{image,text,page,total,width,height}`，
+保留原接口字段，新增图片尺寸供占位和校验使用；均使用本地 `pdf-parse` worker，
+不依赖 CDN。客户端只展开已核对的篇章页范围，重复物理页按 URL 与页号去重。
+
+客户端给所有页保留等比例占位，仅挂载可见页及前后两页的图片，最多同时请求
+两页，离开窗口或切篇时取消旧请求。图片与提取文字缓存有数量和内存上限，
+远处图片卸载后占位不缩短，失败页可独立重试。缩放保持当前可见页附近的位置。
+服务端按文件路径、大小及修改时间等身份缓存，合并同页在途请求；预览 LRU
+上限为 20 页 / 64 MiB，metadata 为 64 个文件 / 4 MiB。响应使用
+`Cache-Control: private, no-cache`，恢复后的新附件路径不复用旧服务端预览。
 
 Evidence 为题目提供的逐字原文片段，点击 Find Evidence 定位并高亮。没有证据时明确说明，不从答案字符串猜造依据。内置原创练习的 Evidence 通过测试确认出现在原文中；Not Given 的证据是相关上下文，仍应结合解析理解信息缺失。
 
@@ -91,6 +136,10 @@ Academic Task 1 的七类图示与 Task 2 的五类论证题共享草稿编辑�
 完整 JSON 包含 `format: ielts-studio`、`version: 1`、导出时间、全部 SQLite 应用表和 base64 附件。导出先初始化各领域表，避免尚未打开的模块被遗漏。API key 和环境文件不在数据库中，不随完整学习备份导出。
 
 恢复前检查格式、版本、全部表与字段、JSON 列、附件对应关系、总大小及路径；附件路径在导出中转为 `upload:ID`，恢复到新的随机本地文件名，不相信备份中的任意路径。附件合计上限 256 MB，大型库建议关闭服务器后复制整个 data 目录。
+
+练习资源及可选篇章范围随 `resource_json` 一并导出。恢复时对篇章执行相同的
+题目引用、完整覆盖和题组校验，并遍历 `readingPassages[].documents` 的本地
+附件引用；缺失文件、未关联题目 PDF 或含答案的默认范围会拒绝恢复。
 
 恢复前自动保存当前完整安全快照；恢复数据使用 SQLite 事务，并在提交前检查外键。失败时回滚原数据库并移除本次创建的附件。旧附件保留以便恢复，不主动删除用户源文件。
 
