@@ -5,7 +5,7 @@ import { listVocabularyEntries, saveVocabularyEntry } from "@/server/vocabulary"
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const words = listVocabularyEntries(url.searchParams.get("q") ?? "");
-  return NextResponse.json({ words, nextDue: words.find((word) => Date.parse(word.dueAt) <= Date.now()) ?? null });
+  return NextResponse.json({ words, nextDue: words.find((word) => Date.parse(word.dueAt) <= Date.now()) ?? null }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {

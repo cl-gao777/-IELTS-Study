@@ -12,14 +12,24 @@ vi.mock("./db", async (importOriginal) => {
 });
 import { migrate } from "./db";
 import { createBackup, databaseBackup, restoreBackup, validateBackup } from "./backup";
-import { saveVocabularyEntry, reviewVocabularyEntry } from "./vocabulary";
+import { saveVocabularyEntry, reviewVocabularyEntry, listVocabularyEntries } from "./vocabulary";
 import { vocabularyInputSchema } from "../lib/vocabulary";
+import { readVocabularySession, requireVocabularySession } from "./vocabulary-session-store";
+import { canRecoverVocabularyDraft, type VocabularyRecovery } from "../lib/vocabulary-recovery";
 
 let directory: string;
 let uploadDirectory: string;
 let originalFile: string;
 const mediaBytes = Buffer.from([0x52, 0x49, 0x46, 0x46, 0, 1, 2, 3, 255]);
 const now = "2026-10-04T10:00:00.000Z";
+const sessionId = "11111111-1111-4111-8111-111111111111";
+const submissionId = "22222222-2222-4222-8222-222222222222";
+function sessionState(wordId: string, phase: "front" | "revealed" = "front") {
+  return { mode: "spelling", current: { wordId, wordVersion: 1, phase, answer: "evidance", gaveUp: false, confirmedTypo: false, audioPlayed: true, startedAt: now }, skippedIds: [], reviewed: 0, learned: 1, lastSubmissionId: null };
+}
+function addSession(wordId: string, phase: "front" | "revealed" = "front") {
+  insert("vocabulary_sessions", { id: sessionId, revision: 1, status: "active", state_json: JSON.stringify(sessionState(wordId, phase)), started_at: now, updated_at: now });
+}
 
 function insert(table: string, values: Record<string, string | number | null>) {
   const columns = Object.keys(values);
@@ -50,7 +60,12 @@ beforeEach(() => {
   insert("study_sessions", { id: "session-1", study_date: "2026-10-04", area: "Reading", duration_seconds: 600, updated_at: now });
   insert("study_tasks", { id: "task-1", study_date: "2026-10-04", area: "Vocabulary", title: "Review", detail: "Recall words", estimated_minutes: 10, completed: 1, href: "/vocabulary", updated_at: now });
   const word = saveVocabularyEntry(vocabularyInputSchema.parse({ term: "evidence", meaningZh: "证据", sourceSentence: "Evidence matters.", sourceMaterial: "Original sample", wordFamily: ["evident"] }))!.word;
-  reviewVocabularyEntry(word.id, { rating: "again", mode: "spelling", userAnswer: "evidance", correct: false, durationSeconds: 9 }, new Date(now));
+  holder.database.prepare("UPDATE vocabulary_learning_state SET learning_started_at=? WHERE word_id=?").run(now, word.id);
+  holder.database.prepare("UPDATE vocabulary_words SET due_at=? WHERE id=?").run(now, word.id);
+  addSession(word.id, "revealed");
+  reviewVocabularyEntry(word.id, { rating: "again", mode: "spelling", userAnswer: "evidance", durationSeconds: 9, expectedVersion: 1, sessionId, expectedSessionRevision: 1, submissionId, confirmedTypo: false, gaveUp: false }, new Date(now));
+  // The common fixture is a legacy review: no historical answer snapshot is invented.
+  holder.database.exec("DELETE FROM vocabulary_review_audit; DELETE FROM vocabulary_sessions;");
   insert("practice_sets", { id: "sample-listening", kind: "listening", title: "Original sample", subtitle: "test", instructions: "Listen", passage: "", transcript: "Evidence matters.", audio_url: "/api/materials/1/file", duration_minutes: 20, questions_json: "[]", created_at: now });
   insert("practice_attempts", { id: 1, set_id: "sample-listening", kind: "listening", raw_score: 0, total_questions: 1, band_score: 0, duration_seconds: 30, answers_json: '[{"questionId":"q1","correct":false}]', submitted_at: now });
   insert("coach_messages", { id: 1, role: "user", content: "Explain evidence", correction: "", provider: "", created_at: now });
@@ -78,6 +93,113 @@ afterEach(() => {
 });
 
 describe("complete local backup and restore", () => {
+  it("migrates only the known v1 vocabulary additions without changing raw history or FSRS state", () => {
+    const original = createBackup();
+    const legacy = { ...structuredClone(original), version: 1 };
+    for (const table of ["vocabulary_learning_state", "vocabulary_sessions", "vocabulary_review_audit"]) delete legacy.data[table];
+    const frozenInput = JSON.stringify(legacy);
+    expect(validateBackup(legacy).version).toBe(2);
+    expect(JSON.stringify(legacy)).toBe(frozenInput);
+    restoreBackup(legacy);
+    const restored = createBackup();
+    expect(restored.version).toBe(2);
+    for (const table of ["vocabulary_words", "vocabulary_reviews", "vocabulary_review_details", "vocabulary_scheduler_state"]) expect(restored.data[table]).toEqual(original.data[table]);
+    expect(restored.data.vocabulary_learning_state[0].learning_started_at).toBe(now);
+    expect(restored.data.vocabulary_review_audit).toEqual([]);
+    expect(restored.data.vocabulary_sessions).toEqual([]);
+    for (const table of ["vocabulary_reviews", "vocabulary_metadata", "vocabulary_review_details"]) {
+      const invalid = structuredClone(legacy); delete invalid.data[table];
+      expect(() => validateBackup(invalid)).toThrow("缺少数据表");
+    }
+    const missingColumn = structuredClone(legacy); delete missingColumn.data.vocabulary_words[0].meaning_zh;
+    expect(() => validateBackup(missingColumn)).toThrow("缺少字段");
+  });
+
+  it("keeps active/current/skipped/counters and audit snapshots, but invalidates old revisions on v2 restore", () => {
+    const word = createBackup().data.vocabulary_words[0];
+    addSession(String(word.id));
+    const state = { ...sessionState(String(word.id), "revealed"), reviewed: 3, learned: 2, skippedIds: ["skipped-legacy-card"], lastSubmissionId: submissionId };
+    state.current.wordVersion = Number(createBackup().data.vocabulary_learning_state[0].review_version);
+    holder.database!.prepare("UPDATE vocabulary_sessions SET revision=5,state_json=?").run(JSON.stringify(state));
+    insert("vocabulary_review_audit", { review_id: 1, submission_id: submissionId, session_id: sessionId, word_version: 1, requested_rating: "again", effective_rating: "again", decision_reason: "confirmed_typo", term_snapshot: "original-standard-answer", confirmed_typo: 1, gave_up: 0 });
+    const original = createBackup();
+    holder.database!.prepare("UPDATE vocabulary_sessions SET revision=12").run();
+    holder.database!.prepare("UPDATE vocabulary_words SET term='edited-after-review'").run();
+    restoreBackup(original);
+    const restored = createBackup();
+    expect(restored.data.vocabulary_review_audit).toEqual(original.data.vocabulary_review_audit);
+    expect(restored.data.vocabulary_review_details).toEqual(original.data.vocabulary_review_details);
+    expect(readVocabularySession(holder.database!)).toMatchObject({ id: sessionId, revision: 14, status: "active", state });
+    expect(() => requireVocabularySession(holder.database!, sessionId, 5)).toThrow();
+    expect(() => requireVocabularySession(holder.database!, sessionId, 12)).toThrow();
+    expect(requireVocabularySession(holder.database!, sessionId, 14).state.current?.answer).toBe("evidance");
+    restoreBackup(original);
+    expect(readVocabularySession(holder.database!)?.revision).toBe(16);
+    const resumed = reviewVocabularyEntry(String(word.id), {
+      rating: "good", mode: "spelling", userAnswer: "evidance", durationSeconds: 9,
+      expectedVersion: state.current.wordVersion, sessionId, expectedSessionRevision: 16,
+      submissionId: "33333333-3333-4333-8333-333333333333", confirmedTypo: false, gaveUp: false,
+    }, new Date("2026-10-04T10:02:00.000Z"));
+    expect(resumed?.review).toMatchObject({ termSnapshot: "evidence", correct: false, effectiveRating: "again" });
+    expect(resumed?.session?.state).toMatchObject({ current: null, reviewed: 4, learned: 2 });
+  });
+
+  it("distinguishes restored revisions from a lost checkpoint acknowledgement before overlaying a draft", () => {
+    const word = listVocabularyEntries()[0];
+    addSession(word.id);
+    const state = sessionState(word.id); state.current.wordVersion = word.reviewVersion;
+    holder.database!.prepare("UPDATE vocabulary_sessions SET revision=5,state_json=?").run(JSON.stringify(state));
+    const checkpoint = readVocabularySession(holder.database!)!;
+    const recovery: VocabularyRecovery = { format: 2, view: "review", dirty: true, pending: null, startAttempt: null,
+      session: { ...checkpoint, state: { ...checkpoint.state, current: { ...checkpoint.state.current!, answer: "pre-restore unsaved typing" } } },
+      attempted: { revision: 5, state: { mode: checkpoint.state.mode, current: checkpoint.state.current, skippedIds: checkpoint.state.skippedIds } },
+    };
+    const words = listVocabularyEntries();
+    // A genuine single checkpoint acknowledgement can preserve subsequent local typing.
+    expect(canRecoverVocabularyDraft(recovery, { ...checkpoint, revision: 6 }, words)).toBe(true);
+    restoreBackup(createBackup());
+    const restored = readVocabularySession(holder.database!)!;
+    expect(restored.revision).toBe(7);
+    expect(restored.state).toEqual(checkpoint.state);
+    expect(canRecoverVocabularyDraft(recovery, restored, words)).toBe(false);
+  });
+
+  it("requires complete v2 fields and rejects malformed new vocabulary data before replacement", () => {
+    const original = createBackup();
+    for (const table of ["vocabulary_learning_state", "vocabulary_sessions", "vocabulary_review_audit"]) {
+      const missing = structuredClone(original); delete missing.data[table];
+      expect(() => validateBackup(missing)).toThrow("缺少数据表");
+    }
+    const oldField = structuredClone(original); delete oldField.data.practice_sets[0].resource_json;
+    expect(() => validateBackup(oldField)).toThrow("缺少字段");
+    const invalidVersion = structuredClone(original); invalidVersion.data.vocabulary_learning_state[0].review_version = 0;
+    expect(() => validateBackup(invalidVersion)).toThrow("学习状态");
+    addSession(String(original.data.vocabulary_words[0].id));
+    const invalidSession = createBackup(); invalidSession.data.vocabulary_sessions[0].state_json = '{"mode":"recall"}';
+    expect(() => validateBackup(invalidSession)).toThrow("会话状态");
+    const malformed = createBackup(); malformed.data.vocabulary_sessions[0].revision = 1.1;
+    expect(() => validateBackup(malformed)).toThrow("会话状态");
+    malformed.data.vocabulary_sessions[0].revision = Number.MAX_SAFE_INTEGER - 1;
+    expect(() => validateBackup(malformed)).toThrow("会话状态");
+    const missingAudio = createBackup();
+    const draft = JSON.parse(String(missingAudio.data.vocabulary_sessions[0].state_json));
+    delete draft.current.audioPlayed;
+    missingAudio.data.vocabulary_sessions[0].state_json = JSON.stringify(draft);
+    expect(() => validateBackup(missingAudio)).toThrow("会话状态");
+    expect(() => validateBackup({ ...original, arbitrary: true })).toThrow("完整 JSON");
+  });
+
+  it("rolls back restored vocabulary revisions and all staged media when a new-table FK is broken", () => {
+    const wordId = String(createBackup().data.vocabulary_words[0].id);
+    addSession(wordId);
+    const original = createBackup();
+    const invalid = structuredClone(original); invalid.data.vocabulary_learning_state[0].word_id = "missing-word";
+    const filesBefore = readdirSync(uploadDirectory).sort();
+    expect(() => restoreBackup(invalid)).toThrow("关联关系损坏");
+    expect(createBackup().data).toEqual(original.data);
+    expect(readdirSync(uploadDirectory).sort()).toEqual(filesBefore);
+  });
+
   it("restores a full-recording-sized attachment without exhausting the regex stack", () => {
     const bytes = Buffer.alloc(8 * 1024 * 1024, 0x5a);
     writeFileSync(originalFile, bytes);
@@ -92,7 +214,7 @@ describe("complete local backup and restore", () => {
   });
 
   it("upgrades the known pre-resource v1 field without losing prior attempts", () => {
-    const older = createBackup();
+    const older = { ...createBackup(), version: 1 };
     delete older.data.practice_sets[0].resource_json;
     restoreBackup(older);
     const restored = createBackup();
@@ -120,7 +242,7 @@ describe("complete local backup and restore", () => {
     const backup = createBackup();
     const tables = holder.database!.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[];
     expect(Object.keys(backup.data).sort()).toEqual(tables.map((table) => table.name));
-    expect(Object.values(backup.data).every((rows) => rows.length > 0)).toBe(true);
+    expect(Object.entries(backup.data).filter(([table]) => !["vocabulary_sessions", "vocabulary_review_audit"].includes(table)).every(([, rows]) => rows.length > 0)).toBe(true);
     expect(backup.data.source_materials[0].file_path).toBe("upload:1");
     expect(JSON.stringify(backup)).not.toContain("test-secret-must-not-be-exported");
     holder.database!.prepare("UPDATE vocabulary_words SET meaning_zh = 'Changed after backup'").run();

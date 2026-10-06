@@ -9,10 +9,30 @@ export interface ReviewHistoryEntry {
 export interface VocabularyScheduler {
   readonly id: string;
   schedule(state: CardInput, rating: ReviewRating, now: Date): Card;
+  preview(state: CardInput, now: Date): VocabularyReviewPreview["ratings"];
   migrate(history: ReviewHistoryEntry[], now: Date): Card;
 }
 
-const engine = fsrs({ enable_fuzz: false, request_retention: 0.9 });
+export interface VocabularyReviewPreview {
+  scheduler: "fsrs";
+  retention: 0.9;
+  generatedAt: string;
+  currentDueAt: string;
+  wordVersion: number;
+  ratings: Record<ReviewRating, { dueAt: string; intervalSeconds: number; scheduledDays: number }>;
+}
+
+export const vocabularyRetention = 0.9;
+
+// Keep ts-fsrs 5.4.2's learning defaults explicit. A new/learning card repeats
+// after 1 minute on Again; a forgotten review card relearns after 10 minutes.
+const engine = fsrs({
+  enable_fuzz: false,
+  request_retention: vocabularyRetention,
+  enable_short_term: true,
+  learning_steps: ["1m", "10m"],
+  relearning_steps: ["10m"],
+});
 const grades: Record<ReviewRating, Grade> = {
   again: Rating.Again,
   hard: Rating.Hard,
@@ -24,6 +44,17 @@ export const vocabularyScheduler: VocabularyScheduler = {
   id: "fsrs",
   schedule(state, rating, now) {
     return engine.next(state, now, grades[rating]).card;
+  },
+  preview(state, now) {
+    const outcomes = engine.repeat(state, now);
+    return Object.fromEntries((Object.keys(grades) as ReviewRating[]).map((rating) => {
+      const card = outcomes[grades[rating]].card;
+      return [rating, {
+        dueAt: card.due.toISOString(),
+        intervalSeconds: Math.max(0, Math.round((card.due.getTime() - now.getTime()) / 1000)),
+        scheduledDays: card.scheduled_days,
+      }];
+    })) as VocabularyReviewPreview["ratings"];
   },
   migrate(history, now) {
     const valid = history.filter((item) => grades[item.rating] && Number.isFinite(Date.parse(item.reviewedAt)))

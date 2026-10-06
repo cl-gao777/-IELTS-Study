@@ -2,23 +2,29 @@ import "server-only";
 import { existsSync, mkdirSync, readFileSync, realpathSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { z } from "zod";
 import { getDatabase, databasePath } from "./db";
 import { ensureLearningTables } from "./learning-workspace-store";
 import { initializeWritingTables } from "./writing-drafts";
 import { ensureVocabularyTables } from "./vocabulary";
 import { officialResourceSchema, validateReadingPassages } from "@/lib/official-resources";
 import type { PracticeSet } from "@/lib/domain";
+import { vocabularyCardDraftSchema, vocabularySessionStateSchema } from "@/lib/vocabulary-session";
+import { reviewModes } from "@/lib/vocabulary";
+import { refreshVocabularySessionRevisions } from "./vocabulary-session-store";
 
 type Row = Record<string, string | number | null>;
 export interface StudioBackup {
   format: "ielts-studio";
-  version: 1;
+  version: 2;
   exportedAt: string;
   data: Record<string, Row[]>;
   files: { materialId: number; base64: string }[];
 }
 
 const MAX_FILE_BYTES = 256 * 1024 * 1024;
+// The only tables absent from the last known v1 vocabulary schema.
+const V2_VOCABULARY_TABLES = ["vocabulary_learning_state", "vocabulary_sessions", "vocabulary_review_audit"] as const;
 class AttachmentBackupError extends Error {}
 const identifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
 function initialize() { ensureLearningTables(); initializeWritingTables(); ensureVocabularyTables(); }
@@ -58,26 +64,32 @@ export function createBackup(): StudioBackup {
     // Backups must never restore a sender-controlled filesystem path.
     row.file_path = `upload:${row.id}`;
   }
-  return { format: "ielts-studio", version: 1, exportedAt: new Date().toISOString(), data, files };
+  return { format: "ielts-studio", version: 2, exportedAt: new Date().toISOString(), data, files };
 }
 
 export function validateBackup(input: unknown): StudioBackup {
   initialize();
-  if (!isRecord(input) || input.format !== "ielts-studio" || input.version !== 1 || !isRecord(input.data) || !Array.isArray(input.files) || typeof input.exportedAt !== "string" || !Number.isFinite(Date.parse(input.exportedAt))) {
-    throw new Error("请使用 IELTS Studio 完整 JSON 备份（version 1）。");
+  if (!isRecord(input) || Object.keys(input).sort().join(",") !== "data,exportedAt,files,format,version" || input.format !== "ielts-studio" || (input.version !== 1 && input.version !== 2) || !isRecord(input.data) || !Array.isArray(input.files) || typeof input.exportedAt !== "string" || !Number.isFinite(Date.parse(input.exportedAt))) {
+    throw new Error("请使用 IELTS Studio 完整 JSON 备份（version 2 或已知 version 1）。");
   }
-  const backup = input as unknown as StudioBackup;
+  // Validation and a known migration must not mutate the caller's original snapshot.
+  const backup = structuredClone(input) as unknown as StudioBackup;
+  if (input.version === 1) {
+    for (const table of V2_VOCABULARY_TABLES) if (!Object.hasOwn(backup.data, table)) backup.data[table] = [];
+    // Preserve the already-supported pre-resource v1 format, but no arbitrary missing fields.
+    if (Array.isArray(backup.data.practice_sets)) for (const row of backup.data.practice_sets) {
+      if (isRecord(row) && !Object.hasOwn(row, "resource_json")) row.resource_json = "{}";
+    }
+  }
+  backup.version = 2;
   const allowed = new Set(tableNames());
-  // This v1 format is a complete snapshot. A partial import must not erase omitted history.
+  // Both formats are complete snapshots after their explicit additive migration.
   for (const required of allowed) if (!Array.isArray(backup.data[required])) throw new Error(`备份缺少数据表 ${required}，已拒绝恢复。`);
   for (const [table, rows] of Object.entries(backup.data)) {
     if (!allowed.has(table) || !Array.isArray(rows) || rows.length > 500_000) throw new Error("备份含不兼容数据表。");
     const columns = new Set((getDatabase().prepare(`PRAGMA table_info(${identifier(table)})`).all() as { name: string }[]).map((row) => row.name));
     for (const row of rows) {
       if (!isRecord(row)) throw new Error("备份记录格式错误。");
-      // Before official-resource support, v1 practice rows had no resource_json.
-      // Only this known additive field is upgraded; other missing data still fails.
-      if (table === "practice_sets" && !Object.hasOwn(row, "resource_json")) row.resource_json = "{}";
       if (Object.keys(row).length !== columns.size) throw new Error("备份记录缺少字段或格式错误。");
       for (const [key, value] of Object.entries(row)) {
         if (!columns.has(key) || (typeof value !== "string" && typeof value !== "number" && value !== null) || (typeof value === "number" && !Number.isFinite(value))) throw new Error("备份字段不兼容。");
@@ -87,6 +99,7 @@ export function validateBackup(input: unknown): StudioBackup {
       }
     }
   }
+  validateVocabularySnapshot(backup);
   if (backup.data.settings.length !== 1 || backup.data.settings[0].id !== 1) throw new Error("备份缺少有效的个人设置。");
   let bytes = 0;
   const ids = new Set<number>();
@@ -117,6 +130,33 @@ export function validateBackup(input: unknown): StudioBackup {
     }
   }
   return backup;
+}
+
+function validateVocabularySnapshot(backup: StudioBackup) {
+  const validDate = (value: unknown) => typeof value === "string" && Number.isFinite(Date.parse(value));
+  const positiveInteger = (value: unknown) => typeof value === "number" && Number.isSafeInteger(value) && value > 0 && value < Number.MAX_SAFE_INTEGER;
+  const ratings = new Set(["again", "hard", "good", "easy"]);
+  const reasons = new Set(["self_assessed", "correct_answer", "incorrect_answer", "gave_up", "confirmed_typo"]);
+  const stateSchema = vocabularySessionStateSchema.extend({ current: vocabularyCardDraftSchema.extend({ audioPlayed: z.boolean() }).strict().nullable() }).strict();
+  for (const row of backup.data.vocabulary_learning_state) {
+    if (typeof row.word_id !== "string" || !row.word_id || !positiveInteger(row.review_version) || (row.learning_started_at !== null && !validDate(row.learning_started_at))) throw new Error("词汇学习状态无效。");
+  }
+  let activeSessions = 0;
+  for (const row of backup.data.vocabulary_sessions) {
+    const parsed = typeof row.state_json === "string" ? stateSchema.safeParse(JSON.parse(row.state_json)) : null;
+    if (typeof row.id !== "string" || !row.id || !positiveInteger(row.revision) || Number(row.revision) > Number.MAX_SAFE_INTEGER - 2 || !["active", "ended"].includes(String(row.status)) || !validDate(row.started_at) || !validDate(row.updated_at) || !parsed?.success) throw new Error("词汇会话状态无效。");
+    if (row.status === "active") activeSessions++;
+  }
+  if (activeSessions > 1) throw new Error("备份包含多个活动词汇会话。");
+  for (const row of backup.data.vocabulary_review_details) {
+    if (!reviewModes.includes(row.mode as typeof reviewModes[number]) || ![null, 0, 1].includes(row.correct as null | number) || !Number.isInteger(row.duration_seconds) || Number(row.duration_seconds) < 0) throw new Error("词汇原始作答记录无效。");
+  }
+  for (const row of backup.data.vocabulary_review_audit) {
+    if (!positiveInteger(row.review_id) || !positiveInteger(row.word_version) || typeof row.submission_id !== "string" || !row.submission_id || typeof row.session_id !== "string" || !row.session_id || !ratings.has(String(row.requested_rating)) || !ratings.has(String(row.effective_rating)) || !reasons.has(String(row.decision_reason)) || typeof row.term_snapshot !== "string" || !row.term_snapshot || ![0, 1].includes(Number(row.confirmed_typo)) || ![0, 1].includes(Number(row.gave_up)) || typeof row.confirmed_typo !== "number" || typeof row.gave_up !== "number") throw new Error("词汇评分审计记录无效。");
+    const review = backup.data.vocabulary_reviews.find((item) => item.id === row.review_id);
+    const detail = backup.data.vocabulary_review_details.find((item) => item.review_id === row.review_id);
+    if (!review || !detail || review.rating !== row.effective_rating) throw new Error("词汇评分审计与原始复习记录不一致。");
+  }
 }
 
 export function restoreBackup(input: unknown) {
@@ -153,6 +193,7 @@ export function restoreBackup(input: unknown) {
     // Disable only for the synchronous replacement transaction, then check every FK before commit.
     database.pragma("foreign_keys = OFF");
     database.transaction(() => {
+      const priorRevisions = new Map((database.prepare("SELECT id, revision FROM vocabulary_sessions").all() as { id: string; revision: number }[]).map((row) => [row.id, row.revision]));
       for (const table of tableNames()) database.prepare(`DELETE FROM ${identifier(table)}`).run();
       for (const [table, original] of Object.entries(backup.data)) {
         for (const row of table === "source_materials" ? rows : original) {
@@ -160,6 +201,10 @@ export function restoreBackup(input: unknown) {
           database.prepare(`INSERT INTO ${identifier(table)} (${columns.map(identifier).join(",")}) VALUES (${columns.map(() => "?").join(",")})`).run(...columns.map((column) => row[column]));
         }
       }
+      // The active card/queue survive restore, while every old tab's write token expires.
+      refreshVocabularySessionRevisions(database, priorRevisions);
+      // Annotate only newly introduced legacy metadata; never infer old grading snapshots.
+      ensureVocabularyTables(database);
       if ((database.pragma("foreign_key_check") as unknown[]).length) throw new Error("备份关联关系损坏，已取消恢复；原有数据保留。");
       database.prepare("INSERT OR IGNORE INTO studio_migrations(id) VALUES ('initial-seed')").run();
     })();

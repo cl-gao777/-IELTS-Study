@@ -18,6 +18,9 @@ export interface VocabularyMetadata {
 
 export interface VocabularyEntry extends VocabularyWord, VocabularyMetadata {
   scheduler: "fsrs";
+  reviewVersion: number;
+  learningStartedAt: string | null;
+  hasReviewHistory: boolean;
 }
 
 const text = (max: number) => z.string().trim().max(max).default("");
@@ -48,10 +51,28 @@ export function normaliseVocabularyAnswer(value: string) {
   return value.trim().toLocaleLowerCase("en").replace(/[’‘]/g, "'").replace(/\s+/g, " ");
 }
 
+/** One insertion, deletion, substitution, or adjacent transposition; never an empty answer. */
+export function isVocabularyTypoCandidate(answer: string, term: string): boolean {
+  const left = Array.from(normaliseVocabularyAnswer(answer));
+  const right = Array.from(normaliseVocabularyAnswer(term));
+  if (!left.length || !right.length || Math.abs(left.length - right.length) > 1) return false;
+  let at = 0;
+  while (at < Math.min(left.length, right.length) && left[at] === right[at]) at++;
+  if (at === left.length && at === right.length) return false;
+  if (left.length === right.length) {
+    if (left.slice(at + 1).join("") === right.slice(at + 1).join("")) return true;
+    return left[at] === right[at + 1] && left[at + 1] === right[at]
+      && left.slice(at + 2).join("") === right.slice(at + 2).join("");
+  }
+  return left.length > right.length
+    ? left.slice(at + 1).join("") === right.slice(at).join("")
+    : left.slice(at).join("") === right.slice(at + 1).join("");
+}
+
 /** Returns null when the sentence cannot safely become a fill-in-the-gap card. */
 export function vocabularyContextGap(term: string, sentence: string): string | null {
   if (!term.trim() || !sentence.trim()) return null;
-  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escaped = normaliseVocabularyAnswer(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+").replace(/'/g, "['’‘]");
   const expression = new RegExp(`(?<![A-Za-z])${escaped}(?![A-Za-z])`, "gi");
   if (!expression.test(sentence)) return null;
   expression.lastIndex = 0;

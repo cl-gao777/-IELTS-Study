@@ -1,5 +1,6 @@
 'use client';
 import {FormEvent,useState} from 'react';
+import {notifyBackupRestored} from '@/lib/backup-recovery';
 import ui from './page-ui.module.css';
 import type {Preferences} from '@/server/preferences';
 type AiSummary={baseUrl:string,model:string,wireApi:string,hasKey:boolean}|null;
@@ -11,7 +12,7 @@ export function SettingsWorkspace({initial,ai,databasePath}:{initial:Preferences
    const r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const p=await r.json();if(!r.ok)throw new Error(p.error);if(p.preferences)setPreferences(p.preferences);setMessage('设置已保存。');
   }catch(e){setMessage(e instanceof Error?e.message:'保存失败');}finally{setBusy(false);}
  }
- async function restore(event:FormEvent<HTMLFormElement>){event.preventDefault();const d=new FormData(event.currentTarget);const file=d.get('backup') as File;if(!file?.size)return;setBusy(true);try{const backup=JSON.parse(await file.text());const r=await fetch('/api/backup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({backup,confirm:d.get('confirm')})});const p=await r.json();if(!r.ok)throw new Error(p.error);setMessage('恢复成功。旧数据快照保存在 '+p.safetyBackup+(p.warning?'。'+p.warning:''));localStorage.removeItem('ielts-studio-writing-recovery');window.setTimeout(()=>window.location.reload(),1800);}catch(e){setMessage(e instanceof Error?e.message:'恢复失败');}finally{setBusy(false);}}
+ async function restore(event:FormEvent<HTMLFormElement>){event.preventDefault();const d=new FormData(event.currentTarget);const file=d.get('backup') as File;if(!file?.size)return;setBusy(true);try{const backup=JSON.parse(await file.text());const r=await fetch('/api/backup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({backup,confirm:d.get('confirm')})});const p=await r.json();if(!r.ok)throw new Error(p.error);setMessage('恢复成功。旧数据快照保存在 '+p.safetyBackup+(p.warning?'。'+p.warning:''));notifyBackupRestored();window.setTimeout(()=>window.location.reload(),1800);}catch(e){setMessage(e instanceof Error?e.message:'恢复失败');}finally{setBusy(false);}}
  return <div className={ui.page}><header className={ui.pageHeader}><div><p className={ui.eyebrow}>YOUR WORKSPACE</p><h1>设置与数据备份</h1><p>学习节奏由你决定。数据保存在本机，可随时完整带走。</p></div></header>
  {message&&<p role="status" className={ui.notice}>{message}</p>}
  <div className={ui.grid2}><div className={ui.stack}>

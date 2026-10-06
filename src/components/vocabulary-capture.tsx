@@ -25,6 +25,7 @@ export function VocabularyCapture() {
 
   useEffect(() => {
     function capture(event: MouseEvent | KeyboardEvent) {
+      if (pathname === "/vocabulary") return;
       if (event instanceof KeyboardEvent && !event.key.startsWith("Arrow") && event.key !== "Shift") return;
       const target = event.target as HTMLElement | null;
       if (!target || target.closest("[data-vocabulary-capture], input, select, [data-no-vocabulary]")) return;
@@ -75,7 +76,7 @@ export function VocabularyCapture() {
     finally { setBusy(false); }
   }
 
-  if (!selection || selection.path !== pathname) return null;
+  if (pathname === "/vocabulary" || !selection || selection.path !== pathname) return null;
   return <aside className={styles.capture} data-vocabulary-capture aria-label="添加选中单词">
     <div className={styles.captureHeader}><strong>{selection.term}</strong><button type="button" aria-label="关闭选词" onClick={() => setSelection(null)}>×</button></div>
     <p>{selection.sentence.slice(0, 200)}{selection.sentence.length > 200 ? "…" : ""}</p>

@@ -25,7 +25,7 @@ export default function AnalyticsPage() {
   const reasonCount = (rows: { count: number }[]) => rows.reduce((sum, row) => sum + row.count, 0);
   const maxMinutes = Math.max(1, ...data.study.minutesByDay.map((day) => day.minutes));
   return <div className={ui.page}>
-    <header className={ui.pageHeader}><div><p className={ui.eyebrow}>Learning signals</p><h1>学习分析</h1><p>根据本地练习、复习与学习记录，决定下一次把时间投在哪里。所有百分比按真实答题数量计算。</p></div><Link href="/" className={ui.buttonSecondary}>返回 Today</Link></header>
+    <header className={ui.pageHeader}><div><p className={ui.eyebrow}>Learning signals</p><h1>学习分析</h1><p>根据本地练习、复习与学习记录，决定下一次把时间投在哪里。客观正确率按实际作答样本计算，自评记录单独标明。</p></div><Link href="/" className={ui.buttonSecondary}>返回 Today</Link></header>
     <section className={`${ui.panel} ${styles.focus}`}>
       <div><p className={ui.eyebrow}>Next focus</p><h2>{data.focus.text}</h2><p>样本较少、重复作答或材料难度不同，都可能影响正确率。这些记录用于安排训练，不据此推算 IELTS 总分。</p></div><Link href={data.focus.href} className={ui.button}>开始针对练习</Link>
     </section>
@@ -51,10 +51,12 @@ export default function AnalyticsPage() {
       <section className={ui.panel}><p className={ui.eyebrow}>Intensive listening</p><h2>听写差异 · {data.dictationAttempts} 次练习</h2>
         <Distribution rows={data.dictationAttempts ? [{ label: "Missing word · 漏词", count: data.dictationErrors.missing }, { label: "Extra word · 多词", count: data.dictationErrors.extra }, { label: "Wrong word · 听错", count: data.dictationErrors.wrong }, { label: "Spelling · 拼写", count: data.dictationErrors.spelling }] : []} empty="导入音频与 transcript，完成听写后查看词语级差异。" /><p>拼写分类基于字符差异启发式；可在 Mistakes 对照原文复习。</p><Link href="/review" className={ui.buttonSecondary}>进入 Mistakes</Link>
       </section>
-      <section className={ui.panel}><p className={ui.eyebrow}>Vocabulary retention</p><h2>词汇状态与实际回忆</h2>
-        <div className={styles.vocabularyStats}>{[["Known · 稳定卡", data.vocabulary.known], ["Learning · 学习中", data.vocabulary.learning], ["New · 未复习", data.vocabulary.new], ["Due · 当前到期", data.vocabulary.due]].map(([label, value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>
-        <p>稳定卡定义：已复习且当前间隔 ≥ 21 天；这是复习状态，不代表永久掌握。到期数包含新词。</p>
-        <p><strong>回忆成功率 {percent(data.vocabulary.retention)}</strong> · {data.vocabulary.reviews} 次自评中非 Again 的比例。答题型复习准确率 {percent(data.vocabulary.objectiveAccuracy)}。</p>
+      <section className={ui.panel}><p className={ui.eyebrow}>Vocabulary practice</p><h2>词汇复习状态与原始作答</h2>
+        <div className={styles.vocabularyStats}>{[["进入较长复习间隔", data.vocabulary.known], ["Learning · 学习中", data.vocabulary.learning], ["New · 尚未开始学习", data.vocabulary.new], ["Due · 当前到期", data.vocabulary.due]].map(([label, value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>
+        <p>较长间隔指已开始学习且当前复习间隔 ≥ 21 天，不代表四种模式都已掌握。已学后遗忘的词仍属学习中；到期数包含新词。</p>
+        <p><strong>复习自评记得比例 {percent(data.vocabulary.retention)}</strong> · {data.vocabulary.reviews} 次记录中自评非 Again 的比例，旧记录采用原评分。答题型原始准确率 {percent(data.vocabulary.objectiveAccuracy)}（{data.vocabulary.objectiveSampleCount} 个有效样本）。</p>
+        <div className={styles.tableWrap}><table className={ui.table}><thead><tr><th>复习模式</th><th>原始正确 / 样本数</th><th>原始准确率</th><th>确认笔误</th></tr></thead><tbody>{data.vocabulary.byMode.map((row) => <tr key={row.mode}><td>{{ recognition: "认识词义 · 自评", recall: "释义回忆", spelling: "听音拼写", context: "语境填空" }[row.mode]}<br /><small>{row.reviewCount} 次复习</small></td><td>{row.mode === "recognition" ? "仅自评" : `${row.correctCount}/${row.sampleCount}`}</td><td>{percent(row.rawAccuracy)}</td><td>{row.confirmedTypoCount}</td></tr>)}</tbody></table></div>
+        <p>确认笔误 {data.vocabulary.confirmedTypoCount} 次；原始拼写错误仍计入错误，不提高准确率。认识词义没有客观正确率。{data.vocabulary.legacyAuditUnknownCount > 0 ? `另有 ${data.vocabulary.legacyAuditUnknownCount} 次旧记录缺少评分审计，未知笔误不推算。` : ""}</p>
         <h3 className={styles.subheading}>近 7 天复习量</h3><Distribution rows={data.vocabulary.reviewsByDay.map((day) => ({ label: day.date.slice(5), count: day.count }))} empty="暂无复习记录。" />
       </section>
     </div>

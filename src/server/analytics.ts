@@ -4,6 +4,7 @@ import type { AttemptAnswer, PracticeQuestion } from "../lib/domain";
 import { activeStudyStreak, choosePracticeFocus, shiftedStudyDate, summarizeObjective, type AnalyticsAttempt } from "../lib/learning-analytics";
 import { writingFeedbackSchema } from "../lib/writing";
 import { getDatabase } from "./db";
+import { reviewModes } from "../lib/vocabulary";
 
 type Row = Record<string, unknown>;
 function array<T>(json: unknown): T[] {
@@ -40,15 +41,31 @@ export function getLearningAnalytics(database: Database.Database = getDatabase()
     if (error.kind in dictationErrors) dictationErrors[error.kind as keyof typeof dictationErrors] += 1;
   }
   const vocabulary = rows("vocabulary_words"), reviews = rows("vocabulary_reviews");
-  const reviewedCards = vocabulary.filter((word) => Number(word.repetitions) > 0);
+  const learningStates = new Map(rows("vocabulary_learning_state").map((state) => [String(state.word_id), state]));
+  const wordsWithHistory = new Set(reviews.map((review) => String(review.word_id)));
+  // Again may reset repetitions to zero; a first learning action is still learning.
+  const reviewedCards = vocabulary.filter((word) => Boolean(learningStates.get(String(word.id))?.learning_started_at) || wordsWithHistory.has(String(word.id)) || Number(word.repetitions) > 0);
   const known = reviewedCards.filter((word) => Number(word.interval_days) >= 21).length;
-  const successfulReviews = reviews.filter((review) => review.rating !== "again").length;
-  const objectiveReviews = rows("vocabulary_review_details").filter((review) => review.correct === 0 || review.correct === 1);
+  const audit = new Map(rows("vocabulary_review_audit").map((review) => [Number(review.review_id), review]));
+  const successfulReviews = reviews.filter((review) => (audit.get(Number(review.id))?.requested_rating ?? review.rating) !== "again").length;
+  const details = rows("vocabulary_review_details");
+  const objectiveReviews = details.filter((review) => review.mode !== "recognition" && (review.correct === 0 || review.correct === 1));
+  const byMode = reviewModes.map((mode) => {
+    const modeReviews = details.filter((review) => review.mode === mode);
+    const samples = mode === "recognition" ? [] : modeReviews.filter((review) => review.correct === 0 || review.correct === 1);
+    const correct = samples.filter((review) => review.correct === 1).length;
+    return { mode, reviewCount: modeReviews.length, sampleCount: samples.length, correctCount: correct,
+      rawAccuracy: samples.length ? correct / samples.length * 100 : null,
+      confirmedTypoCount: modeReviews.filter((review) => audit.get(Number(review.review_id))?.confirmed_typo === 1).length };
+  });
   const vocabularyStats = {
     total: vocabulary.length, known, learning: reviewedCards.length - known, new: vocabulary.length - reviewedCards.length,
     due: vocabulary.filter((word) => Date.parse(String(word.due_at)) <= now.getTime()).length,
     reviews: reviews.length, retention: reviews.length ? successfulReviews / reviews.length * 100 : null,
     objectiveAccuracy: objectiveReviews.length ? objectiveReviews.filter((row) => row.correct === 1).length / objectiveReviews.length * 100 : null,
+    objectiveSampleCount: objectiveReviews.length, byMode,
+    confirmedTypoCount: [...audit.values()].filter((review) => review.confirmed_typo === 1).length,
+    legacyAuditUnknownCount: reviews.filter((review) => !audit.has(Number(review.id))).length,
     reviewsByDay: weekDates.map((date) => ({ date, count: reviews.filter((review) => day(String(review.reviewed_at)) === date).length })),
   };
   const submissions = new Map(rows("writing_submissions").map((row) => [Number(row.id), row]));
