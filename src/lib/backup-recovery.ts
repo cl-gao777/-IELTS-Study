@@ -3,7 +3,7 @@ export const BACKUP_RESTORE_CHANNEL = "ielts-studio-restores";
 
 /** Browser caches never take precedence over a successfully restored database. */
 export function notifyBackupRestored() {
-  for (const key of ["ielts-studio-writing-recovery", "ielts-studio-vocabulary-recovery"]) {
+  for (const key of ["ielts-studio-writing-recovery", "ielts-studio-vocabulary-recovery", "ielts-studio-vocabulary-assessment", "ielts-studio-vocabulary-study"]) {
     try { localStorage.removeItem(key); } catch { /* Storage may be unavailable; still invalidate open screens. */ }
   }
   window.dispatchEvent(new Event(BACKUP_RESTORED_EVENT));

@@ -1,0 +1,115 @@
+{
+  "acquiredAt": "2026-10-07T12:37:22.145547+00:00",
+  "version": "1.2",
+  "attribution": "Browne, C., Culligan, B., and Phillips, J. — New General Service List Project",
+  "license": "CC-BY-SA-4.0",
+  "sources": [
+    {
+      "id": "ngsl-members",
+      "url": "https://www.newgeneralservicelist.com/s/NGSL_12_stats.csv",
+      "sha256": "2098bab8955a120a9766c6282a51d7d578c6cb0a7d946600d2ffb73ba25a0b44",
+      "bytes": 62566,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "id": "ngsl-definitions",
+      "url": "https://www.newgeneralservicelist.com/s/NGSL_12_with_English_definitions.xlsx",
+      "sha256": "27f8bb4e0948719ffef01a42de0f9e01089b78a12bd576b480d5f14df5e3341c",
+      "bytes": 121077,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "id": "nawl-members",
+      "url": "https://www.newgeneralservicelist.com/s/NAWL_12_alphabetized_description.txt",
+      "sha256": "88a99099e10010ea40992cca4a5119102d05a0f2888ee5d43d4c8b4afd597fef",
+      "bytes": 10340,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "id": "nawl-definitions",
+      "url": "https://www.newgeneralservicelist.com/s/NAWL_12_with_en_definitions.csv",
+      "sha256": "2eca6b402b2cd17a8a0ce79f0ab6880bef8af2f4dbab38d045321cecaa3284a4",
+      "bytes": 71275,
+      "license": "CC-BY-SA-4.0"
+    }
+  ],
+  "counts": {
+    "general": 2809,
+    "academic": 957
+  },
+  "missingDefinitions": [
+    "email",
+    "cheer",
+    "descendent"
+  ],
+  "extraNawlDefinitions": [
+    "cheers",
+    "criteria",
+    "founds"
+  ],
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "sourcePages": [
+    "https://www.newgeneralservicelist.com/new-general-service-list",
+    "https://www.newgeneralservicelist.com/new-academic-word-list"
+  ],
+  "contentVersion": 3,
+  "complete": true,
+  "publishedEntries": 3766,
+  "publishedExercises": 7532,
+  "catalogSha256": "d2bed0ba7524b9c8247e299bbfc23e71a88860435d46736a9119b8887d1812dd",
+  "adaptations": {
+    "chineseMeanings": "IELTS Studio 原创",
+    "contextExamples": "IELTS Studio 原创学习例句（非雅思试题）",
+    "definitionCorrectionsAndSupplements": {
+      "email": "An electronic message sent over a computer network; to send such a message.",
+      "cheer": "To shout encouragement or express happiness; a shout of encouragement.",
+      "descendent": "A person, animal, or plant descended from an earlier ancestor.",
+      "he": "The pronoun used as the subject for a male person already mentioned.",
+      "as": "In the role or capacity of; used to compare equal qualities.",
+      "some": "An unspecified amount or number of something.",
+      "week": "A period of seven days.",
+      "program": "An organised set of activities or instructions for a computer.",
+      "process": "To treat material or information using a series of operations.",
+      "price": "To decide how much money to charge for something.",
+      "else": "In addition or instead; used after words such as who, what, and somewhere.",
+      "please": "A polite expression used when asking someone to do something.",
+      "distribution": "The way something is spread among places or people; the act of supplying or giving it out.",
+      "headquarter": "To establish the main office or centre of an organisation in a particular place.",
+      "ex": "A prefix meaning former, as in ex-president; in some other formations, out of or from.",
+      "star": "A large ball of hot gas in space that produces its own light.",
+      "software": "Programs and instructions used by a computer.",
+      "regard": "Care, attention, or respect for someone or something.",
+      "cancer": "A disease in which abnormal cells grow uncontrollably and may spread to other parts of the body.",
+      "tumor": "An abnormal mass of tissue, which may be benign or cancerous.",
+      "fungus": "An organism such as a mushroom, mould, or yeast that absorbs nutrients from organic matter.",
+      "dioxide": "An oxide containing two oxygen atoms in each molecule.",
+      "rid": "To free someone or something from an unwanted thing.",
+      "compose": "To write or create music or a piece of writing; to form or make up something.",
+      "moon": "The Earth's natural satellite, visible by reflected sunlight.",
+      "artificial": "Made by people rather than occurring naturally.",
+      "amino": "Relating to an amino group or amino acids.",
+      "atom": "The smallest unit of a chemical element that retains its chemical properties.",
+      "algorithm": "A step-by-step procedure or set of rules for solving a problem.",
+      "chloride": "A compound containing chlorine combined with another element, or the chloride ion.",
+      "capitalism": "An economic system based on private ownership of businesses and the means of production.",
+      "capitalist": "A person who owns or invests capital in a business, or supports capitalism.",
+      "constrain": "To limit or restrict what someone or something can do.",
+      "wherever": "In, at, or to any place; in every place where.",
+      "stair": "A step in a set of steps leading from one level to another.",
+      "nerve": "A bundle of fibres that carries signals between the brain or spinal cord and the body.",
+      "organic": "Relating to living things or carbon-based compounds; for food, produced using organic farming methods.",
+      "rose": "A flowering shrub, or its flower, which has layered petals and is often fragrant.",
+      "theoretical": "Based on ideas or principles rather than practical use or experience.",
+      "amplitude": "The greatest displacement or variation from an equilibrium value, as in a wave or vibration.",
+      "antibiotic": "A medicine that kills bacteria or inhibits their growth.",
+      "capillary": "A very small blood vessel connecting the smallest arteries and veins.",
+      "acid": "A substance that can donate hydrogen ions; many acids have a sour taste and react with bases.",
+      "assignment": "A task or piece of work given to someone to complete.",
+      "bound": "Certain or very likely to happen; travelling towards a particular place.",
+      "cognitive": "Relating to mental processes such as thinking, knowing, remembering, and learning.",
+      "complication": "An additional problem that makes a situation more difficult.",
+      "consumption": "The use of resources or goods; the act of eating or drinking."
+    }
+  },
+  "missingAuthoredCount": 0
+}

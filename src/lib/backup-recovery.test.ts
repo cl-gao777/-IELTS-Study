@@ -4,14 +4,14 @@ import { BACKUP_RESTORED_EVENT, BACKUP_RESTORE_CHANNEL, notifyBackupRestored } f
 afterEach(() => vi.unstubAllGlobals());
 
 describe("backup restore browser invalidation", () => {
-  it("clears both draft caches and tells current and other tabs to reload server state", () => {
+  it("clears writing, vocabulary, assessment and timer caches and tells every tab to reload", () => {
     const removeItem = vi.fn(), dispatchEvent = vi.fn(), postMessage = vi.fn(), close = vi.fn();
     vi.stubGlobal("localStorage", { removeItem });
     vi.stubGlobal("window", { dispatchEvent });
     const channels: string[] = [];
     vi.stubGlobal("BroadcastChannel", class { constructor(name: string) { channels.push(name); } postMessage = postMessage; close = close; });
     notifyBackupRestored();
-    expect(removeItem.mock.calls).toEqual([["ielts-studio-writing-recovery"], ["ielts-studio-vocabulary-recovery"]]);
+    expect(removeItem.mock.calls).toEqual([["ielts-studio-writing-recovery"], ["ielts-studio-vocabulary-recovery"], ["ielts-studio-vocabulary-assessment"], ["ielts-studio-vocabulary-study"]]);
     expect(dispatchEvent.mock.calls[0][0].type).toBe(BACKUP_RESTORED_EVENT);
     expect(channels).toEqual([BACKUP_RESTORE_CHANNEL]);
     expect(postMessage).toHaveBeenCalledWith({ type: BACKUP_RESTORED_EVENT });

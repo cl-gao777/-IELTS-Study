@@ -1,2 +1,9 @@
 * text=auto eol=lf
 *.bat text eol=crlf
+# Downloaded provenance and the generated catalog are verified byte-for-byte.
+# Preserve their published SHA-256 values across Windows/Linux checkouts.
+src/data/vocabulary-catalog.json -text -diff
+src/data/vocabulary-sources/ngsl-members.csv -text -diff
+src/data/vocabulary-sources/ngsl-definitions.xlsx -text -diff
+src/data/vocabulary-sources/nawl-members.txt -text -diff
+src/data/vocabulary-sources/nawl-definitions.csv -text -diff

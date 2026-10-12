@@ -4,8 +4,11 @@ import { listVocabularyEntries, saveVocabularyEntry } from "@/server/vocabulary"
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const words = listVocabularyEntries(url.searchParams.get("q") ?? "");
-  return NextResponse.json({ words, nextDue: words.find((word) => Date.parse(word.dueAt) <= Date.now()) ?? null }, { headers: { "Cache-Control": "no-store" } });
+  const all = listVocabularyEntries(url.searchParams.get("query") ?? url.searchParams.get("q") ?? "");
+  const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
+  const pageSize = Math.max(1, Math.min(100, Number(url.searchParams.get("pageSize")) || 30));
+  const words = url.searchParams.has("page") || url.searchParams.has("pageSize") ? all.slice((page - 1) * pageSize, page * pageSize) : all;
+  return NextResponse.json({ words, total: all.length, page, pageSize, nextDue: all.find((word) => Date.parse(word.dueAt) <= Date.now()) ?? null }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {

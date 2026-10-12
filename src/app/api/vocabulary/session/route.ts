@@ -6,9 +6,10 @@ import { changeVocabularySession, getVocabularySession } from "@/server/vocabula
 import { vocabularyConflictResponse } from "@/server/vocabulary-session-http";
 
 const sessionSchema = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("start"), id: z.uuid().optional(), mode: z.enum(reviewModes).default("recall") }).strict(),
+  z.object({ action: z.literal("start"), id: z.uuid().optional(), restoreVersion: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER - 2), mode: z.enum(reviewModes).default("context"), courseId: z.string().min(1).max(200).nullable().optional() }).strict(),
   z.object({ action: z.literal("checkpoint"), id: z.uuid(), expectedRevision: z.number().int().positive(), state: vocabularyCheckpointSchema }).strict(),
   z.object({ action: z.literal("end"), id: z.uuid(), expectedRevision: z.number().int().positive() }).strict(),
+  z.object({ action: z.literal("next"), id: z.uuid(), expectedRevision: z.number().int().positive() }).strict(),
 ]);
 export async function GET(request: Request) {
   const submissionId = new URL(request.url).searchParams.get("submissionId") ?? undefined;

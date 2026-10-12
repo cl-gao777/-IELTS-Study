@@ -12,7 +12,7 @@ export function ensureVocabularySessionTables(database: Database.Database) {
 export function readVocabularySession(database: Database.Database, id?: string): VocabularySession | null {
   const row = (id
     ? database.prepare("SELECT * FROM vocabulary_sessions WHERE id = ?").get(id)
-    : database.prepare("SELECT * FROM vocabulary_sessions ORDER BY rowid DESC LIMIT 1").get()) as SessionRow | undefined;
+    : database.prepare("SELECT * FROM vocabulary_sessions ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END, updated_at DESC, started_at DESC, id ASC LIMIT 1").get()) as SessionRow | undefined;
   if (!row) return null;
   return { id: row.id, revision: row.revision, status: row.status,
     state: vocabularySessionStateSchema.parse(JSON.parse(row.state_json)), startedAt: row.started_at, updatedAt: row.updated_at };

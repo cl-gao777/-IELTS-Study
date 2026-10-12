@@ -20,7 +20,11 @@ describe("real local PDF preview", () => {
     expect(preview.height).toBe(png.readUInt32BE(20));
     expect(preview.width).toBe(1200);
     expect(preview.text).toContain("Urban gardens support native insects.");
+    const extracted = await service.text(file, [1, 1]);
+    expect(extracted).toHaveLength(1);
+    expect(extracted[0]).toMatchObject({ page: 1, text: expect.stringContaining("Urban gardens support native insects.") });
     expect(preview.height / preview.width).toBeCloseTo(metadata.pages[0].height / metadata.pages[0].width, 2);
     await expect(service.page(file, 2)).rejects.toMatchObject({ status: 400 });
+    await expect(service.text(file, [2])).rejects.toMatchObject({ status: 400 });
   });
 });

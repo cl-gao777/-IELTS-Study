@@ -24,6 +24,8 @@ export default function AnalyticsPage() {
   const unfinishedBaseline = !data.reading.total || !data.listening.total || !data.completedDrafts;
   const reasonCount = (rows: { count: number }[]) => rows.reduce((sum, row) => sum + row.count, 0);
   const maxMinutes = Math.max(1, ...data.study.minutesByDay.map((day) => day.minutes));
+  const assessment = data.vocabulary.assessment, lastAssessment = assessment.lastResult;
+  const targetStats = data.vocabulary.targets, auxiliary = data.vocabulary.supplemental;
   return <div className={ui.page}>
     <header className={ui.pageHeader}><div><p className={ui.eyebrow}>Learning signals</p><h1>学习分析</h1><p>根据本地练习、复习与学习记录，决定下一次把时间投在哪里。客观正确率按实际作答样本计算，自评记录单独标明。</p></div><Link href="/" className={ui.buttonSecondary}>返回 Today</Link></header>
     <section className={`${ui.panel} ${styles.focus}`}>
@@ -54,9 +56,21 @@ export default function AnalyticsPage() {
       <section className={ui.panel}><p className={ui.eyebrow}>Vocabulary practice</p><h2>词汇复习状态与原始作答</h2>
         <div className={styles.vocabularyStats}>{[["进入较长复习间隔", data.vocabulary.known], ["Learning · 学习中", data.vocabulary.learning], ["New · 尚未开始学习", data.vocabulary.new], ["Due · 当前到期", data.vocabulary.due]].map(([label, value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>
         <p>较长间隔指已开始学习且当前复习间隔 ≥ 21 天，不代表四种模式都已掌握。已学后遗忘的词仍属学习中；到期数包含新词。</p>
+        <div className={styles.practiceCounts}>{[["已记录首次学习词数", data.vocabulary.firstLearningCount], ["正式调度评分次数", data.vocabulary.scheduledGradeCount], ["辅助语境练习次数", data.vocabulary.supplemental.attemptCount]].map(([label, value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>
+        <p>首次学习只统计已有明确学习开始时间的词；{data.vocabulary.firstLearningUnknownCount > 0 ? `${data.vocabulary.firstLearningUnknownCount} 个历史已学词的首次时间未知，不推测补写。` : "未记录开始时间的历史词不计入该数。"}浏览课程、导入与摸底不算首次学习或调度评分。</p>
         <p><strong>复习自评记得比例 {percent(data.vocabulary.retention)}</strong> · {data.vocabulary.reviews} 次记录中自评非 Again 的比例，旧记录采用原评分。答题型原始准确率 {percent(data.vocabulary.objectiveAccuracy)}（{data.vocabulary.objectiveSampleCount} 个有效样本）。</p>
-        <div className={styles.tableWrap}><table className={ui.table}><thead><tr><th>复习模式</th><th>原始正确 / 样本数</th><th>原始准确率</th><th>确认笔误</th></tr></thead><tbody>{data.vocabulary.byMode.map((row) => <tr key={row.mode}><td>{{ recognition: "认识词义 · 自评", recall: "释义回忆", spelling: "听音拼写", context: "语境填空" }[row.mode]}<br /><small>{row.reviewCount} 次复习</small></td><td>{row.mode === "recognition" ? "仅自评" : `${row.correctCount}/${row.sampleCount}`}</td><td>{percent(row.rawAccuracy)}</td><td>{row.confirmedTypoCount}</td></tr>)}</tbody></table></div>
+        <div className={styles.tableWrap}><table className={ui.table}><thead><tr><th>正式复习模式</th><th>原始正确 / 样本数</th><th>原始准确率</th><th>确认笔误</th></tr></thead><tbody>{data.vocabulary.byMode.map((row) => <tr key={row.mode}><td>{{ recognition: "认识词义 · 自评", recall: "释义回忆", spelling: "听音拼写", context: "语境填空" }[row.mode]}<br /><small>{row.reviewCount} 次复习</small></td><td>{row.mode === "recognition" ? "仅自评" : `${row.correctCount}/${row.sampleCount}`}</td><td>{percent(row.rawAccuracy)}</td><td>{row.confirmedTypoCount}</td></tr>)}</tbody></table></div>
         <p>确认笔误 {data.vocabulary.confirmedTypoCount} 次；原始拼写错误仍计入错误，不提高准确率。认识词义没有客观正确率。{data.vocabulary.legacyAuditUnknownCount > 0 ? `另有 ${data.vocabulary.legacyAuditUnknownCount} 次旧记录缺少评分审计，未知笔误不推算。` : ""}</p>
+        <h3 className={styles.subheading}>辅助练习与分钟巩固</h3>
+        <p>辅助原始准确率 <strong>{percent(auxiliary.rawAccuracy)}</strong> · {auxiliary.correctCount}/{auxiliary.sampleCount} 个有效样本 · 确认笔误 {auxiliary.confirmedTypoCount} 次。额外换句和用法分钟巩固独立记录，不改变 FSRS，也不混入正式复习准确率；确认笔误仍保留原始错误。</p>
+        <div className={styles.tableWrap}><table className={ui.table}><thead><tr><th>辅助练习</th><th>次数</th><th>原始正确 / 样本数</th><th>原始准确率</th></tr></thead><tbody>{[{ label: "追加一句", stats: auxiliary.extraSentence }, { label: "用法分钟巩固", stats: auxiliary.consolidation }].map(({ label, stats }) => <tr key={label}><td>{label}</td><td>{stats.attemptCount}</td><td>{stats.correctCount}/{stats.sampleCount}</td><td>{percent(stats.rawAccuracy)}</td></tr>)}</tbody></table></div>
+        <p>与正式到期复习合并的用法巩固 {auxiliary.mergedScheduledGradeCount} 次，已包含在正式评分中，每次只推进一次 FSRS。{auxiliary.unknownPurposeCount > 0 ? ` ${auxiliary.unknownPurposeCount} 次旧辅助记录的具体用途未知，保留在辅助总数中。` : ""}</p>
+        <h3 className={styles.subheading}>用法介绍与个人暂停</h3>
+        <div className={styles.practiceCounts}>{[["已有明确介绍时间的用法", targetStats.introducedTargetCount], ["当前自报已会的用法", targetStats.selfReportedKnownTargetCount], ["整词暂停", targetStats.pausedTermCount]].map(([label, value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>
+        <p>课程共记录 {targetStats.catalogTargetCount} 个用法；自报已会操作 {targetStats.selfReportedKnownActionCount} 次。自报已会和整词暂停用于排除学习目标，不计入客观掌握、准确率或 FSRS 评分。{targetStats.focus === "ielts-advanced" ? "当前按雅思进阶策略" : "当前按通用策略"}有 {targetStats.consolidationPendingCount} 个待巩固用法，其中 {targetStats.consolidationDueCount} 个已到分钟步骤；旧记录未有明确介绍时间的用法不推测补写。</p>
+        <h3 className={styles.subheading}>课程摸底</h3>
+        <p>已完成 {assessment.completedCount} 次 · 进行中 {assessment.activeCount} 次 · 已完成测评中明确跳过 {assessment.skippedQuestionCount} 道题。摸底只用于选课，不改变 FSRS，也不推算总词汇量。{assessment.resultUnknownCount > 0 ? ` ${assessment.resultUnknownCount} 次历史结果缺少可核对的完整题面，保持未知。` : ""}</p>
+        {lastAssessment ? <div className={styles.assessmentResult}><strong>最近结果：{lastAssessment.correct}/{lastAssessment.total} 题正确</strong><span>{lastAssessment.answered} 题作答 · {lastAssessment.skipped} 题跳过 · {date(lastAssessment.completedAt)}</span><p>建议 {lastAssessment.recommendedCourseTitle}{lastAssessment.recommendedCourseId === "general" ? `，从第 ${lastAssessment.recommendedStartRank} 个词所在频档开始` : ""}。</p><div className={styles.assessmentBands}>{lastAssessment.bands.map((band) => <span key={band.band}>{band.band === "nawl" ? "学术" : `基础频档 ${band.band.slice(-1)}`} {band.correct}/{band.total}</span>)}</div></div> : <div className={ui.empty}>暂无可核对的摸底结果。可在词汇课程页开始 30 题摸底，或跳过并直接选择学术课程。</div>}
         <h3 className={styles.subheading}>近 7 天复习量</h3><Distribution rows={data.vocabulary.reviewsByDay.map((day) => ({ label: day.date.slice(5), count: day.count }))} empty="暂无复习记录。" />
       </section>
     </div>

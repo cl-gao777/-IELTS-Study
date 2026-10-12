@@ -125,6 +125,20 @@ export function createPdfPreviewService(limits: Partial<CacheLimits> = {}) {
   );
 
   return {
+    /** Text extraction shares one parser for the requested range; no image rendering. */
+    async text(filePath: string, pages: readonly number[]) {
+      const requested = [...new Set(pages)].sort((a, b) => a - b);
+      if (!requested.length || requested.some((page) => !Number.isInteger(page) || page < 1 || page > 1000)) {
+        throw new PdfPreviewError("请输入有效的 PDF 页码范围。", 400);
+      }
+      await fileIdentity(filePath);
+      return withParser(filePath, async (parser) => {
+        const info = await parser.getInfo();
+        if (requested.at(-1)! > info.total) throw new PdfPreviewError(`该 PDF 共 ${info.total} 页。`, 400);
+        const result = await parser.getText({ partial: requested, pageJoiner: "" });
+        return result.pages.map((page) => ({ page: page.num, text: page.text }));
+      });
+    },
     async metadata(filePath: string): Promise<PdfPreviewMetadata> {
       const key = await fileIdentity(filePath);
       return metadata.get(key, () => withParser(filePath, async (parser) => {
