@@ -26,6 +26,13 @@ learning pack uses CC BY-SA 4.0 with its source files and hash manifest.
   hash are preserved.
 - `scripts/smoke-local-install.cjs` repeats this check after a production build.
   GitHub Actions runs checks and this smoke on Windows and Ubuntu with Node 24.
+- A new Git clone with no inherited `node_modules`, `.env`, database or private
+  course installed 518 locked packages successfully. The same 352 tests, type
+  check, lint, production build and HTTP/restart smoke passed in that clone.
+- The publication audit inspected 302 tracked files and 506 reachable historical
+  blobs: no private runtime paths or common credential patterns were found.
+  The catalog and all four downloaded sources match their indexed SHA-256;
+  Git attributes preserve those bytes across different checkout line endings.
 
 The optional Docker runtime has been corrected to the npm lockfile and full
 Linux runtime layout. Docker was unavailable locally, so no Docker build/run
