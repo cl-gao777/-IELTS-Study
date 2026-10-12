@@ -6,10 +6,8 @@ local-first product boundary described in `CONTEXT.md`.
 Before opening a pull request:
 
 ```bash
-pnpm test
-pnpm typecheck
-pnpm lint
-pnpm build
+npm ci
+npm run check
 ```
 
 Do not add copyrighted IELTS books, audio, past papers, scraped question banks,

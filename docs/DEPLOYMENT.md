@@ -1,126 +1,106 @@
-# Production deployment
+# Local deployment and optional Linux packaging
 
-This guide keeps ISTS isolated from unrelated sites and applications.
+IELTS Studio is a private workspace for one learner. The supported release
+workflow is cloning the source and running it locally. Node.js 24 is recommended;
+Windows users can double-click `start.bat`. See [README_LOCAL.md](../README_LOCAL.md).
+No AI account is required for the offline learning features.
 
-## Directory layout
+## Run from source on Linux or macOS
 
-```text
-/www/wwwroot/ists/
-  current/          application checkout
-  shared/
-    .env.production
-    .htpasswd
-    data/
-```
-
-`current/data` should be a symlink to `shared/data` so deployments never replace
-the learner's database or uploads.
-
-## Build
+Use the committed npm lockfile, not the upstream project's old pnpm commands:
 
 ```bash
-cd /www/wwwroot/ists/current
-corepack enable
-pnpm install --frozen-lockfile
-pnpm test
-pnpm typecheck
-pnpm lint
-pnpm build
+npm ci
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm start
 ```
 
-Example production environment:
+Open `http://127.0.0.1:3000`. `npm start` binds to loopback. The first run creates
+`data/ists.db` and `data/uploads/`; each clone has its own local learning records.
+The public NGSL/NAWL courses and original sample exercises work without private
+PDFs or `data/vocabulary-private-catalog.json`. Private course packages and
+imported material must be supplied separately by their owner.
 
-```env
-NODE_ENV=production
-PORT=3210
-HOSTNAME=127.0.0.1
-DATABASE_URL=file:./data/ists.db
-UPLOAD_DIR=/www/wwwroot/ists/shared/data/uploads
-APP_TIME_ZONE=Asia/Shanghai
-AI_PROVIDERS_JSON=
-AI_BASE_URL=
-AI_API_KEY=
-AI_MODEL=
-NOTION_TOKEN=
-NOTION_PARENT_PAGE_ID=
-ISTS_BASIC_AUTH_USER=aimer
-ISTS_BASIC_AUTH_PASSWORD=use-a-long-random-password
+SQLite and PDF rendering use native Node modules. Run `npm ci` on the target
+operating system and CPU architecture; do not copy Windows `node_modules` to
+Linux. If a native prebuilt binary is unavailable, install the platform's native
+build tools and retry. No Linux or macOS source launch was executed as part of
+this Windows release validation.
+
+## Optional Docker runtime
+
+The Dockerfile uses Node.js 24, `npm ci`, an ordinary `next build`, and
+`next start`. It does not require `output: standalone`. Only explicit public
+source inputs are copied; personal `data/`, `work/`, `.env` files and Git history
+are not included. The runtime retains the full Linux `node_modules` and the
+public learning pack with its source manifest and licence.
+
+**Docker was not available on the Windows machine used for this release. This
+optional image and Linux archive have been reviewed but not built or started
+there; validate them on your Docker installation before relying on them.**
+
+```bash
+docker build --target runner -t ielts-studio .
+docker volume create ielts-studio-data
+docker run --rm --name ielts-studio \
+  -p 127.0.0.1:3000:3000 \
+  --mount type=volume,source=ielts-studio-data,target=/app/data \
+  ielts-studio
 ```
 
-If the server already has a working Codex configuration, ISTS can discover it
-from `CODEX_HOME` or the service user's `~/.codex`.
+The service listens on `0.0.0.0:3000` **inside the container** so Docker can
+forward traffic. The example publishes the host port only on `127.0.0.1`, not
+the LAN or internet. Persist `/app/data` across container replacement. A named
+volume inherits the image's writable data-directory ownership; an existing
+Linux bind mount must be writable by the container's `node` user (UID 1000).
+Do not mount your production data for a disposable image test.
 
-## Process
+For a container smoke test, verify `/api/health`, both public courses, a new
+vocabulary learning card, one local PDF import, and a backup export. Stop and
+recreate the container with the same volume, then verify the records remain.
 
-`pnpm build` also creates `.next/standalone`, which is useful when the target
-server has slow package-registry access. Build the artifact for the same
-operating system and CPU architecture as the server because `better-sqlite3`
-contains a native binary.
+## Optional full Linux runtime archive
 
-Do not build the standalone directory directly on Windows and copy it to Linux.
-That also breaks pnpm's platform-specific symlink layout. On Windows with Docker
-Desktop, export a Linux artifact instead:
+The historical helper filename remains available for existing callers:
 
 ```powershell
 .\scripts\export-linux-standalone.ps1
 ```
 
-The script builds the `runner` stage from `Dockerfile`, copies `public` and
-`.next/static` into the standalone runtime, and writes a Linux tarball plus its
-SHA-256 digest under `output/`.
+Despite that filename, it now exports a **complete Linux runtime**, not a Next.js
+standalone bundle. It builds the Docker runner and writes
+`output/ielts-studio-linux-runtime-COMMIT.tar.gz` plus a reported SHA-256 digest.
+The archive includes `.next`, Linux `node_modules`, `public`, the public learning
+pack, the package files, `next.config.ts`, and the software licence. Its allowlist
+excludes all databases, uploads, private packages, and environment files.
 
-On the server:
+Use Linux with matching architecture and Node.js 24 to run the archive:
 
 ```bash
-mkdir -p /www/wwwroot/ists/releases/RELEASE_ID
-sha256sum /tmp/ists-linux-standalone-COMMIT.tar.gz
-tar -xzf /tmp/ists-linux-standalone-COMMIT.tar.gz \
-  -C /www/wwwroot/ists/releases/RELEASE_ID
-cd /www/wwwroot/ists/releases/RELEASE_ID
-set -a
-source /www/wwwroot/ists/shared/.env.production
-set +a
-node server.js
+mkdir -p ielts-studio-runtime
+tar -xzf ielts-studio-linux-runtime-COMMIT.tar.gz -C ielts-studio-runtime
+cd ielts-studio-runtime
+node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3000
 ```
 
-Run `node server.js` under a dedicated process manager for automatic restart.
-The database and uploads must remain in `shared/data`, outside the release
-directory.
+The container's `/app/data` environment settings are not embedded in the archive;
+without environment overrides this command creates `data/` beside the extracted
+runtime. Keep that directory outside future replacement archives, or configure
+absolute `DATABASE_URL=file:/path/to/ists.db` and `UPLOAD_DIR=/path/to/uploads`.
+Load any AI configuration privately on the target host. Codex fallback is opt-in.
 
-## Nginx
+## Updates and private hosting
 
-Proxy a dedicated hostname to `127.0.0.1:3210`. The application-level Basic
-Authentication variables above protect pages, APIs, exports, and uploaded
-files. Nginx authentication can be added as a second layer if desired.
+Before updating, export a complete backup and stop the application. Update the
+code, run `npm ci` when the lockfile changes, rebuild, and restart while retaining
+`data/` and private configuration. Check the health endpoint, vocabulary, recent
+writing, and uploaded materials. Do not run `git clean -xfd` in a personal install.
 
-```nginx
-server {
-    listen 80;
-    server_name your-private-hostname.example;
-
-    auth_basic "ISTS private workspace";
-    auth_basic_user_file /www/wwwroot/ists/shared/.htpasswd;
-
-    client_max_body_size 30m;
-
-    location / {
-        proxy_pass http://127.0.0.1:3210;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-Validate Nginx configuration before reloading it.
-
-## Upgrade
-
-1. Back up SQLite and uploads.
-2. Pull the new commit.
-3. Run `pnpm install --frozen-lockfile` and the validation commands.
-4. Build.
-5. Restart only the ISTS process.
-6. Check `/`, `/coach`, `/practice/reading`, `/writing`, and `/settings`.
+Public GitHub source distribution does not imply a shared online learning service.
+For deliberate private internet hosting, configure both `ISTS_BASIC_AUTH_USER`
+and `ISTS_BASIC_AUTH_PASSWORD`, HTTPS, and persistent storage before exposing
+the application. There is still only one learner profile; the application does
+not provide account registration or isolation between multiple learners.

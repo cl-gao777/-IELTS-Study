@@ -1,125 +1,79 @@
-# IELTS Studio
+# IELTS Study · 本地雅思学习工作台
 
-Windows 本地版请阅读 [README_LOCAL.md](README_LOCAL.md)。使用 npm 与 start.bat；下方保留上游 ISTS 说明以便追溯，旧 pnpm / Linux 分发命令不适用于本分支。
+A local-first IELTS workspace. Clone it, run it on your computer, and keep your learning history and documents on your own device.
 
----
+本项目基于 [aimerfeng/ists](https://github.com/aimerfeng/ists) 的 MIT 代码扩展，使用 Next.js、React、TypeScript 和 SQLite。每个使用者在自己的电脑上独立运行，无需注册账号。
 
-# ISTS — IELTS Study OS
+## 功能
 
-ISTS is an open-source, desktop-first IELTS learning workspace for one learner.
-It combines a durable study history, spaced-repetition vocabulary, objective
-Listening/Reading practice, Writing feedback, full computer mock flows,
-mistake review, material import, analytics, and a persistent AI English coach.
+- **阅读**：按 Passage 连续滚动阅读 PDF，左右分栏答题，保存整卷草稿和计时。
+- **听力**：本地音频播放、逐题答题、评分与错题复习。
+- **词汇**：离线语境填空，认词、回忆、听写专项，共享 FSRS 调度；核对前隐藏答案，恢复原题面和输入。
+- **课程**：NGSL 1.2 基础词 2,809 个、NAWL 1.2 学术词 957 个，共 3,766 个词条和 7,532 道原创语境题；支持 TXT、CSV、Excel 导入。
+- **进阶用法**：支持 B2/C1 义项、熟词新用法、暂停与分钟级巩固；需自行导入相应学习资料。
+- **写作与模考**：作文自动保存、计时、历史版本；可选 AI 反馈明确标为估计分数。
+- **记录与备份**：学习统计、错题、SQLite 持久保存，以及含附件的 v4 JSON 备份和恢复。
 
-Speaking practice is intentionally out of scope.
+## 快速开始：Windows
 
-## What is implemented
+安装 [Node.js 24 LTS](https://nodejs.org/) 和 [Git](https://git-scm.com/)，然后执行：
 
-- Daily Study Loop with persistent completion and weighted minutes
-- 女仆小C AI coach for Chinese, English, and mixed-language questions
-- Natural-English rewrites and ordered AI provider fallback
-- SQLite vocabulary deck with Again / Hard / Good / Easy SRS
-- Original Academic Reading and Listening drills with timing and evidence
-- Browser-based English audio playback and imported audio playback
-- Task 1/2 writing editor, timer, word count, AI criteria feedback, and history
-- Listening → Reading → Writing computer mock with combined results
-- Automatic mistake-to-review queue
-- Attempt, writing, and mock analytics
-- Text, PDF, DOCX, image, and audio material import
-- AI generation of editable practice sets from imported text
-- Full JSON export and optional one-way Notion backup
-- Desktop UI designed for a private, single-user deployment
+```powershell
+git clone https://github.com/cl-gao777/-IELTS-Study.git IELTS-Study
+cd IELTS-Study
+.\start.bat
+```
 
-The repository includes only original sample exercises. Bring your own
-licensed, public-domain, or personally created learning material.
+首次启动需要联网安装 npm 锁定依赖并构建，之后浏览器会打开 **http://127.0.0.1:3000**。也可以在文件管理器中双击 `start.bat`。保留终端窗口，按 Ctrl+C 停止。
 
-## Technology
+最低 Node.js 版本为 22.3，推荐使用 24。端口冲突时运行：
 
-- Next.js App Router, React, TypeScript
-- SQLite through `better-sqlite3`
-- Zod validation
-- CSS Modules and Tailwind CSS 4
-- Vitest
-- OpenAI Responses API or Chat Completions-compatible providers
-- Optional Notion API backup
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\start.ps1 -Port 3001
+```
 
-## Quick start
-
-Requirements: Node.js 22+ and pnpm.
+## 手动启动
 
 ```bash
-pnpm install
-cp .env.example .env.local
-pnpm dev
+npm ci
+npm run build
+npm start
 ```
 
-Open `http://localhost:3000`.
+开发使用 `npm run dev`。macOS/Linux 可使用上述 npm 命令；依赖含 SQLite 和 PDF 原生模块，须在使用设备上安装，不能跨系统复制 `node_modules`。
 
-The database is created automatically at `data/ists.db`. It is excluded from
-Git.
+基础练习、词汇课程和本地保存无需 AI API Key。可选 AI 功能在 Settings 配置，或复制 `.env.example` 为 `.env.local`；密钥留在本机。语音使用浏览器/系统提供的英语声音，可用性与是否联网取决于所选声音。
 
-## AI provider configuration
+## 克隆后包含哪些资料
 
-Providers are tried in this order:
+公开仓库包含上述 NGSL/NAWL 离线课程及项目原创阅读、听力示例。首次使用默认学术课程，公共课程和个人学习词条分开；浏览几千词不会自动生成几千条到期记录。
 
-1. `AI_PROVIDERS_JSON`
-2. `AI_BASE_URL`, `AI_API_KEY`, and `AI_MODEL`
-3. the active Codex configuration under `CODEX_HOME` or `~/.codex`
+仓库**不包含**维护者的私人 PDF、历年试题、答案课包、音频、数据库、学习历史或 API Key。其他使用者请导入自己有权使用的资料。支持私人进阶课程的程序功能已包含，维护者的「PDF 精选」课程内容不随公开代码分发。来源与导入说明见 [本地使用指南](README_LOCAL.md)、[官方练习资源](docs/OFFICIAL_RESOURCES.md) 和 [个人题库](docs/PRIVATE_RESOURCES.md)。
 
-Example ordered list:
+## 数据与升级
 
-```env
-AI_PROVIDERS_JSON=[{"name":"primary","baseUrl":"https://api.example.com/v1","apiKey":"...","model":"gpt-5","wireApi":"responses"},{"name":"backup","baseUrl":"https://backup.example.com/v1","apiKey":"...","model":"model-name","wireApi":"chat-completions"}]
-```
+默认文件均相对于项目目录：
 
-Keys stay server-side. If every provider fails, coach and writing modules use a
-deterministic local fallback instead of losing saved work.
+- `data/ists.db`：个人 SQLite 学习数据库。
+- `data/uploads/`：个人附件。
+- `data/ai-provider.secret.json`：可选 AI 配置。
+- `data/backups/`：恢复前安全快照。
 
-For an internet-reachable single-user deployment, set
-`ISTS_BASIC_AUTH_USER` and `ISTS_BASIC_AUTH_PASSWORD`. The app then protects
-pages, APIs, exports, and uploaded files with HTTP Basic Authentication.
+Settings 可导出/恢复完整 JSON 备份。SQLite 快照不含附件和密钥；完整迁移请使用 JSON，或停服后备份整个数据目录。v4 支持本项目已知完整 v1/v2/v3 备份的升级，不能将上游不完整导出视为完整备份。
 
-## Validation
+升级前先备份，停止应用，再 `git pull`；保留 `data/` 和 `.env.local`，运行 `start.bat` 或重新 `npm ci && npm run build && npm start`。不要使用 `git clean -xfd`，它会删除 Git 忽略的个人资料。
+
+## 检查与贡献
 
 ```bash
-pnpm test
-pnpm typecheck
-pnpm lint
-pnpm build
+npm ci
+npm run check
 ```
 
-The test suite covers study progress, SRS scheduling, objective scoring,
-estimated bands, mock overall rounding, and provider fallback order.
+检查包含测试、类型检查、lint 和生产构建。贡献说明见 [CONTRIBUTING.md](CONTRIBUTING.md)。可选容器与私人服务器说明见 [部署指南](docs/DEPLOYMENT.md)。应用默认仅监听本机；本仓库提供本地安装应用，没有多人共享学习记录或公开在线服务。
 
-## Data and backup
+## 许可与来源
 
-- SQLite: `data/ists.db`
-- Uploaded private files: `data/uploads/`
-- JSON export: Settings → **Download JSON backup**
-- Optional Notion snapshot: Settings → **Backup to Notion now**
+程序使用 [MIT License](LICENSE)，保留上游作者和本项目维护者署名。NGSL/NAWL 词表、释义和本项目课包改编另按 **CC BY-SA 4.0** 分发，完整作者、下载来源、版本和 SHA-256 见 [词库许可说明](src/data/VOCABULARY-LICENSE.md) 及 [来源清单](src/data/vocabulary-source-manifest.json)。私人资料不因程序开源而获得再分发许可。
 
-See [`docs/BACKUP.md`](./docs/BACKUP.md).
-
-Both locations can be moved outside the checkout with `DATABASE_URL` and
-`UPLOAD_DIR`.
-
-## Deployment
-
-See [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) for a production deployment
-using a dedicated process, persistent data directory, and Nginx Basic
-Authentication.
-
-## Architecture
-
-- Product vocabulary: [`CONTEXT.md`](./CONTEXT.md)
-- Product specification: [`docs/PRODUCT.md`](./docs/PRODUCT.md)
-- Local-first decision:
-  [`docs/adr/0001-local-first-single-user-web-app.md`](./docs/adr/0001-local-first-single-user-web-app.md)
-- Learning-material policy:
-  [`docs/adr/0002-user-supplied-learning-materials.md`](./docs/adr/0002-user-supplied-learning-materials.md)
-- AI fallback:
-  [`docs/adr/0003-ai-provider-fallback.md`](./docs/adr/0003-ai-provider-fallback.md)
-
-## License
-
-MIT
+本项目不是 IELTS 官方产品，词库不称为官方固定考纲；没有复制 Lingvist 课程内容。AI 反馈不代表正式 IELTS 成绩。
