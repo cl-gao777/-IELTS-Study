@@ -63,6 +63,8 @@ export interface WritingFeedbackRecord extends WritingFeedback {
   evaluatedEssay: string;
 }
 export interface WritingDraft extends WritingDraftInput {
+  revision?: number;
+  dataEpoch?: string;
   feedback?: WritingFeedbackRecord;
 }
 

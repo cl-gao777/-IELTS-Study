@@ -359,6 +359,21 @@ describe("durable vocabulary sessions and reviews", () => {
     expect(saveVocabularyStudy({ heartbeat }, new Date(now.getTime() + 86400000)).todaySeconds).toBe(0);
     expect(db().prepare("SELECT COUNT(*) AS total FROM vocabulary_study_heartbeats").get()).toEqual({ total: 1 });
   });
+  it("credits cumulative segments by their positive delta, including acknowledgements lost between tabs", () => {
+    const id = randomUUID();
+    expect(saveVocabularyStudy({ restoreVersion: 1, heartbeat: { id, seconds: 5, cumulative: true } }, now).todaySeconds).toBe(5);
+    expect(saveVocabularyStudy({ restoreVersion: 1, heartbeat: { id, seconds: 5, cumulative: true } }, now).todaySeconds).toBe(5);
+    expect(saveVocabularyStudy({ restoreVersion: 1, heartbeat: { id, seconds: 9, cumulative: true } }, now).todaySeconds).toBe(9);
+    expect(saveVocabularyStudy({ restoreVersion: 1, heartbeat: { id, seconds: 3, cumulative: true } }, now).todaySeconds).toBe(9);
+    expect(db().prepare("SELECT seconds FROM vocabulary_study_time_segments WHERE id=?").get(id)).toEqual({ seconds: 9 });
+  });
+  it("does not credit an old heartbeat again when seeding the new cumulative segment ledger", () => {
+    const id = randomUUID(); ensureVocabularyCourseTables();
+    saveVocabularyStudy({ restoreVersion: 1, heartbeat: { id, seconds: 5 } }, now);
+    db().prepare("DELETE FROM vocabulary_study_time_segments WHERE id=?").run(id);
+    expect(saveVocabularyStudy({ restoreVersion: 1, heartbeat: { id, seconds: 5, cumulative: true } }, now).todaySeconds).toBe(5);
+    expect(saveVocabularyStudy({ restoreVersion: 1, heartbeat: { id, seconds: 8, cumulative: true } }, now).todaySeconds).toBe(8);
+  });
   it("adds the restore token to existing study preferences without changing goals or time", () => {
     db().exec(`DROP TABLE vocabulary_study_preferences;
       CREATE TABLE vocabulary_study_preferences (id INTEGER PRIMARY KEY CHECK(id=1), active_course_id TEXT,

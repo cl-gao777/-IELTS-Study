@@ -8,7 +8,9 @@ vi.mock("server-only", () => ({}));
 const holder = vi.hoisted(() => ({ database: null as Database.Database | null }));
 vi.mock("./db", () => ({ getDatabase: () => holder.database! }));
 import { addMaterial, createPracticeSet, getPracticeSet } from "./store";
-import { createMaterialPractice, ensureLearningTables, getMaterialMetadata, getPracticeWorkspaceState, saveDictation, saveMistakeReason, savePracticeWorkspace, updateMaterial } from "./learning-workspace-store";
+import { createMaterialPractice, ensureLearningTables, getMaterialMetadata, getPracticeWorkspaceState, saveDictation, saveMistakeReason, savePracticeWorkspace, saveProtectedPracticeWorkspace, completePracticeRun, updateMaterial } from "./learning-workspace-store";
+import { rotateDataEpoch } from "./data-integrity";
+import { beginSubmission, completeSubmission } from "./submissions";
 describe("local materials and practice persistence", () => {
   let directory: string; let filename: string;
   beforeEach(() => {
@@ -37,6 +39,36 @@ describe("local materials and practice persistence", () => {
     const set = createMaterialPractice(material.id, [{ id: "q", kind: "short-answer", prompt: "Word?", answers: ["Original"], explanation: "First word" }], 10)!;
     updateMaterial(material.id, { title: "Updated", content: "Changed text", sourceUrl: "", metadata: emptyMaterialMetadata });
     expect(getPracticeSet(set.id)?.passage).toBe("Original text");
+  });
+  it("keeps one shared run, rejects stale revisions and restored pages, and creates a fresh explicit retry", () => {
+    createPracticeSet({ id: "r", kind: "reading", title: "Text", subtitle: "", instructions: "", passage: "Text", transcript: "", audioUrl: "", durationMinutes: 10, questions: [] });
+    const first = getPracticeWorkspaceState("r");
+    expect(getPracticeWorkspaceState("r").runId).toBe(first.runId);
+    const input = { dataEpoch: first.dataEpoch, expectedRevision: first.revision, runId: first.runId, draft: { ...emptyPracticeDraft, notes: "Newest notes" }, annotations: [] };
+    const saved = saveProtectedPracticeWorkspace("r", input)!;
+    expect(saved.revision).toBe(1); expect(saved.runId).toBe(first.runId);
+    expect(() => saveProtectedPracticeWorkspace("r", input)).toThrow("另一页面");
+    const retry = saveProtectedPracticeWorkspace("r", { ...input, expectedRevision: 1, restart: true })!;
+    expect(retry.runId).not.toBe(saved.runId); expect(retry.submissionId).not.toBe(saved.submissionId);
+    rotateDataEpoch();
+    expect(() => saveProtectedPracticeWorkspace("r", { ...input, expectedRevision: 2, runId: retry.runId })).toThrow("数据已恢复");
+    expect(getPracticeWorkspaceState("r").draft.notes).toBe("Newest notes");
+  });
+  it("commits result and completion once and rolls back partial attempts", () => {
+    createPracticeSet({ id: "r", kind: "reading", title: "Text", subtitle: "", instructions: "", passage: "Text", transcript: "", audioUrl: "", durationMinutes: 10, questions: [] });
+    const state = getPracticeWorkspaceState("r");
+    const input = { submissionId: state.submissionId, kind: "practice" as const, scopeId: state.runId, dataEpoch: state.dataEpoch, payload: { answer: "x" } };
+    const claim = beginSubmission(input);
+    let count = 0;
+    const result = completeSubmission(input, claim.leaseId!, () => { count++; completePracticeRun("r"); return { score: 1 }; });
+    expect(completeSubmission(input, claim.leaseId!, () => { count++; return { score: 2 }; })).toEqual(result);
+    expect(count).toBe(1);
+    expect(() => beginSubmission({ ...input, payload: { answer: "other" } })).toThrow("首次请求不同");
+    const retry = saveProtectedPracticeWorkspace("r", { dataEpoch: state.dataEpoch, expectedRevision: 0, runId: state.runId, restart: true, draft: emptyPracticeDraft, annotations: [] })!;
+    const second = { ...input, submissionId: retry.submissionId, scopeId: retry.runId };
+    const lease = beginSubmission(second);
+    expect(() => completeSubmission(second, lease.leaseId!, () => { completePracticeRun("r"); throw new Error("failure"); })).toThrow("failure");
+    expect(holder.database!.prepare("SELECT completed FROM practice_workspace_versions WHERE set_id='r'").get()).toEqual({ completed: 0 });
   });
   it("saves aligned dictation errors and one Review Item atomically", () => {
     const set = createPracticeSet({ id: "l", kind: "listening", title: "Audio", subtitle: "", instructions: "", passage: "", transcript: "the green park", audioUrl: "", durationMinutes: 10, questions: [] });

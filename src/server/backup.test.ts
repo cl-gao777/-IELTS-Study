@@ -18,6 +18,10 @@ import { readVocabularySession, requireVocabularySession } from "./vocabulary-se
 import { canRecoverVocabularyDraft, type VocabularyRecovery } from "../lib/vocabulary-recovery";
 import { V3_VOCABULARY_TABLES } from "./backup-vocabulary-courses";
 import { V4_VOCABULARY_TABLES } from "./backup-vocabulary-targets";
+import { V5_DURABILITY_TABLES } from "./backup-durability";
+import { getDataEpoch, assertDataEpoch } from "./data-integrity";
+import { beginSubmission, submissionHash } from "./submissions";
+import { initialMockState } from "../lib/mock-exam";
 import { registerVocabularyCourse, listVocabularyCatalogEntries, getVocabularyStudy, saveVocabularyStudy, vocabularyExerciseForWord, VocabularyStudyConflict } from "./vocabulary-courses";
 import { createVocabularyImportPreview, confirmVocabularyImport } from "./vocabulary-import";
 import { startVocabularyAssessment, checkpointVocabularyAssessment, readVocabularyAssessment, submitVocabularyAssessment } from "./vocabulary-assessment";
@@ -165,15 +169,61 @@ afterEach(() => {
 });
 
 describe("complete local backup and restore", () => {
+  it("strictly upgrades v4 without manufacturing run or submission identities", () => {
+    const current = createBackup(), legacy = { ...structuredClone(current), version: 4 };
+    for (const table of V5_DURABILITY_TABLES) delete legacy.data[table];
+    const frozen = JSON.stringify(legacy), upgraded = validateBackup(legacy);
+    expect(upgraded.version).toBe(5); expect(JSON.stringify(legacy)).toBe(frozen);
+    expect(upgraded.data.app_data_state).toHaveLength(1);
+    for (const table of V5_DURABILITY_TABLES.filter((table) => table !== "app_data_state")) expect(upgraded.data[table]).toEqual([]);
+    for (const table of Object.keys(legacy.data)) expect(upgraded.data[table]).toEqual(legacy.data[table]);
+    const invalid = { ...legacy, version: 5 }; expect(() => validateBackup(invalid)).toThrow("缺少数据表");
+  });
+
+  it("round-trips v5 durability records, invalidates old pages and releases restored active locks", () => {
+    const db = holder.database!, epoch = getDataEpoch(db), runId = "66666666-6666-4666-8666-666666666666";
+    const receiptId = "77777777-7777-4777-8777-777777777777", mockId = "88888888-8888-4888-8888-888888888888";
+    const mockSubmissionId = "99999999-9999-4999-8999-999999999999", writerId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    insert("practice_workspace_versions", { set_id: "sample-listening", revision: 3, run_id: runId, submission_id: receiptId, completed: 1 });
+    insert("writing_draft_revisions", { draft_id: "draft-1", revision: 5 });
+    insert("vocabulary_study_time_segments", { id: writerId, restore_version: 1, study_date: "2026-10-04", seconds: 5, created_at: now, updated_at: now });
+    const request = { setId: "sample-listening", answers: { q1: "sample" } };
+    insert("submission_receipts", { id: receiptId, kind: "practice", scope_id: runId, data_epoch: epoch, request_hash: submissionHash(request), request_json: JSON.stringify(request), status: "completed", result_json: '{"attempt":{"id":1}}', lease_id: null, lease_until: null, owner_pid: null, error: "", updated_at: now });
+    const question = { id: "q1", kind: "short-answer", prompt: "Original fixture", answers: ["sample"], explanation: "Original answer" };
+    const set = { id: "sample-listening", kind: "listening", title: "Original", subtitle: "Fixture", instructions: "Listen", passage: "", transcript: "Sample", audioUrl: "", durationMinutes: 20, questions: [question] };
+    insert("practice_sets", { id: "sample-reading", kind: "reading", title: "Original", subtitle: "Fixture", instructions: "Read", passage: "Sample", transcript: "", audio_url: "", duration_minutes: 20, questions_json: JSON.stringify([question]), created_at: now });
+    const state = { ...initialMockState(), paused: false, listeningAnswers: { q1: "sample" }, durations: { listening: 5, reading: 0, writing: 0 } };
+    insert("mock_exam_sessions", { id: mockId, data_epoch: epoch, revision: 7, state_json: JSON.stringify(state), snapshot_json: JSON.stringify({ listeningSet: set, readingSet: { ...set, id: "sample-reading", kind: "reading", transcript: "", passage: "Sample" }, writingPrompt: "Discuss a topic." }), submission_id: mockSubmissionId, started_at: now, updated_at: now, status: "active", writer_id: writerId, lease_until: now, result_json: null });
+    beginSubmission({ submissionId: mockSubmissionId, kind: "mock", scopeId: mockId, dataEpoch: epoch, payload: { essay: "Pending essay" } }, db);
+    const backup = createBackup(); expect(validateBackup(backup).version).toBe(5);
+    expect(V5_DURABILITY_TABLES.every((table) => backup.data[table].length > 0)).toBe(true);
+    db.prepare("UPDATE practice_workspace_versions SET revision=10").run();
+    db.prepare("UPDATE writing_draft_revisions SET revision=11").run();
+    db.prepare("UPDATE mock_exam_sessions SET revision=12").run();
+    restoreBackup(backup); const restored = createBackup();
+    expect(() => assertDataEpoch(epoch, db)).toThrow();
+    expect(restored.data.practice_workspace_versions[0].revision).toBe(12);
+    expect(restored.data.writing_draft_revisions[0].revision).toBe(13);
+    expect(restored.data.mock_exam_sessions[0]).toMatchObject({ revision: 14, writer_id: null, lease_until: null, data_epoch: getDataEpoch(db) });
+    expect(JSON.parse(String(restored.data.mock_exam_sessions[0].state_json))).toEqual({ ...state, paused: true });
+    expect(restored.data.submission_receipts.find((row) => row.id === mockSubmissionId)).toMatchObject({ status: "failed", lease_id: null, owner_pid: null });
+    expect(restored.data.submission_receipts.find((row) => row.id === receiptId)).toMatchObject({ status: "completed", result_json: '{"attempt":{"id":1}}', data_epoch: getDataEpoch(db) });
+    for (const table of ["vocabulary_study_time_segments", "practice_attempts", "vocabulary_reviews", "vocabulary_scheduler_state"]) expect(restored.data[table]).toEqual(backup.data[table]);
+    expect(validateBackup(restored).version).toBe(5);
+    const beforeFailure = getDataEpoch(db), bad = structuredClone(restored); bad.data.submission_receipts[0].request_hash = "invalid";
+    expect(() => restoreBackup(bad)).toThrow("提交审计"); expect(getDataEpoch(db)).toBe(beforeFailure);
+  });
+
   it("strictly migrates a complete v3 catalog without inferring targets, historical senses or new pause state", () => {
     addCourseFixtures(); addSession(listVocabularyEntries()[0].id);
     insert("vocabulary_study_preferences", { id: 1, active_course_id: "academic", daily_goal_seconds: 1200, paused: 1, start_rank: 37, restore_version: 5 });
     const current = createBackup(), legacy = { ...structuredClone(current), version: 3 };
+    for (const table of V5_DURABILITY_TABLES) delete legacy.data[table];
     for (const table of V4_VOCABULARY_TABLES) delete legacy.data[table];
     for (const row of legacy.data.vocabulary_study_preferences) for (const column of ["focus", "next_level", "policy_version", "private_catalog_key"]) delete row[column];
     for (const row of legacy.data.vocabulary_catalog_entries) { const value = JSON.parse(String(row.data_json)); delete value.targets; row.data_json = JSON.stringify(value); }
     const frozen = JSON.stringify(legacy), migrated = validateBackup(legacy);
-    expect(migrated.version).toBe(4); expect(JSON.stringify(legacy)).toBe(frozen);
+    expect(migrated.version).toBe(5); expect(JSON.stringify(legacy)).toBe(frozen);
     for (const table of V4_VOCABULARY_TABLES) expect(migrated.data[table]).toEqual([]);
     expect(migrated.data.vocabulary_study_preferences).toEqual(current.data.vocabulary_study_preferences);
     expect(migrated.data.vocabulary_catalog_entries).toEqual(current.data.vocabulary_catalog_entries);
@@ -185,7 +235,7 @@ describe("complete local backup and restore", () => {
   });
   it("round-trips v4 target introduction, persistent pauses and exact active minute card without rewriting old schedules", () => {
     const fixture = addAdvancedFixtures(), backup = createBackup();
-    expect(validateBackup(backup).version).toBe(4);
+    expect(validateBackup(backup).version).toBe(5);
     expect(V4_VOCABULARY_TABLES.every((table) => backup.data[table].length > 0)).toBe(true);
     holder.database!.prepare("UPDATE vocabulary_study_preferences SET restore_version=18").run();
     holder.database!.prepare("UPDATE vocabulary_sessions SET revision=12").run();
@@ -258,20 +308,21 @@ describe("complete local backup and restore", () => {
     delete legacy.supplementalReviewed; delete legacy.current.supplemental; delete legacy.current.canSupplement;
     const raw = JSON.stringify(legacy);
     insert("vocabulary_sessions", { id: sessionId, revision: 1, status: "active", state_json: raw, started_at: now, updated_at: now });
-    const exported = createBackup(); expect(validateBackup(exported).version).toBe(4);
+    const exported = createBackup(); expect(validateBackup(exported).version).toBe(5);
     expect(JSON.parse(String(exported.data.vocabulary_sessions[0].state_json))).toEqual(state);
     expect(holder.database!.prepare("SELECT state_json FROM vocabulary_sessions WHERE id=?").get(sessionId)).toEqual({ state_json: raw });
   });
   it("strictly upgrades complete v2 snapshots without inventing old course or answer provenance", () => {
     addSession(listVocabularyEntries()[0].id);
     const legacy = { ...createBackup(), version: 2 };
+    for (const table of V5_DURABILITY_TABLES) delete legacy.data[table];
     for (const table of [...V3_VOCABULARY_TABLES, ...V4_VOCABULARY_TABLES]) delete legacy.data[table];
     const state = JSON.parse(String(legacy.data.vocabulary_sessions[0].state_json));
     delete state.courseId; delete state.current.exercise; delete state.current.requestedRating; delete state.current.ratingSource;
     delete state.supplementalReviewed; delete state.current.supplemental; delete state.current.canSupplement;
     legacy.data.vocabulary_sessions[0].state_json = JSON.stringify(state);
     const raw = JSON.stringify(legacy), migrated = validateBackup(legacy);
-    expect(JSON.stringify(legacy)).toBe(raw); expect(migrated.version).toBe(4);
+    expect(JSON.stringify(legacy)).toBe(raw); expect(migrated.version).toBe(5);
     expect(JSON.parse(String(migrated.data.vocabulary_sessions[0].state_json))).toMatchObject({ courseId: null, supplementalReviewed: 0, current: { exercise: null, requestedRating: null, ratingSource: "automatic", supplemental: false, canSupplement: false } });
     expect(migrated.data.vocabulary_review_context).toEqual([]);
     expect(migrated.data.vocabulary_supplemental_attempts).toEqual([]);
@@ -323,7 +374,7 @@ describe("complete local backup and restore", () => {
       current: { ...sessionState(word.id, "revealed").current, wordVersion: word.reviewVersion, exercise, answer: exercise.targetSurface.slice(0, -1), confirmedTypo: true, supplemental: true, canSupplement: false, requestedRating: "good" } };
     database.prepare("UPDATE vocabulary_sessions SET state_json=? WHERE id=?").run(JSON.stringify(state), sessionId);
     database.prepare("UPDATE vocabulary_words SET term='changed-after-auxiliary'").run();
-    const snapshot = createBackup(); expect(validateBackup(snapshot).version).toBe(4);
+    const snapshot = createBackup(); expect(validateBackup(snapshot).version).toBe(5);
     restoreBackup(snapshot); const restored = createBackup();
     for (const table of ["vocabulary_words", "vocabulary_learning_state", "vocabulary_reviews", "vocabulary_review_details", "vocabulary_scheduler_state", "vocabulary_supplemental_attempts"]) expect(restored.data[table]).toEqual(snapshot.data[table]);
     expect(readVocabularySession(database)).toMatchObject({ id: sessionId, revision: 3, status: "active", state });
@@ -374,7 +425,7 @@ describe("complete local backup and restore", () => {
     insert("vocabulary_sessions", { id: sessionId, revision: 1, status: "active", state_json: JSON.stringify(state), started_at: now, updated_at: now });
     const result = reviewVocabularyEntry(word.id, { rating: "good", mode: "context", userAnswer: exercise!.targetSurface, durationSeconds: 9, expectedVersion: word.reviewVersion, sessionId, expectedSessionRevision: 1, submissionId, confirmedTypo: false, gaveUp: false }, new Date(Date.parse(now) + 86400000));
     expect(result!.review).toMatchObject({ correct: true, courseId: "general", exercise });
-    const backup = createBackup(); expect(validateBackup(backup).version).toBe(4);
+    const backup = createBackup(); expect(validateBackup(backup).version).toBe(5);
     restoreBackup(backup);
     const restored = createBackup();
     for (const table of ["vocabulary_words", "vocabulary_reviews", "vocabulary_review_details", "vocabulary_review_audit", "vocabulary_review_context", "vocabulary_scheduler_state"]) expect(restored.data[table]).toEqual(backup.data[table]);
@@ -398,7 +449,7 @@ describe("complete local backup and restore", () => {
     database.prepare("UPDATE vocabulary_catalog_entries SET data_json=? WHERE id=?").run(JSON.stringify(entry), entry.id);
     const word = listVocabularyEntries()[0]; addSession(word.id);
     addSupplementalFixture(word.id, { ...entry.exercises[0], entryId: entry.id, courseId: entry.courseIds[0] });
-    const good = createBackup(); expect(validateBackup(good).version).toBe(4);
+    const good = createBackup(); expect(validateBackup(good).version).toBe(5);
     for (const [key, value] of [["materialId", "999"], ["fileSha256", "a".repeat(64)], ["passageId", "missing"], ["pdfPage", 1], ["endPdfPage", 4]] as const) {
       const bad = structuredClone(good), row = bad.data.vocabulary_catalog_entries.find((item) => item.id === entry.id)!;
       const changed = JSON.parse(String(row.data_json)); changed.exercises[0].sourceReference[key] = value; row.data_json = JSON.stringify(changed);
@@ -414,7 +465,7 @@ describe("complete local backup and restore", () => {
     const saved = checkpointVocabularyAssessment(active.id, active.revision, { answers: Object.fromEntries(active.questions.map((question) => [question.id, ""])), currentIndex: 30 }, database);
     submitVocabularyAssessment(active.id, saved.revision, database);
     createVocabularyImportPreview("pending.txt", [["pending"]], database);
-    const good = createBackup(); expect(validateBackup(good).version).toBe(4);
+    const good = createBackup(); expect(validateBackup(good).version).toBe(5);
     const badResult = structuredClone(good), result = JSON.parse(String(badResult.data.vocabulary_assessments[0].result_json));
     result.correct = 30; badResult.data.vocabulary_assessments[0].result_json = JSON.stringify(result);
     expect(() => validateBackup(badResult)).toThrow("测评结果");
@@ -443,6 +494,7 @@ describe("complete local backup and restore", () => {
 
   it.each([1, 2, 3, 4])("invalidates token 1 when a version %s snapshot has no study preference row", (version) => {
     const original = createBackup(), incoming = { ...structuredClone(original), version };
+    for (const table of V5_DURABILITY_TABLES) delete incoming.data[table];
     if (version < 3) for (const table of V3_VOCABULARY_TABLES) delete incoming.data[table];
     if (version < 4) for (const table of V4_VOCABULARY_TABLES) delete incoming.data[table];
     if (version === 1) for (const table of ["vocabulary_learning_state", "vocabulary_sessions", "vocabulary_review_audit"]) delete incoming.data[table];
@@ -488,13 +540,14 @@ describe("complete local backup and restore", () => {
   it("migrates only the known v1 vocabulary additions without changing raw history or FSRS state", () => {
     const original = createBackup();
     const legacy = { ...structuredClone(original), version: 1 };
+    for (const table of V5_DURABILITY_TABLES) delete legacy.data[table];
     for (const table of ["vocabulary_learning_state", "vocabulary_sessions", "vocabulary_review_audit", ...V3_VOCABULARY_TABLES, ...V4_VOCABULARY_TABLES]) delete legacy.data[table];
     const frozenInput = JSON.stringify(legacy);
-    expect(validateBackup(legacy).version).toBe(4);
+    expect(validateBackup(legacy).version).toBe(5);
     expect(JSON.stringify(legacy)).toBe(frozenInput);
     restoreBackup(legacy);
     const restored = createBackup();
-    expect(restored.version).toBe(4);
+    expect(restored.version).toBe(5);
     for (const table of ["vocabulary_words", "vocabulary_reviews", "vocabulary_review_details", "vocabulary_scheduler_state"]) expect(restored.data[table]).toEqual(original.data[table]);
     expect(restored.data.vocabulary_learning_state[0].learning_started_at).toBe(now);
     expect(restored.data.vocabulary_review_audit).toEqual([]);
@@ -607,6 +660,7 @@ describe("complete local backup and restore", () => {
 
   it("upgrades the known pre-resource v1 field without losing prior attempts", () => {
     const older = { ...createBackup(), version: 1 };
+    for (const table of V5_DURABILITY_TABLES) delete older.data[table];
     delete older.data.practice_sets[0].resource_json;
     restoreBackup(older);
     const restored = createBackup();
@@ -634,7 +688,7 @@ describe("complete local backup and restore", () => {
     const backup = createBackup();
     const tables = holder.database!.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[];
     expect(Object.keys(backup.data).sort()).toEqual(tables.map((table) => table.name));
-    expect(Object.entries(backup.data).filter(([table]) => !["vocabulary_sessions", "vocabulary_review_audit", ...V3_VOCABULARY_TABLES, ...V4_VOCABULARY_TABLES].includes(table)).every(([, rows]) => rows.length > 0)).toBe(true);
+    expect(Object.entries(backup.data).filter(([table]) => !["vocabulary_sessions", "vocabulary_review_audit", ...V3_VOCABULARY_TABLES, ...V4_VOCABULARY_TABLES, ...V5_DURABILITY_TABLES].includes(table)).every(([, rows]) => rows.length > 0)).toBe(true);
     expect(backup.data.source_materials[0].file_path).toBe("upload:1");
     expect(JSON.stringify(backup)).not.toContain("test-secret-must-not-be-exported");
     holder.database!.prepare("UPDATE vocabulary_words SET meaning_zh = 'Changed after backup'").run();
@@ -642,7 +696,7 @@ describe("complete local backup and restore", () => {
     expect(existsSync(result.safetyBackup)).toBe(true);
     expect(readFileSync(result.safetyBackup, "utf8")).toContain("Changed after backup");
     const restored = createBackup();
-    expect(restored.data).toEqual({ ...backup.data, vocabulary_study_preferences: [restoredDefaultStudy] });
+    expect(restored.data).toEqual({ ...backup.data, app_data_state: restored.data.app_data_state, vocabulary_study_preferences: [restoredDefaultStudy] });
     expect(restored.files).toEqual(backup.files);
     const restoredPath = (holder.database!.prepare("SELECT file_path FROM source_materials WHERE id=1").get() as { file_path: string }).file_path;
     expect(path.dirname(restoredPath)).toBe(uploadDirectory);
@@ -743,7 +797,7 @@ describe("complete local backup and restore", () => {
       expect(safety.prepare("SELECT meaning_zh FROM vocabulary_words").get()).toEqual({ meaning_zh: "Current value before restore" });
       expect(safety.pragma("integrity_check", { simple: true })).toBe("ok");
     } finally { safety.close(); }
-    expect(createBackup().data).toEqual({ ...healthy.data, vocabulary_study_preferences: [restoredDefaultStudy] });
+    expect(createBackup().data).toEqual({ ...healthy.data, app_data_state: createBackup().data.app_data_state, vocabulary_study_preferences: [restoredDefaultStudy] });
     expect(createBackup().files).toEqual(healthy.files);
   });
 });

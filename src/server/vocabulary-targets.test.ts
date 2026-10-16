@@ -20,6 +20,8 @@ import { getVocabularyStudy, getVocabularyCourses, registerVocabularyCourse, sel
 import { changeVocabularyTargetDisposition, readVocabularyTargetState, listVocabularyTermDispositions, advanceVocabularyConsolidation } from "./vocabulary-targets";
 import { GET as targetsGET } from "@/app/api/vocabulary/targets/route";
 import { GET as studyGET } from "@/app/api/vocabulary/study/route";
+import { publishVocabularyCatalogReview } from "./vocabulary-catalog-review";
+import { vocabularyCardWord } from "@/lib/vocabulary-card-presentation";
 
 const at = new Date("2030-01-01T00:00:00.000Z"), courseId = "advanced-fixture";
 const db = () => holder.database!;
@@ -86,6 +88,27 @@ describe("advanced targets preserve personal progress and have their own non-FSR
     ensureVocabularyTables();
   });
   afterEach(() => { holder.database?.close(); holder.database = null; vi.unstubAllEnvs(); });
+
+  it("rejects old cards after a reviewed sense changes and uses the new meaning in all four modes", () => {
+    const original = entry("address"); setup([original]); personal("address", "2030-01-01T00:00:00.000Z");
+    const oldSession = next(start()); const oldCard = oldSession.state.current!;
+    const personalBefore = listVocabularyEntries();
+    const changed = publishVocabularyCatalogReview({ entryId: original.id, expectedVersion: original.version, courseId, targetId: original.targets[0].id,
+      expectedTargetVersion: 1, meaningZh: "着手解决复杂议题", definitionEn: "To take deliberate action to solve a complex issue.", partOfSpeech: "verb",
+      exercises: original.exercises.map((exercise) => ({ ...exercise, meaningZh: "着手解决复杂议题" })) });
+    expect(changed.targets?.[0].version).toBe(2); expect(listVocabularyEntries()).toEqual(personalBefore);
+    expect(() => learnVocabularyEntry(oldCard.wordId, { operationId: randomUUID(), expectedVersion: oldCard.wordVersion, sessionId: oldSession.id,
+      expectedSessionRevision: oldSession.revision, restoreVersion: oldCard.restoreVersion!, targetId: oldCard.target!.id,
+      targetVersion: oldCard.target!.version, expectedStateVersion: oldCard.targetStateVersion! }, at)).toThrow();
+    for (const mode of ["recognition", "recall", "spelling", "context"] as const) {
+      const previous = getVocabularySession().session;
+      if (previous?.status === "active") changeVocabularySession({ action: "end", id: previous.id, expectedRevision: previous.revision }, at);
+      const card = next(start(mode)).state.current!;
+      const display = vocabularyCardWord(listVocabularyEntries().find((word) => word.id === card.wordId)!, card.target);
+      expect(display).toMatchObject({ meaningZh: "着手解决复杂议题", partOfSpeech: "verb", definitionEn: "To take deliberate action to solve a complex issue." });
+      expect(card.exercise?.meaningZh).toBe("着手解决复杂议题");
+    }
+  });
 
   it("appends explicit targets without replacing catalog rank, old examples or personal meanings", () => {
     const saved = personal("address");

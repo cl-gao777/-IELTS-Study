@@ -4,6 +4,7 @@ import type Database from "better-sqlite3";
 import type { WritingDraft, WritingDraftInput, WritingFeedback, WritingFeedbackRecord } from "../lib/writing";
 import { countWritingWords } from "../lib/writing";
 import { getDatabase } from "./db";
+import { assertDataEpoch, DataIntegrityConflict, getDataEpoch } from "./data-integrity";
 
 export function initializeWritingTables(database: Database.Database = getDatabase()) {
   database.exec(`
@@ -22,6 +23,7 @@ export function initializeWritingTables(database: Database.Database = getDatabas
     );
     CREATE INDEX IF NOT EXISTS idx_writing_drafts_updated ON writing_drafts(updated_at);
     CREATE INDEX IF NOT EXISTS idx_writing_feedback_draft ON writing_feedback_details(draft_id);
+    CREATE TABLE IF NOT EXISTS writing_draft_revisions (draft_id TEXT PRIMARY KEY REFERENCES writing_drafts(id) ON DELETE CASCADE, revision INTEGER NOT NULL);
   `);
   return database;
 }
@@ -37,11 +39,31 @@ function fromRow(row: Row, database: Database.Database): WritingDraft {
     prompt: String(row.prompt), image: String(row.image), essay: String(row.essay),
     elapsedSeconds: Number(row.elapsed_seconds), timeLimitMinutes: Number(row.time_limit_minutes),
     status: row.status as WritingDraft["status"], updatedAt: String(row.updated_at),
+    revision: (database.prepare("SELECT revision FROM writing_draft_revisions WHERE draft_id=?").get(row.id) as { revision: number } | undefined)?.revision ?? 0,
+    dataEpoch: getDataEpoch(database),
     ...(evaluated ? { feedback: {
       ...JSON.parse(String(evaluated.feedback_json)), submissionId: Number(evaluated.submission_id),
       provider: String(evaluated.provider), evaluatedAt: String(evaluated.created_at), evaluatedEssay: String(evaluated.essay),
     } as WritingFeedbackRecord } : {}),
   };
+}
+
+export function assertWritingDraftVersion(id: string, expectedRevision: number, epoch: string, database: Database.Database = getDatabase()) {
+  assertDataEpoch(epoch, database);
+  const draft = getWritingDraft(id, database);
+  if ((draft?.revision ?? 0) !== expectedRevision) throw new DataIntegrityConflict("另一页面已修改这份作文，请导出当前内容并刷新。", "DRAFT_CONFLICT");
+  return draft;
+}
+
+export function saveProtectedWritingDraft(input: WritingDraftInput, expectedRevision: number, epoch: string, database: Database.Database = getDatabase()) {
+  initializeWritingTables(database);
+  return database.transaction(() => {
+    assertWritingDraftVersion(input.id, expectedRevision, epoch, database);
+    // Server time is metadata only; optimistic concurrency decides which edit may save.
+    saveWritingDraft({ ...input, updatedAt: new Date().toISOString() }, database, true);
+    database.prepare("INSERT INTO writing_draft_revisions(draft_id,revision) VALUES(?,?) ON CONFLICT(draft_id) DO UPDATE SET revision=excluded.revision").run(input.id, expectedRevision + 1);
+    return getWritingDraft(input.id, database)!;
+  })();
 }
 
 export function listWritingDrafts(database: Database.Database = getDatabase()) {
@@ -56,7 +78,7 @@ export function getWritingDraft(id: string, database: Database.Database = getDat
   return row ? fromRow(row, database) : null;
 }
 
-export function saveWritingDraft(input: WritingDraftInput, database: Database.Database = getDatabase()) {
+export function saveWritingDraft(input: WritingDraftInput, database: Database.Database = getDatabase(), versionChecked = false) {
   initializeWritingTables(database);
   database.prepare(`INSERT INTO writing_drafts
     (id, group_id, version, task_type, category, prompt, image, essay, elapsed_seconds, time_limit_minutes, status, updated_at)
@@ -65,7 +87,7 @@ export function saveWritingDraft(input: WritingDraftInput, database: Database.Da
       task_type = excluded.task_type, category = excluded.category, prompt = excluded.prompt,
       image = excluded.image, essay = excluded.essay, elapsed_seconds = excluded.elapsed_seconds,
       time_limit_minutes = excluded.time_limit_minutes, status = excluded.status, updated_at = excluded.updated_at
-    WHERE excluded.updated_at >= writing_drafts.updated_at`).run(input);
+    ${versionChecked ? "" : "WHERE excluded.updated_at >= writing_drafts.updated_at"}`).run(input);
   return getWritingDraft(input.id, database)!;
 }
 

@@ -41,7 +41,11 @@ export function VocabularyWorkspace({ initialWords, nowIso }: { initialWords: Vo
     };
     const sample = () => {
       const active = engaged();
-      if (!active && releaseLock) { releaseLock(); releaseLock = undefined; ownsTimer = false; }
+      if (!active && releaseLock) {
+        // Seal our final sample before transferring the foreground clock.
+        studyClient.sample(Date.now(), false); void studyClient.flush(true);
+        releaseLock(); releaseLock = undefined; ownsTimer = false;
+      }
       if (active && navigator.locks && !ownsTimer && !acquiring) {
         acquiring = true;
         void navigator.locks.request("ielts-vocabulary-study-timer", { ifAvailable: true }, async (lock) => {

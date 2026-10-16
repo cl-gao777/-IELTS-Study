@@ -13,6 +13,7 @@ export const vocabularySourceReferenceSchema = z.object({
     context.addIssue({ code: "custom", message: "原文位置范围无效。" });
 });
 export const vocabularyExerciseSchema = z.object({
+  locallyReviewed: z.boolean().optional(),
   status: z.enum(["draft", "published"]).default("published"),
   id: identity, version: z.number().int().positive(), sentence: z.string().min(1).max(4000),
   targetStart: z.number().int().nonnegative(), targetEnd: z.number().int().positive(),
@@ -33,6 +34,7 @@ export const vocabularyCourseSchema = z.object({
   kind: z.enum(["builtin", "user-import"]).default("builtin"), version: z.number().int().positive().default(1),
 });
 export const vocabularyCatalogEntrySchema = vocabularyInputSchema.extend({
+  locallyReviewed: z.boolean().optional(),
   status: z.enum(["draft", "published"]).default("published"), version: z.number().int().positive().default(1),
   id: identity, courseIds: z.array(identity).min(1).max(1000), rank: z.number().int().positive(),
   exercises: z.array(vocabularyExerciseSchema).max(500).default([]),
@@ -50,7 +52,7 @@ export type VocabularyRatingSource = "automatic" | "self";
 export type VocabularyCourseSummary = VocabularyCourse & { total: number; ready: number; pending: number; learned: number; due: number };
 export interface VocabularyCoursesResponse { courses: VocabularyCourseSummary[]; activeCourseId: string | null; startRank: number; total: number; page: number; pageSize: number }
 export interface VocabularyStudyState { restoreVersion: number; dailyGoalSeconds: number; todaySeconds: number; paused: boolean; activeCourseId: string | null; activeCourseTitle?: string | null; startRank: number; focus?: VocabularyFocus; policyVersion?: number; nextLevel?: "B2" | "C1" }
-export interface VocabularyStudyUpdate { restoreVersion?: number; dailyGoalSeconds?: number; paused?: boolean; focus?: VocabularyFocus; heartbeat?: { id: string; seconds: number } }
+export interface VocabularyStudyUpdate { restoreVersion?: number; dailyGoalSeconds?: number; paused?: boolean; focus?: VocabularyFocus; heartbeat?: { id: string; seconds: number; cumulative?: true } }
 
 export function vocabularyExerciseGap(exercise: VocabularyExercise) {
   const alternatives = [...new Set([exercise.targetSurface, ...exercise.acceptedAnswers])].sort((a, b) => b.length - a.length)

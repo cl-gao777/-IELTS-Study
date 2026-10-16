@@ -478,16 +478,18 @@ export function submitPracticeAttempt(input: {
   setId: string;
   answers: Record<string, string>;
   durationSeconds: number;
+  snapshot?: PracticeSet;
 }) {
-  const set = getPracticeSet(input.setId);
+  const set = input.snapshot ?? getPracticeSet(input.setId);
   if (!set) {
     return null;
   }
+  if (set.id !== input.setId) throw new Error("试卷快照与提交身份不一致。");
   const score = scoreObjectiveAnswers(input.answers, set.questions);
   const band = set.resource?.bandEstimateAllowed === false ? 0 : calculateAcademicBand(score.correct, score.total, set.kind);
   const database = getDatabase();
   const submittedAt = new Date().toISOString();
-
+  return database.transaction(() => {
   const result = database
     .prepare(
       `INSERT INTO practice_attempts (
@@ -550,6 +552,7 @@ export function submitPracticeAttempt(input: {
     })),
     submittedAt,
   } satisfies PracticeAttempt;
+  })();
 }
 
 export function listAttempts(limit = 20) {
@@ -650,7 +653,7 @@ export function listWritingSubmissions(limit = 20) {
 export function saveMockExam(input: {
   readingAttemptId: number;
   listeningAttemptId: number;
-  writingSubmissionId: number;
+  writingSubmissionId: number | null;
   overallBand: number;
   startedAt: string;
 }) {

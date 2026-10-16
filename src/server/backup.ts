@@ -19,11 +19,15 @@ import { migrateVocabularyCourseBackup, validateVocabularyCourseBackup } from ".
 import { isDeepStrictEqual } from "node:util";
 import { ensureVocabularyTargetTables } from "./vocabulary-targets";
 import { migrateVocabularyTargetBackup, validateVocabularyTargetBackup } from "./backup-vocabulary-targets";
+import { ensureDataIntegrityTables, rotateDataEpoch } from "./data-integrity";
+import { ensureSubmissionTables } from "./submissions";
+import { ensureMockExamTables } from "./mock-exam-session";
+import { migrateDurabilityBackup, validateDurabilityBackup } from "./backup-durability";
 
 type Row = Record<string, string | number | null>;
 export interface StudioBackup {
   format: "ielts-studio";
-  version: 4;
+  version: 5;
   exportedAt: string;
   data: Record<string, Row[]>;
   files: { materialId: number; base64: string }[];
@@ -34,7 +38,7 @@ const MAX_FILE_BYTES = 256 * 1024 * 1024;
 const V2_VOCABULARY_TABLES = ["vocabulary_learning_state", "vocabulary_sessions", "vocabulary_review_audit"] as const;
 class AttachmentBackupError extends Error {}
 const identifier = (value: string) => `"${value.replace(/"/g, '""')}"`;
-function initialize() { ensureLearningTables(); initializeWritingTables(); ensureVocabularyTables(); ensureVocabularyCourseTables(); ensureVocabularyTargetTables(getDatabase()); ensureVocabularyImportTables(); ensureVocabularyAssessmentTables(); }
+function initialize() { ensureLearningTables(); initializeWritingTables(); ensureVocabularyTables(); ensureVocabularyCourseTables(); ensureVocabularyTargetTables(getDatabase()); ensureVocabularyImportTables(); ensureVocabularyAssessmentTables(); ensureDataIntegrityTables(); ensureSubmissionTables(); ensureMockExamTables(); }
 function tableNames() {
   return (getDatabase().prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[]).map((row) => row.name);
 }
@@ -74,13 +78,13 @@ export function createBackup(): StudioBackup {
     // Backups must never restore a sender-controlled filesystem path.
     row.file_path = `upload:${row.id}`;
   }
-  return { format: "ielts-studio", version: 4, exportedAt: new Date().toISOString(), data, files };
+  return { format: "ielts-studio", version: 5, exportedAt: new Date().toISOString(), data, files };
 }
 
 export function validateBackup(input: unknown): StudioBackup {
   initialize();
-  if (!isRecord(input) || Object.keys(input).sort().join(",") !== "data,exportedAt,files,format,version" || input.format !== "ielts-studio" || ![1, 2, 3, 4].includes(Number(input.version)) || typeof input.version !== "number" || !isRecord(input.data) || !Array.isArray(input.files) || typeof input.exportedAt !== "string" || !Number.isFinite(Date.parse(input.exportedAt))) {
-    throw new Error("请使用 IELTS Studio 完整 JSON 备份（version 4 或已知 version 1/2/3）。");
+  if (!isRecord(input) || Object.keys(input).sort().join(",") !== "data,exportedAt,files,format,version" || input.format !== "ielts-studio" || ![1, 2, 3, 4, 5].includes(Number(input.version)) || typeof input.version !== "number" || !isRecord(input.data) || !Array.isArray(input.files) || typeof input.exportedAt !== "string" || !Number.isFinite(Date.parse(input.exportedAt))) {
+    throw new Error("请使用 IELTS Studio 完整 JSON 备份（version 5 或已知 version 1/2/3/4）。");
   }
   // Validation and a known migration must not mutate the caller's original snapshot.
   const backup = structuredClone(input) as unknown as StudioBackup;
@@ -93,7 +97,8 @@ export function validateBackup(input: unknown): StudioBackup {
   }
   if (input.version === 1 || input.version === 2) migrateVocabularyCourseBackup(backup.data);
   if (input.version < 4) migrateVocabularyTargetBackup(backup.data);
-  backup.version = 4;
+  if (input.version < 5) migrateDurabilityBackup(backup.data);
+  backup.version = 5;
   const allowed = new Set(tableNames());
   // Both formats are complete snapshots after their explicit additive migration.
   for (const required of allowed) if (!Array.isArray(backup.data[required])) throw new Error(`备份缺少数据表 ${required}，已拒绝恢复。`);
@@ -143,6 +148,7 @@ export function validateBackup(input: unknown): StudioBackup {
   }
   validateVocabularyCourseBackup(backup.data, backup.files);
   validateVocabularyTargetBackup(backup.data, backup.files);
+  validateDurabilityBackup(backup.data, backup.files);
   return backup;
 }
 
@@ -207,6 +213,10 @@ export function restoreBackup(input: unknown) {
     // Disable only for the synchronous replacement transaction, then check every FK before commit.
     database.pragma("foreign_keys = OFF");
     database.transaction(() => {
+      const durabilityRevisions = new Map(["practice_workspace_versions", "writing_draft_revisions", "mock_exam_sessions"].map((table) => {
+        const key = table === "practice_workspace_versions" ? "set_id" : table === "writing_draft_revisions" ? "draft_id" : "id";
+        return [table, { key, rows: new Map((database.prepare(`SELECT ${key} AS id,revision FROM ${table}`).all() as { id: string; revision: number }[]).map((row) => [row.id, row.revision])) }];
+      }));
       const priorRevisions = new Map((database.prepare("SELECT id, revision FROM vocabulary_sessions").all() as { id: string; revision: number }[]).map((row) => [row.id, row.revision]));
       const priorStudy = database.prepare("SELECT restore_version FROM vocabulary_study_preferences WHERE id=1").get() as { restore_version: number } | undefined;
       const featureRevisions = new Map(["vocabulary_import_previews", "vocabulary_assessments"].map((table) => [table, new Map((database.prepare(`SELECT id,revision FROM ${identifier(table)}`).all() as { id: string; revision: number }[]).map((row) => [row.id, row.revision]))]));
@@ -242,6 +252,19 @@ export function restoreBackup(input: unknown) {
         const revision = Math.max(row.revision, revisions.get(row.id) ?? 0) + 2;
         if (!Number.isSafeInteger(revision)) throw new Error("备份会话版本超出安全范围。");
         database.prepare(`UPDATE ${identifier(table)} SET revision=? WHERE id=?`).run(revision, row.id);
+      }
+      const dataEpoch = rotateDataEpoch(database);
+      for (const [table, { key, rows: revisions }] of durabilityRevisions) for (const row of database.prepare(`SELECT ${key} AS id,revision FROM ${table}`).all() as { id: string; revision: number }[]) {
+        const revision = Math.max(row.revision, revisions.get(row.id) ?? 0) + 2;
+        if (!Number.isSafeInteger(revision)) throw new Error("草稿恢复版本超出安全范围。");
+        database.prepare(`UPDATE ${table} SET revision=? WHERE ${key}=?`).run(revision, row.id);
+      }
+      database.prepare("UPDATE submission_receipts SET data_epoch=?").run(dataEpoch);
+      database.prepare("UPDATE submission_receipts SET status='failed',lease_id=NULL,lease_until=NULL,owner_pid=NULL,error='恢复后请使用原提交编号重试。' WHERE status='processing'").run();
+      database.prepare("UPDATE mock_exam_sessions SET data_epoch=?,writer_id=NULL,lease_until=NULL").run(dataEpoch);
+      for (const row of database.prepare("SELECT id,state_json FROM mock_exam_sessions WHERE status='active'").all() as { id: string; state_json: string }[]) {
+        const state = JSON.parse(row.state_json); state.paused = true;
+        database.prepare("UPDATE mock_exam_sessions SET state_json=? WHERE id=?").run(JSON.stringify(state), row.id);
       }
       // Annotate only newly introduced legacy metadata; never infer old grading snapshots.
       ensureVocabularyTables(database);

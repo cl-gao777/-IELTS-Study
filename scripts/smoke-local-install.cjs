@@ -65,6 +65,11 @@ async function main() {
     return body;
   }
   const put = (body) => ({ method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const post = (body) => ({ ...put(body), method: 'POST' });
+  async function rejects(route, body, status, method = 'PUT') {
+    const response = await fetch(base + route, { ...put(body), method });
+    assert.equal(response.status, status, `${route}: expected ${status}, got ${response.status} ${await response.text()}`);
+  }
   await launch(port);
   for (const route of ['/', '/vocabulary', '/practice/reading', '/practice/listening', '/writing', '/analytics', '/settings']) {
     const response = await fetch(base + route, { signal: AbortSignal.timeout(60000) });
@@ -96,8 +101,40 @@ async function main() {
   form.append('file', new Blob([readFileSync(path.join(root, 'src/server/fixtures/original-import.pdf'))], { type: 'application/pdf' }), 'original-import.pdf');
   const imported = await json('/api/materials/file', { method: 'POST', body: form });
   assert(imported.material.id, 'Original PDF import must produce a material.');
+  const epoch = (await json('/api/data-state')).dataEpoch;
+  const practiceRoute = '/api/practice/workspace/reading-urban-cooling';
+  let workspace = await json(practiceRoute);
+  workspace = await json(practiceRoute, put({ dataEpoch: epoch, expectedRevision: workspace.revision, runId: workspace.runId,
+    draft: { ...workspace.draft, notes: 'Durability fixture', answers: {} }, annotations: [] }));
+  const practiceRequest = { dataEpoch: epoch, runId: workspace.runId, submissionId: workspace.submissionId, setId: 'reading-urban-cooling', answers: {}, durationSeconds: 5 };
+  const firstAttempt = await json('/api/practice/attempts', post(practiceRequest));
+  assert.deepEqual(await json('/api/practice/attempts', post(practiceRequest)), firstAttempt);
+  await rejects('/api/practice/attempts', { ...practiceRequest, durationSeconds: 6 }, 409, 'POST');
+  assert.equal((await json(`/api/submissions/${workspace.submissionId}?dataEpoch=${epoch}`)).status, 'completed');
+  const writingId = randomUUID();
+  const writingRequest = { id: writingId, groupId: writingId, version: 1, taskType: 'task-2', category: 'Opinion', prompt: 'Discuss local public transport.',
+    image: '', essay: 'This is a saved original essay used only for isolated release verification.', elapsedSeconds: 5, timeLimitMinutes: 40, status: 'draft', updatedAt: new Date().toISOString(), dataEpoch: epoch, expectedRevision: 0 };
+  const writing = (await json('/api/writing/drafts', put(writingRequest))).draft;
+  await rejects('/api/writing/drafts', writingRequest, 409);
+  const segment = { id: randomUUID(), seconds: 5, cumulative: true };
+  const timeBefore = await json('/api/vocabulary/study');
+  await json('/api/vocabulary/study', put({ restoreVersion: timeBefore.restoreVersion, heartbeat: segment }));
+  const timeAfter = await json('/api/vocabulary/study', put({ restoreVersion: timeBefore.restoreVersion, heartbeat: segment }));
+  assert.equal(timeAfter.todaySeconds - timeBefore.todaySeconds, 5, 'Replayed 5 seconds must remain 5 seconds.');
+  let exam = (await json('/api/mock-exam/session', put({ action: 'start', dataEpoch: epoch, listeningSetId: 'listening-campus-project', readingSetId: 'reading-urban-cooling' }))).session;
+  const writer = randomUUID();
+  exam = (await json('/api/mock-exam/session', put({ action: 'claim', id: exam.id, dataEpoch: epoch, writerId: writer }))).session;
+  await rejects('/api/mock-exam/session', { action: 'claim', id: exam.id, dataEpoch: epoch, writerId: randomUUID() }, 409);
+  async function checkpoint(state, release = false) {
+    exam = (await json('/api/mock-exam/session', put({ action: 'checkpoint', id: exam.id, dataEpoch: exam.dataEpoch, writerId: writer, expectedRevision: exam.revision, state, release }))).session;
+  }
+  assert(exam.listeningSet.questions.every((q) => q.answers.length === 0 && !q.explanation), 'Mock must not reveal keys.');
+  await checkpoint({ ...exam.state, paused: false, listeningAnswers: { [exam.listeningSet.questions[0].id]: 'Original wrong answer' }, durations: { listening: 5, reading: 0, writing: 0 } });
+  await checkpoint({ ...exam.state, stage: 'reading' });
+  await checkpoint({ ...exam.state, readingAnswers: { [exam.readingSet.questions[0].id]: 'Original wrong answer' }, positions: { 'reading:source': 120 }, zooms: { reading: 125 } });
+  await checkpoint({ ...exam.state, stage: 'writing', essay: writingRequest.essay }, true);
   const backup = await json('/api/backup');
-  assert.equal(backup.version, 4);
+  assert.equal(backup.version, 5);
   assert.equal(backup.files.length, 1);
   await stop();
   await launch(port);
@@ -106,7 +143,39 @@ async function main() {
   assert.deepEqual(recovered.session.state.current, cue, 'Restart must preserve the exact issued card.');
   const recoveredBackup = await json('/api/backup');
   assert.equal(recoveredBackup.files[0].sha256, backup.files[0].sha256);
-  console.log(JSON.stringify({ passed: true, pages: 7, publicWords: 3766, contexts: 7532, backupVersion: 4, pdfImport: true, cardRestoredAfterRestart: true }));
+  const resumed = (await json('/api/mock-exam/session')).session;
+  assert.deepEqual(resumed.state, exam.state, 'Restart must preserve paused exam, phase, essay, clocks and material position.');
+  exam = (await json('/api/mock-exam/session', put({ action: 'claim', id: exam.id, dataEpoch: epoch, writerId: writer }))).session;
+  const mockRequest = { sessionId: exam.id, submissionId: exam.submissionId, dataEpoch: epoch, writerId: writer };
+  const completed = await json('/api/mock-exam', post(mockRequest));
+  assert.equal(completed.provider, 'local-fallback'); assert.equal(completed.writing.id, 0);
+  assert.deepEqual(await json('/api/mock-exam', post(mockRequest)), completed);
+  await rejects('/api/mock-exam', { ...mockRequest, sessionId: randomUUID() }, 409, 'POST');
+  const graded = await json('/api/backup');
+  assert.equal(graded.data.mock_exams.length, 1);
+  assert.equal(graded.data.practice_attempts.length, backup.data.practice_attempts.length + 2);
+  assert.equal(graded.data.writing_submissions.length, 0, 'Unavailable AI must not create a fake band score.');
+  const completedSession = (await json('/api/mock-exam/session')).session;
+  await json('/api/mock-exam/session', put({ action: 'end', id: exam.id, dataEpoch: epoch, expectedRevision: completedSession.revision }));
+  await json('/api/backup'); // Ended completed sessions retain valid immutable receipts.
+  await json('/api/backup', post({ confirm: 'RESTORE', backup }));
+  const newEpoch = (await json('/api/data-state')).dataEpoch;
+  assert.notEqual(newEpoch, epoch);
+  await rejects(practiceRoute, { dataEpoch: epoch, expectedRevision: workspace.revision, runId: workspace.runId, draft: workspace.draft, annotations: [] }, 409);
+  await rejects('/api/practice/attempts', practiceRequest, 409, 'POST');
+  await rejects('/api/writing/drafts', { ...writingRequest, expectedRevision: writing.revision }, 409);
+  await rejects('/api/writing/evaluate', { ...writingRequest, expectedRevision: writing.revision }, 409, 'POST');
+  await rejects('/api/mock-exam/session', { action: 'claim', id: exam.id, dataEpoch: epoch, writerId: writer }, 409);
+  await rejects('/api/mock-exam', mockRequest, 409, 'POST');
+  const restored = await json('/api/backup');
+  assert.deepEqual(restored.data.practice_attempts, backup.data.practice_attempts);
+  assert.equal(restored.data.mock_exam_sessions[0].writer_id, null);
+  assert.equal(JSON.parse(restored.data.mock_exam_sessions[0].state_json).paused, true);
+  const invalidBackup = structuredClone(restored); invalidBackup.files[0].sha256 = '0'.repeat(64);
+  await rejects('/api/backup', { confirm: 'RESTORE', backup: invalidBackup }, 400, 'POST');
+  assert.equal((await json('/api/data-state')).dataEpoch, newEpoch);
+  console.log(JSON.stringify({ passed: true, pages: 7, publicWords: 3766, contexts: 7532, backupVersion: 5, pdfImport: true, cardRestoredAfterRestart: true,
+    examRestoredAfterRestart: true, idempotentSubmissions: true, oldPagesBlocked: true, duplicateTimeSeconds: 5, unavailableAIUnassessed: true }));
   succeeded = true;
 }
 

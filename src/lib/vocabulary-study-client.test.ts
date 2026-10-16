@@ -4,23 +4,63 @@ import type { VocabularyStudyState, VocabularyStudyUpdate } from "./vocabulary-c
 
 function fixture() {
   let study: VocabularyStudyState = { restoreVersion: 1, dailyGoalSeconds: 900, todaySeconds: 0, paused: false, activeCourseId: "academic", startRank: 1 };
-  const seen = new Set<string>(); const calls: VocabularyStudyUpdate[] = []; let failure: "before" | "after" | null = null;
+  const seen = new Set<string>(); const totals = new Map<string, number>(); const calls: VocabularyStudyUpdate[] = []; let failure: "before" | "after" | null = null;
   const send = async (update?: VocabularyStudyUpdate) => {
     if (update) calls.push(structuredClone(update));
     if (update && update.restoreVersion !== study.restoreVersion) throw new VocabularyStudyRestoreConflict(structuredClone(study));
     if (update?.heartbeat) {
       if (failure === "before") throw new TypeError("offline");
-      if (!seen.has(update.heartbeat.id)) { seen.add(update.heartbeat.id); study = { ...study, todaySeconds: study.todaySeconds + update.heartbeat.seconds }; }
+      seen.add(update.heartbeat.id); const prior = totals.get(update.heartbeat.id) ?? 0;
+      study = { ...study, todaySeconds: study.todaySeconds + Math.max(0, update.heartbeat.seconds - prior) };
+      totals.set(update.heartbeat.id, Math.max(prior, update.heartbeat.seconds));
       if (failure === "after") { failure = null; throw new TypeError("ack lost"); }
     }
     study = { ...study, ...(update?.paused !== undefined ? { paused: update.paused } : {}), ...(update?.dailyGoalSeconds ? { dailyGoalSeconds: update.dailyGoalSeconds } : {}) };
     return structuredClone(study);
   };
-  const values = new Map<string, string>(); const cache = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value); }, removeItem: (key: string) => { values.delete(key); } };
+  const values = new Map<string, string>(); const cache = { get length() { return values.size; }, key: (index: number) => [...values.keys()][index] ?? null,
+    getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value); }, removeItem: (key: string) => { values.delete(key); } };
   return { send, cache, calls, seen, fail: (value: typeof failure) => { failure = value; }, state: () => study,
     restore: () => { study = { ...study, restoreVersion: study.restoreVersion + 2, todaySeconds: 0 }; } };
 }
 describe("foreground vocabulary study time", () => {
+  it("uses the same segment when a recovered snapshot is credited before its owner seals the growing buffer", async () => {
+    const f = fixture(); const first = new VocabularyStudyClient(f.send); await first.initialize(f.cache);
+    first.sample(0, true); for (let second = 1; second <= 5; second++) first.sample(second * 1000, true);
+    const second = new VocabularyStudyClient(f.send); await second.initialize(f.cache); await second.flush();
+    expect(f.state().todaySeconds).toBe(5); expect(second.getSnapshot().unsavedSeconds).toBe(0);
+    for (let second = 6; second <= 9; second++) first.sample(second * 1000, true);
+    await first.flush(true); expect(f.state().todaySeconds).toBe(9); expect(f.seen.size).toBe(1);
+    first.dispose(); second.dispose();
+  });
+  it("claims a pre-upgrade unsealed cache once without changing its historical seconds", async () => {
+    const f = fixture(); f.cache.setItem("ielts-studio-vocabulary-study", JSON.stringify({ milliseconds: 5000, queue: [], restoreVersion: 1 }));
+    const first = new VocabularyStudyClient(f.send); await first.initialize(f.cache);
+    const second = new VocabularyStudyClient(f.send); await second.initialize(f.cache);
+    await Promise.all([first.flush(true), second.flush(true)]);
+    expect(f.state().todaySeconds).toBe(5); expect(f.seen.size).toBe(1); first.dispose(); second.dispose();
+  });
+  it("derives one migration ID when two readers see the identical old snapshot before either writes", async () => {
+    const f = fixture(); const key = "ielts-studio-vocabulary-study";
+    const legacy = JSON.stringify({ milliseconds: 5000, queue: [], restoreVersion: 1 });
+    f.cache.setItem(key, legacy); let reads = 0;
+    const concurrentCache = { ...f.cache, getItem: (name: string) => name === key && reads++ < 2 ? legacy : f.cache.getItem(name) };
+    const first = new VocabularyStudyClient(f.send), second = new VocabularyStudyClient(f.send);
+    await Promise.all([first.initialize(concurrentCache), second.initialize(concurrentCache)]);
+    await Promise.all([first.flush(true), second.flush(true)]);
+    expect(f.state().todaySeconds).toBe(5); expect(f.seen.size).toBe(1);
+    const ids = f.calls.filter((call) => call.heartbeat).map((call) => call.heartbeat!.id);
+    expect(new Set(ids).size).toBe(1); first.dispose(); second.dispose();
+  });
+  it("does not copy another tab's five-second buffer into a new heartbeat", async () => {
+    const f = fixture(); const first = new VocabularyStudyClient(f.send); await first.initialize(f.cache);
+    first.sample(0, true); for (let second = 1; second <= 5; second++) first.sample(second * 1000, true);
+    const second = new VocabularyStudyClient(f.send); await second.initialize(f.cache);
+    await Promise.all([first.flush(true), second.flush(true)]);
+    expect(f.state().todaySeconds).toBe(5); expect(f.seen.size).toBe(1);
+    second.sample(10_000, true); second.sample(11_000, true); await second.flush(true);
+    expect(f.state().todaySeconds).toBe(6); first.dispose(); second.dispose();
+  });
   it("pauses without losing the accumulated seconds and skips hidden/sleep gaps", async () => {
     const f = fixture(); const client = new VocabularyStudyClient(f.send); await client.initialize(f.cache);
     client.sample(0, true); for (let second = 1; second <= 5; second++) client.sample(second * 1000, true);

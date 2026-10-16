@@ -15,10 +15,12 @@ export const vocabularySourcePdfSchema = z.object({
   quote: z.string().min(1).max(4000),
 });
 export const vocabularyTargetMembershipSchema = z.object({
+  locallyReviewed: z.boolean().optional(),
   courseId: identity, version: z.number().int().positive(), rank: z.number().int().positive(),
   exerciseIds: z.array(identity).min(2).max(500),
 });
 export const vocabularyTargetSchema = z.object({
+  locallyReviewed: z.boolean().optional(),
   id: identity, version: z.number().int().positive(), status: z.enum(["draft", "published"]).default("published"),
   partOfSpeech: z.string().trim().min(1).max(100), meaningZh: z.string().trim().min(1).max(1000),
   definitionEn: z.string().trim().min(1).max(2000), ipa: z.string().max(200).default(""),

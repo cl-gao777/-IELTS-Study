@@ -2,9 +2,15 @@
 
 - Status: Accepted
 - Date: 2026-10-04
-- Updated: 2026-10-08
+- Updated: 2026-10-13
 
-## Version 4 snapshot
+## Version 5 durability additions
+
+Version 5 includes the global restore epoch, practice draft revisions and run identities, writing draft CAS revisions, immutable submission receipts and processing leases, frozen mock exam sessions, and cumulative vocabulary time segments. A successful restore rotates the epoch inside the replacement transaction, advances restored draft/session revisions, releases mock writer leases, pauses active exams, and marks incomplete submission tasks retryable with their original IDs. Failed restores retain the old epoch. Completed submissions and historical grades are preserved; no IDs or scores are invented for old history.
+
+Complete v1–v4 backups receive empty durability tables and a fresh initial epoch before strict validation. Version 5 requires all six additions, validates receipt hashes and result associations, validates frozen PDF/audio references, and rejects malformed sessions. See [ADR 0007](0007-durable-learning-sessions.md).
+
+## Version 4 snapshot (retained compatibility contract)
 
 The JSON format identifies itself as `ielts-studio`, version `4`, with `exportedAt`, `data`, and `files`. It snapshots every initialized application table, including vocabulary courses/catalog and sense targets, source and grading context, study preferences and heartbeat ledger, import previews, fixed assessment assignments and unfinished inputs, learning state, active sessions, raw review details, immutable grading audit, supplemental context attempts, target introductions and minute steps, persistent term/target dispositions and operation idempotency records, FSRS state, practice drafts, dictation history, and writing revisions. Imported material bytes travel in a base64 manifest. The AI provider key is stored separately in `ai-provider.secret.json`; JSON and raw database exports exclude it, and restore does not overwrite it.
 

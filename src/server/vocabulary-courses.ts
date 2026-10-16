@@ -31,6 +31,8 @@ export function ensureVocabularyCourseTables(database: Database.Database = getDa
       restore_version INTEGER NOT NULL DEFAULT 1);
     CREATE TABLE IF NOT EXISTS vocabulary_study_heartbeats (id TEXT PRIMARY KEY, study_date TEXT NOT NULL,
       seconds INTEGER NOT NULL, created_at TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS vocabulary_study_time_segments (id TEXT PRIMARY KEY, restore_version INTEGER NOT NULL,
+      study_date TEXT NOT NULL, seconds INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
   `);
   const preferencesColumns = database.prepare("PRAGMA table_info(vocabulary_study_preferences)").all() as { name: string }[];
   if (!preferencesColumns.some((column) => column.name === "restore_version")) {
@@ -62,7 +64,7 @@ export function registerVocabularyCourse(courseInput: VocabularyCourse, entryInp
         // Re-extraction cannot undo a user's review of a quoted sentence. A newer
         // local revision likewise takes precedence over an older bundled exercise.
         if (!previous) return exercise;
-        if (previous.sourceReference || previous.version > exercise.version) return previous;
+        if (previous.locallyReviewed || previous.sourceReference || previous.version > exercise.version) return previous;
         const content = (item: typeof exercise) => JSON.stringify({ ...item, version: undefined });
         return content(previous) === content(exercise) ? previous : { ...exercise, version: Math.max(previous.version + 1, exercise.version) };
       });
@@ -72,16 +74,16 @@ export function registerVocabularyCourse(courseInput: VocabularyCourse, entryInp
         const memberships = [...previous.memberships.filter((member) => !incoming.memberships.some((item) => item.courseId === member.courseId)), ...incoming.memberships.map((member) => {
           const prior = previous.memberships.find((item) => item.courseId === member.courseId);
           if (!prior) return member;
-          if (prior.version > member.version) return prior;
+          if (prior.locallyReviewed || prior.version > member.version) return prior;
           const content = (item: typeof member) => JSON.stringify({ ...item, version: undefined });
           return content(prior) === content(member) ? member : { ...member, version: Math.max(prior.version + 1, member.version) };
         })];
         const content = (item: typeof incoming) => JSON.stringify({ ...item, version: undefined, memberships: undefined });
-        const target = previous.version > incoming.version ? previous : incoming;
-        return { ...target, memberships, version: Math.max(previous.version, incoming.version) + Number(content(previous) !== content(target) && incoming.version <= previous.version) };
+        const target = previous.locallyReviewed || previous.version > incoming.version ? previous : incoming;
+        return { ...target, memberships, version: previous.locallyReviewed ? previous.version : Math.max(previous.version, incoming.version) + Number(content(previous) !== content(target) && incoming.version <= previous.version) };
       });
       const entry = vocabularyCatalogEntrySchema.parse({ rank: index + 1, ...saved, ...input,
-        ...(saved && !replaceContent ? saved : {}), id: saved?.id ?? input.id ?? `${course.id}:${term}`,
+        ...(saved && (!replaceContent || saved.locallyReviewed) ? saved : {}), id: saved?.id ?? input.id ?? `${course.id}:${term}`,
         ...(saved && replaceContent ? { version: saved.version, exercises: [
           ...exercises, ...saved.exercises.filter((exercise) => !exercises.some((incoming) => incoming.id === exercise.id))] } : {}),
         targets: [...(saved?.targets ?? []).filter((target) => !targets.some((incoming) => incoming.id === target.id)), ...targets],
@@ -245,13 +247,21 @@ export function saveVocabularyStudy(input: VocabularyStudyUpdate, now = new Date
       ON CONFLICT(id) DO UPDATE SET daily_goal_seconds=excluded.daily_goal_seconds,paused=excluded.paused,focus=excluded.focus,
       policy_version=policy_version+CASE WHEN focus<>excluded.focus THEN 1 ELSE 0 END`)
       .run(current.activeCourseId, goal, Number(paused), current.startRank, focus);
-    if (input.heartbeat && !database.prepare("SELECT 1 FROM vocabulary_study_heartbeats WHERE id=?").get(input.heartbeat.id)) {
+    if (input.heartbeat) {
       database.exec(`CREATE TABLE IF NOT EXISTS study_sessions(id TEXT PRIMARY KEY,study_date TEXT NOT NULL,area TEXT NOT NULL,duration_seconds INTEGER NOT NULL DEFAULT 0,updated_at TEXT NOT NULL)`);
       // The client counts only focused, visible, unpaused seconds. The durable ID makes
       // an offline packet safe to retry, including after pausing or ending the round.
-      const date = studyDate(now); const id = `vocabulary-active:${date}`;
-      const credited = Math.min(15, Math.max(0, input.heartbeat.seconds));
-      database.prepare("INSERT INTO vocabulary_study_heartbeats(id,study_date,seconds,created_at) VALUES(?,?,?,?)").run(input.heartbeat.id, date, credited, now.toISOString());
+      const previous = database.prepare("SELECT seconds,study_date FROM vocabulary_study_time_segments WHERE id=?").get(input.heartbeat.id) as { seconds: number; study_date: string } | undefined;
+      // Old heartbeat IDs already contributed to study_sessions. They establish
+      // the baseline when an offline pre-upgrade packet is replayed.
+      const legacy = database.prepare("SELECT seconds,study_date FROM vocabulary_study_heartbeats WHERE id=?").get(input.heartbeat.id) as { seconds: number; study_date: string } | undefined;
+      const date = previous?.study_date ?? legacy?.study_date ?? studyDate(now); const id = `vocabulary-active:${date}`;
+      const total = Math.min(15, Math.max(0, input.heartbeat.seconds));
+      const credited = Math.max(0, total - (previous?.seconds ?? legacy?.seconds ?? 0));
+      database.prepare(`INSERT INTO vocabulary_study_time_segments(id,restore_version,study_date,seconds,created_at,updated_at) VALUES(?,?,?,?,?,?)
+        ON CONFLICT(id) DO UPDATE SET seconds=MAX(seconds,excluded.seconds),updated_at=excluded.updated_at`)
+        .run(input.heartbeat.id, current.restoreVersion, date, Math.max(total, previous?.seconds ?? legacy?.seconds ?? 0), now.toISOString(), now.toISOString());
+      database.prepare("INSERT OR IGNORE INTO vocabulary_study_heartbeats(id,study_date,seconds,created_at) VALUES(?,?,?,?)").run(input.heartbeat.id, date, total, now.toISOString());
       database.prepare(`INSERT INTO study_sessions(id,study_date,area,duration_seconds,updated_at) VALUES(?,?,'Vocabulary',?,?)
         ON CONFLICT(id) DO UPDATE SET duration_seconds=duration_seconds+excluded.duration_seconds,updated_at=excluded.updated_at`).run(id, date, credited, now.toISOString());
     }

@@ -113,13 +113,15 @@
 
 .mockSplit {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
   gap: 14px;
 }
 
 .mockScroll {
-  max-height: calc(100vh - 125px);
+  height: calc(100vh - 240px);
+  min-height: 320px;
   overflow-y: auto;
+  min-width: 0;
 }
 
 .audioExam {
@@ -163,7 +165,7 @@
 
 .mockQuestions legend {
   padding-bottom: 9px;
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 750;
   line-height: 1.5;
 }
@@ -186,9 +188,16 @@
 .mockPassage {
   color: #37443d !important;
   font-family: Georgia, serif;
-  font-size: 12px !important;
+  font-size: 17px !important;
   line-height: 1.85 !important;
 }
+
+.sessionActions, .passageTabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.audioBox { display: grid; gap: 16px; margin-bottom: 16px; }
+.audioBox audio { width: 100%; min-width: 0; }
+.saveHint { font-size: 13px; color: #536059; }
+.mockQuestions p { font-size: 12px; overflow-wrap: anywhere; }
+.mockScroll h1 { font-size: 20px; }
 
 .writingExam {
   display: grid;
@@ -294,5 +303,17 @@
   font-family: Georgia, serif;
   font-size: 21px;
   font-weight: 500;
+}
+
+/* Keep narrow-screen overrides after the writing layout they replace. */
+@media (max-width: 760px) {
+  .examToolbar { grid-template-columns: 1fr auto; gap: 8px; }
+  .examToolbar nav { grid-column: 1 / -1; grid-row: 2; }
+  .mockSplit, .writingExam { grid-template-columns: minmax(0, 1fr); }
+  .mockScroll { height: 55vh; min-height: 260px; }
+  .writingExam > div:first-child { grid-row: auto; }
+  .writingExam textarea { min-height: 420px; padding: 14px; }
+  .examToolbar nav span { padding: 5px; }
+  .examRoom { min-width: 0; }
 }
 

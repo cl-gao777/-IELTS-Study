@@ -1,7 +1,18 @@
 import type { VocabularyStudyState, VocabularyStudyUpdate } from "./vocabulary-course";
 
 const recoveryKey = "ielts-studio-vocabulary-study";
+const segmentPrefix = `${recoveryKey}:segment:`;
 type Heartbeat = NonNullable<VocabularyStudyUpdate["heartbeat"]> & { restoreVersion: number };
+/** Concurrent readers of an old, identity-less packet must derive the same ID. */
+async function legacySegmentId(recovery: { restoreVersion: number; milliseconds: number; queue?: Heartbeat[] }) {
+  const queue = (Array.isArray(recovery.queue) ? recovery.queue : []).map((item) => ({ id: item?.id, seconds: item?.seconds, restoreVersion: item?.restoreVersion }))
+    .sort((a, b) => String(a.id).localeCompare(String(b.id)));
+  const payload = JSON.stringify({ format: "legacy-study-buffer-v1", restoreVersion: recovery.restoreVersion, milliseconds: recovery.milliseconds, queue });
+  const bytes = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(payload))).slice(0, 16);
+  bytes[6] = (bytes[6] & 15) | 128; bytes[8] = (bytes[8] & 63) | 128;
+  const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
 type StudyTransport = (update?: VocabularyStudyUpdate) => Promise<VocabularyStudyState>;
 export interface VocabularyStudySnapshot { study: VocabularyStudyState | null; ready: boolean; busy: boolean; message: string; unsavedSeconds: number }
 export class VocabularyStudyRestoreConflict extends Error {
@@ -26,10 +37,11 @@ export class VocabularyStudyClient {
   private listeners = new Set<() => void>();
   private queue: Heartbeat[] = [];
   private milliseconds = 0;
+  private segmentId = crypto.randomUUID();
   private lastSample: number | null = null;
   private wasActive = false;
   private chain: Promise<void> = Promise.resolve();
-  private storage?: Pick<Storage, "getItem" | "setItem" | "removeItem">;
+  private storage?: Pick<Storage, "getItem" | "setItem" | "removeItem"> & Partial<Pick<Storage, "key" | "length">>;
   private epoch = 0;
   private bufferVersion: number | null = null;
   constructor(private send: StudyTransport = transport) {}
@@ -40,11 +52,18 @@ export class VocabularyStudyClient {
     this.remember(); for (const listener of this.listeners) listener();
   }
   private remember() {
-    try { this.storage?.setItem(recoveryKey, JSON.stringify({ milliseconds: this.milliseconds, queue: this.queue, restoreVersion: this.bufferVersion })); } catch { /* Server statistics remain intact. */ }
+    try {
+      this.storage?.setItem(recoveryKey, JSON.stringify({ milliseconds: this.milliseconds, segmentId: this.segmentId, queue: this.queue, restoreVersion: this.bufferVersion }));
+      for (const packet of [...this.queue, ...(this.bufferVersion && this.milliseconds >= 1000 ? [{ id: this.segmentId, seconds: Math.floor(this.milliseconds / 1000), restoreVersion: this.bufferVersion }] : [])]) {
+        const key = `${segmentPrefix}${packet.id}`;
+        const old = JSON.parse(this.storage?.getItem(key) || "null") as Heartbeat | null;
+        if (!old || old.restoreVersion !== packet.restoreVersion || old.seconds < packet.seconds) this.storage?.setItem(key, JSON.stringify(packet));
+      }
+    } catch { /* Server statistics remain intact. */ }
   }
   private adopt(study: VocabularyStudyState) {
     const changed = this.bufferVersion !== null && this.bufferVersion !== study.restoreVersion;
-    if (changed) { this.queue = []; this.milliseconds = 0; this.lastSample = null; this.wasActive = false; }
+    if (changed) { this.queue = []; this.milliseconds = 0; this.segmentId = crypto.randomUUID(); this.lastSample = null; this.wasActive = false; }
     this.bufferVersion = study.restoreVersion;
     this.update({ study, ready: true, ...(changed ? { message: "数据已恢复，旧计时缓存已清除。" } : {}) });
   }
@@ -58,11 +77,35 @@ export class VocabularyStudyClient {
     try {
       const recovery = JSON.parse(storage?.getItem(recoveryKey) || "null");
       this.bufferVersion = Number.isSafeInteger(recovery?.restoreVersion) && recovery.restoreVersion > 0 ? recovery.restoreVersion : null;
-      if (this.bufferVersion && Number.isFinite(recovery?.milliseconds) && recovery.milliseconds >= 0 && recovery.milliseconds < 15_000) this.milliseconds = recovery.milliseconds;
-      if (Array.isArray(recovery?.queue)) this.queue = recovery.queue.filter((item: Heartbeat) => item.restoreVersion === this.bufferVersion && /^[0-9a-f-]{36}$/i.test(item.id) && Number.isInteger(item.seconds) && item.seconds > 0 && item.seconds <= 15).slice(0, 2000);
+      const packets: Heartbeat[] = Array.isArray(recovery?.queue) ? recovery.queue : [];
+      if (this.bufferVersion && Number.isFinite(recovery?.milliseconds) && recovery.milliseconds >= 1000 && recovery.milliseconds < 15_000) {
+        // Claim a legacy buffer once by recording its stable identity before
+        // another tab can recover it. Never borrow its milliseconds as our own.
+        const id = /^[0-9a-f-]{36}$/i.test(recovery.segmentId ?? "") ? recovery.segmentId : await legacySegmentId(recovery);
+        if (epoch !== this.epoch) return;
+        recovery.segmentId = id; storage?.setItem(recoveryKey, JSON.stringify(recovery));
+        packets.push({ id, seconds: Math.floor(recovery.milliseconds / 1000), restoreVersion: this.bufferVersion });
+      }
+      for (let index = 0; index < (storage?.length ?? 0); index++) {
+        const key = storage?.key?.(index); if (!key?.startsWith(segmentPrefix)) continue;
+        try { packets.push(JSON.parse(storage!.getItem(key) || "null")); } catch {}
+      }
+      const byId = new Map<string, Heartbeat>();
+      for (const item of packets) if (item && Number.isSafeInteger(item.restoreVersion) && item.restoreVersion > 0 && /^[0-9a-f-]{36}$/i.test(item.id) && Number.isInteger(item.seconds) && item.seconds > 0 && item.seconds <= 15) {
+        if ((byId.get(item.id)?.seconds ?? 0) < item.seconds) byId.set(item.id, item);
+      }
+      this.queue = [...byId.values()].slice(0, 2000); this.milliseconds = 0; this.segmentId = crypto.randomUUID();
     } catch { /* Ignore malformed local recovery. */ }
     this.update({ busy: true, message: "" });
-    try { const study = await this.send(); if (epoch === this.epoch) this.adopt(study); }
+    try {
+      const study = await this.send();
+      if (epoch === this.epoch) {
+        // The shared compatibility pointer may belong to an older tab. The
+        // server token decides which durable segments can be replayed.
+        this.queue = this.queue.filter((packet) => packet.restoreVersion === study.restoreVersion);
+        this.bufferVersion = study.restoreVersion; this.adopt(study);
+      }
+    }
     catch (error) { if (epoch === this.epoch) this.update({ message: error instanceof Error ? error.message : "学习时间暂时无法读取。" }); }
     finally { if (epoch === this.epoch) { this.update({ busy: false }); if (this.snapshot.ready && this.queue.length) void this.flush(); } }
   }
@@ -73,7 +116,7 @@ export class VocabularyStudyClient {
     this.lastSample = now;
     this.wasActive = active && this.snapshot.ready && !this.snapshot.study?.paused;
     while (this.milliseconds >= 15_000) {
-      if (this.bufferVersion) this.queue.push({ id: crypto.randomUUID(), seconds: 15, restoreVersion: this.bufferVersion }); this.milliseconds -= 15_000;
+      if (this.bufferVersion) this.queue.push({ id: this.segmentId, seconds: 15, restoreVersion: this.bufferVersion }); this.milliseconds -= 15_000; this.segmentId = crypto.randomUUID();
     }
     this.update({});
     if (this.queue.length && this.snapshot.ready) void this.flush();
@@ -81,7 +124,7 @@ export class VocabularyStudyClient {
   flush(final = false) {
     if (final) {
       const seconds = Math.floor(this.milliseconds / 1000);
-      if (seconds && this.bufferVersion) { this.queue.push({ id: crypto.randomUUID(), seconds, restoreVersion: this.bufferVersion }); this.milliseconds -= seconds * 1000; this.update({}); }
+      if (seconds && this.bufferVersion) { this.queue.push({ id: this.segmentId, seconds, restoreVersion: this.bufferVersion }); this.milliseconds -= seconds * 1000; this.segmentId = crypto.randomUUID(); this.update({}); }
     }
     const epoch = this.epoch;
     const run = async () => {
@@ -89,9 +132,13 @@ export class VocabularyStudyClient {
         const heartbeat = this.queue[0];
         try {
           const { restoreVersion, ...packet } = heartbeat;
-          const study = await this.send({ heartbeat: packet, restoreVersion });
+          const study = await this.send({ heartbeat: { ...packet, cumulative: true }, restoreVersion });
           if (epoch !== this.epoch) return;
           if (this.queue[0]?.id === heartbeat.id) this.queue.shift();
+          try {
+            const key = `${segmentPrefix}${heartbeat.id}`; const stored = JSON.parse(this.storage?.getItem(key) || "null");
+            if (stored?.seconds <= heartbeat.seconds) this.storage?.removeItem(key);
+          } catch {}
           this.adopt(study); this.update({ message: "" });
         } catch (error) { if (epoch === this.epoch) this.failed(error); return; }
       }

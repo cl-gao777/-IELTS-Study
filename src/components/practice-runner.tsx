@@ -5,6 +5,7 @@ import type { PracticeAttempt, PracticeSet } from "@/lib/domain";
 import { QUESTION_TYPES, MISTAKE_REASONS, questionOptions } from "@/lib/question-types";
 import { emptyPracticeDraft, type PassageAnnotation, type PracticeWorkspaceState } from "@/lib/learning-workspace";
 import type { DictationToken } from "@/lib/dictation";
+import { exportRecoveryCopy, useDataEpochGuard } from "@/lib/data-epoch-client";
 import { ListeningPlayer } from "./listening-player";
 import { OfficialPaper } from "./official-paper";
 import { ReadingPaper } from "./reading-paper";
@@ -38,6 +39,37 @@ export function PracticeRunner({ set, initialState }: { set: PracticeSet; initia
   const restoredPdfPassage = useRef<string | null>(null);
   const form = useRef<HTMLFormElement>(null);
   const saveSequence = useRef(Promise.resolve());
+  const protocol = useRef({ dataEpoch: initialState?.dataEpoch ?? "", revision: initialState?.revision ?? 0, runId: initialState?.runId ?? "", submissionId: initialState?.submissionId ?? "" });
+  const pendingSubmission = useRef<string | null>(null);
+  const [submissionPending, setSubmissionPending] = useState(false);
+  const { frozen, frozenRef, freeze, requestSignal } = useDataEpochGuard(() => { setSaveStatus("页面已冻结，请导出未保存内容后刷新。"); setBusy(false); });
+  const recoveryKey = "ielts-studio-practice-recovery:" + set.id;
+  const oldRecovery = useRef<unknown>(null);
+  const [hasOldRecovery, setHasOldRecovery] = useState(false);
+  const [recovering, setRecovering] = useState(true);
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/practice/workspace/" + encodeURIComponent(set.id), { signal: requestSignal() }).then(async (response) => {
+      if (!response.ok) throw new Error();
+      const state = await response.json() as PracticeWorkspaceState;
+      if (cancelled) return;
+      if (protocol.current.dataEpoch && state.dataEpoch !== protocol.current.dataEpoch) { freeze(); return; }
+      protocol.current = { dataEpoch: state.dataEpoch, revision: state.revision, runId: state.runId, submissionId: state.submissionId };
+      let cached: { dataEpoch: string; runId: string; revision: number; draft: typeof draft; annotations: PassageAnnotation[]; pendingSubmission?: string | null } | null = null;
+      try { cached = JSON.parse(localStorage.getItem(recoveryKey) || "null"); } catch { /* SQLite still loads. */ }
+      const matching = cached && cached.dataEpoch === state.dataEpoch && cached.runId === state.runId && cached.revision === state.revision;
+      const restored = matching ? cached!.draft : state.draft;
+      setDraft(restored); setAnnotations(matching ? cached!.annotations : state.annotations);
+      elapsedRef.current = restored.elapsed; setElapsed(restored.elapsed); setAttempt(restored.isRetry ? null : state.attempt); setReasons(state.reasons);
+      if (cached?.dataEpoch === state.dataEpoch && cached.runId === state.runId) { pendingSubmission.current = cached.pendingSubmission ?? null; setSubmissionPending(Boolean(pendingSubmission.current)); }
+      if (cached && !matching) { oldRecovery.current = cached; setHasOldRecovery(true); setMessage("浏览器旧草稿与服务端版本不同，未自动导入。可先导出旧草稿，再核对。"); }
+    }).catch(() => { setMessage("无法核对服务器状态，暂停自动保存，请刷新重试。"); freeze(); }).finally(() => { if (!cancelled) setRecovering(false); });
+    return () => { cancelled = true; };
+  }, [set.id, recoveryKey, freeze, requestSignal]);
+  useEffect(() => {
+    if (recovering || frozen || !protocol.current.dataEpoch) return;
+    try { localStorage.setItem(recoveryKey, JSON.stringify({ ...protocol.current, draft: { ...draft, elapsed }, annotations, pendingSubmission: pendingSubmission.current })); } catch { /* SQLite save remains available. */ }
+  }, [draft, elapsed, annotations, recoveryKey, recovering, frozen]);
   const isReading = set.kind === "reading";
   const canEstimateBand = set.questions.length === 40 && set.resource?.bandEstimateAllowed !== false;
   const sourceText = isReading ? set.passage : set.transcript;
@@ -80,28 +112,44 @@ export function PracticeRunner({ set, initialState }: { set: PracticeSet; initia
     if (document.fullscreenElement) void document.exitFullscreen();
     else void root.current?.requestFullscreen().catch(() => setMessage("此浏览器暂不支持全屏。"));
   }
-  const patchDraft = (patch: Partial<typeof draft>) => { setDraft((current) => ({ ...current, ...patch })); setSaveStatus("正在保存…"); };
-  const save = useCallback(() => {
-    const body = JSON.stringify({ draft: { ...draft, elapsed: elapsedRef.current }, annotations });
+  const patchDraft = (patch: Partial<typeof draft>) => { if (frozenRef.current) return; setDraft((current) => ({ ...current, ...patch })); setSaveStatus("正在保存…"); };
+  const save = useCallback((restart = false, nextDraft?: typeof draft) => {
+    const snapshot = { draft: { ...(nextDraft ?? draft), elapsed: nextDraft?.elapsed ?? elapsedRef.current }, annotations };
+    const queuedRun = protocol.current.runId;
     saveSequence.current = saveSequence.current.catch(() => undefined).then(async () => {
+      if (frozenRef.current || recovering || !protocol.current.dataEpoch) return;
+      if (queuedRun !== protocol.current.runId) return;
+      const body = JSON.stringify({ ...snapshot, dataEpoch: protocol.current.dataEpoch, expectedRevision: protocol.current.revision, runId: protocol.current.runId, restart });
       try {
-        const response = await fetch("/api/practice/workspace/" + encodeURIComponent(set.id), { method: "PUT", headers: { "Content-Type": "application/json" }, body, keepalive: body.length < 50000 });
+        const response = await fetch("/api/practice/workspace/" + encodeURIComponent(set.id), { method: "PUT", headers: { "Content-Type": "application/json" }, signal: requestSignal(), body, keepalive: body.length < 50000 });
+        if (response.status === 409) { freeze(); return; }
         if (!response.ok) throw new Error("保存失败");
+        const payload = await response.json() as PracticeWorkspaceState;
+        if (frozenRef.current) return;
+        protocol.current = { dataEpoch: payload.dataEpoch, revision: payload.revision, runId: payload.runId, submissionId: payload.submissionId };
         setSaveStatus("已保存到本地 SQLite");
       } catch { setSaveStatus("保存失败：输入仍在页面，请重试"); }
     });
     return saveSequence.current;
-  }, [draft, annotations, set.id]);
+  }, [draft, annotations, set.id, freeze, frozenRef, recovering, requestSignal]);
+  async function restartPractice() {
+    if (frozenRef.current || busy) return;
+    setBusy(true);
+    const next = { ...draft, answers: {}, elapsed: 0, isRetry: true };
+    const previousRun = protocol.current.runId;
+    try { await save(true, next); if (!frozenRef.current && protocol.current.runId !== previousRun) { pendingSubmission.current = null; setSubmissionPending(false); setAttempt(null); elapsedRef.current = 0; setElapsed(0); setDraft(next); setReasons({}); } }
+    finally { setBusy(false); }
+  }
   const latestSave = useRef(save);
   useEffect(() => { latestSave.current = save; }, [save]);
   useEffect(() => () => { void latestSave.current(); }, []);
   useEffect(() => {
-    if (attempt) return;
+    if (attempt || frozen || recovering || pendingSubmission.current) return;
     const timer = window.setInterval(() => {
       if (!document.hidden) { elapsedRef.current += 1; setElapsed(elapsedRef.current); }
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [attempt]);
+  }, [attempt, frozen, recovering, busy]);
   useEffect(() => { const timer = window.setTimeout(() => { void save(); }, 650); return () => window.clearTimeout(timer); }, [save]);
   useEffect(() => {
     const timer = window.setInterval(() => { void save(); }, 15000);
@@ -145,26 +193,42 @@ export function PracticeRunner({ set, initialState }: { set: PracticeSet; initia
     setAnnotations((current) => [...current, { id: crypto.randomUUID(), start: selection.start, end: selection.end, style, note: "" }]); setSelection(null); setSaveStatus("正在保存…");
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); if (busy || attempt || !set.questions.length) return;
+    event.preventDefault(); if (busy || attempt || frozenRef.current || recovering || !set.questions.length) return;
     setBusy(true); setMessage("");
     try {
-      const response = await fetch("/api/practice/attempts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ setId: set.id, answers, durationSeconds: elapsedRef.current }) });
+      await save(); if (frozenRef.current) return;
+      if (!pendingSubmission.current) pendingSubmission.current = JSON.stringify({ setId: set.id, answers, durationSeconds: elapsedRef.current, dataEpoch: protocol.current.dataEpoch, runId: protocol.current.runId, submissionId: protocol.current.submissionId });
+      setSubmissionPending(true);
+      try { localStorage.setItem(recoveryKey, JSON.stringify({ ...protocol.current, draft: { ...draft, elapsed: elapsedRef.current }, annotations, pendingSubmission: pendingSubmission.current })); } catch { /* Input remains visible. */ }
+      const lookup = await fetch("/api/submissions/" + protocol.current.submissionId + "?dataEpoch=" + encodeURIComponent(protocol.current.dataEpoch), { signal: requestSignal() });
+      if (lookup.status === 409) { freeze(); return; }
+      if (!lookup.ok) throw new Error("提交状态查询失败，保留原请求，请重试查询。");
+      const receipt = await lookup.json();
+      if (receipt.status === "processing") { setMessage("提交正在处理中，请稍后点击查询结果。"); return; }
+      const response = receipt.status === "completed" ? new Response(JSON.stringify(receipt.result)) : await fetch("/api/practice/attempts", { method: "POST", headers: { "Content-Type": "application/json" }, signal: requestSignal(), body: pendingSubmission.current });
+      if (response.status === 409) { freeze(); return; }
+      if (response.status === 202) { setMessage("提交正在处理中，请稍后点击查询结果。"); return; }
       const payload = await response.json(); if (!response.ok || !payload.attempt) throw new Error(payload.error || "评分失败");
+      if (frozenRef.current) return;
+      pendingSubmission.current = null; setSubmissionPending(false);
       setAttempt(payload.attempt); patchDraft({ isRetry: false }); setMessage("已评分并保存。错误答案已加入 Mistakes；可在下方记录错误原因。"); window.speechSynthesis?.cancel();
     } catch (error) { setMessage(error instanceof Error ? error.message : "无法连接本地服务器，答案已保留，请重试。"); }
     finally { setBusy(false); }
   }
   async function classify(questionId: string, reason: string) {
-    if (!attempt || !reason) return;
+    if (!attempt || !reason || frozenRef.current) return;
     try {
-      const response = await fetch("/api/practice/mistake-reason", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ attemptId: attempt.id, questionId, reason }) });
+      const response = await fetch("/api/practice/mistake-reason", { method: "POST", headers: { "Content-Type": "application/json" }, signal: requestSignal(), body: JSON.stringify({ attemptId: attempt.id, questionId, reason, dataEpoch: protocol.current.dataEpoch }) });
+      if (response.status === 409) { freeze(); return; }
       if (!response.ok) throw new Error(); setReasons((current) => ({ ...current, [questionId]: reason })); setMessage("错误原因已保存。");
     } catch { setMessage("错误原因保存失败，请重试。"); }
   }
   async function dictation() {
+    if (frozenRef.current || recovering) return;
     setBusy(true); setMessage("");
     try {
-      const response = await fetch("/api/practice/dictation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ setId: set.id, expected: draft.dictationReference, submitted: draft.dictationText, ...audioRange }) });
+      const response = await fetch("/api/practice/dictation", { method: "POST", headers: { "Content-Type": "application/json" }, signal: requestSignal(), body: JSON.stringify({ setId: set.id, expected: draft.dictationReference, submitted: draft.dictationText, ...audioRange, dataEpoch: protocol.current.dataEpoch }) });
+      if (response.status === 409) { freeze(); return; }
       const payload = await response.json(); if (!response.ok) throw new Error(payload.error || "听写保存失败");
       setDictationResult(payload.tokens); setMessage("听写已保存：" + payload.errorCount + " 处差异，错误已进入 Mistakes。拼写分类使用字符相似度判断。");
     } catch (error) { setMessage(error instanceof Error ? error.message : "无法连接本地服务器，听写文本已保留。"); }
@@ -183,7 +247,7 @@ export function PracticeRunner({ set, initialState }: { set: PracticeSet; initia
         <div className={styles.readingHeading}><Link href="/practice/reading" className={styles.sourceLink}>← 阅读题库</Link><h1 title={set.title}>{set.title}</h1></div>
         <div className={styles.readingTimer}><small>{attempt ? "已提交" : "练习用时"}</small><strong>{formatTime(elapsed)}</strong><small>建议 {set.durationMinutes} 分钟</small></div>
         <span className={styles.overallProgress} aria-label="整卷答题进度">整卷 {answeredCount}/{set.questions.length} 已答</span>
-        {!attempt && set.questions.length > 0 && <button className={ui.button} type="submit" form="practice-answers" disabled={busy}>{busy ? "正在评分…" : "提交整套卷"}</button>}
+        {!attempt && set.questions.length > 0 && <button className={ui.button} type="submit" form="practice-answers" disabled={busy || frozen || recovering}>{busy ? "正在评分…" : "提交整套卷"}</button>}
       </header>
       <div className={styles.readingControls}>
         {passages && passages.length > 1 ? <nav className={styles.passageTabs} aria-label="阅读篇章">{passages.map((passage, index) => <button type="button" key={passage.id} aria-pressed={passage.id === currentPassage?.id} className={passage.id === currentPassage?.id ? ui.button : ui.buttonSecondary} onClick={() => switchPassage(passage.id)}>Passage {index + 1}<small>{passage.questionIds.filter((id) => answers[id]?.trim()).length}/{passage.questionIds.length}</small></button>)}</nav> : <span className={styles.singlePassage}>单篇阅读练习</span>}
@@ -194,10 +258,12 @@ export function PracticeRunner({ set, initialState }: { set: PracticeSet; initia
       <div className={styles.toolbar}><Link className={ui.buttonGhost} href="/practice/listening">练习列表</Link><Link className={ui.buttonGhost} href="/materials">导入 / 管理资料</Link>{!set.resource && <label>字号 <select className={ui.select} value={draft.fontSize} onChange={(event) => patchDraft({ fontSize: Number(event.target.value) })}>{[14, 16, 17, 18, 20, 22, 24, 26].map((size) => <option key={size}>{size}</option>)}</select></label>}<button className={ui.buttonGhost} type="button" onClick={toggleFullscreen}>全屏</button><span className={styles.saveStatus} role="status">{saveStatus}</span><button className={ui.buttonGhost} type="button" onClick={() => void save()}>保存笔记</button></div>
     </>}
     {message && <div className={ui.notice} role="status">{message}</div>}
-    {attempt && <section className={styles.resultBar}><div><small>正确 / 总题数</small><strong>{attempt.rawScore} / {attempt.totalQuestions}</strong></div><div><small>错误</small><strong>{attempt.totalQuestions - attempt.rawScore}</strong></div><div><small>Estimated IELTS Band</small><strong>{canEstimateBand ? attempt.bandScore.toFixed(1) : "—"}</strong><small>{canEstimateBand ? "非官方评分" : "本练习不估分，以正确率为准"}</small></div><Link className={ui.buttonGhost} href="/review">查看错题</Link><button className={ui.buttonGhost} onClick={() => { setAttempt(null); elapsedRef.current = 0; setElapsed(0); patchDraft({ answers: {}, elapsed: 0, isRetry: true }); setReasons({}); }}>重新练习</button></section>}
+    {frozen && <div className={ui.notice} role="alert">当前页面不能再保存或提交。请先保留内容，再刷新。</div>}
+    {(frozen || hasOldRecovery) && <div className={styles.toolbar}><button className={ui.buttonSecondary} type="button" onClick={() => exportRecoveryCopy("practice-recovery.json", { draft: { ...draft, elapsed }, annotations, protocol: protocol.current })}>导出当前内容</button><button className={ui.buttonSecondary} type="button" onClick={() => { const old = oldRecovery.current ?? JSON.parse(localStorage.getItem(recoveryKey) || "null"); if (old) exportRecoveryCopy("practice-browser-recovery.json", old); }}>导出浏览器草稿</button></div>}
+    {attempt && <section className={styles.resultBar}><div><small>正确 / 总题数</small><strong>{attempt.rawScore} / {attempt.totalQuestions}</strong></div><div><small>错误</small><strong>{attempt.totalQuestions - attempt.rawScore}</strong></div><div><small>Estimated IELTS Band</small><strong>{canEstimateBand ? attempt.bandScore.toFixed(1) : "—"}</strong><small>{canEstimateBand ? "非官方评分" : "本练习不估分，以正确率为准"}</small></div><Link className={ui.buttonGhost} href="/review">查看错题</Link><button className={ui.buttonGhost} disabled={busy || frozen || recovering} onClick={() => void restartPractice()}>重新练习</button></section>}
     </div>
     <form id="practice-answers" ref={form} className={styles.practiceGrid + (isReading ? " " + styles.readingGrid : "")} onSubmit={submit}>
-      <section ref={sourcePanel} className={ui.panel + " " + styles.sourcePanel} aria-label={isReading ? "阅读材料与题目" : "听力材料"} tabIndex={0}>
+      <section ref={sourcePanel} className={ui.panel + " " + styles.sourcePanel} aria-label={isReading ? "阅读材料与题目" : "听力材料"} tabIndex={0} inert={frozen || recovering}>
         {set.resource ? currentPassage ? <ReadingPaper resource={set.resource} passage={currentPassage} scrollRoot={sourcePanel} onLayoutReady={restorePdfScroll} /> : <OfficialPaper resource={set.resource} listening={!isReading} onRange={setAudioRange} /> : <>
           {!isReading && <ListeningPlayer audioUrl={set.audioUrl} transcript={set.transcript} onRange={setAudioRange} />}
           {(isReading || showTranscript) && <><div className={styles.paperTitle}><small>{isReading ? "Reading Passage" : "Transcript"}</small><strong>{set.title}</strong></div><div className={styles.toolbar}><button className={ui.buttonGhost} type="button" onClick={() => annotate("highlight")}>高亮</button><button className={ui.buttonGhost} type="button" onClick={() => annotate("underline")}>下划线</button>{selection && <small>已选：{selection.text.slice(0, 60)}</small>}</div><div ref={source} className={styles.passage} style={{ fontSize: draft.fontSize }} onMouseUp={captureSelection} onKeyUp={captureSelection}><AnnotatedText text={sourceText} annotations={annotations} evidence={evidence} /></div>{!sourceText && <p>此音频还没有 Transcript。到 Materials 打开该资料，粘贴并保存听力稿。</p>}</>}
@@ -205,15 +271,15 @@ export function PracticeRunner({ set, initialState }: { set: PracticeSet; initia
         </>}
         <details className={styles.notes} open={!set.questions.length}><summary>Notes · 阅读 / 听力笔记（自动保存）</summary><textarea className={ui.textarea} aria-label="学习笔记" value={draft.notes} onChange={(event) => patchDraft({ notes: event.target.value })} placeholder="记录同义替换、句子理解和疑问…" />{annotations.map((annotation) => <div key={annotation.id} className={styles.annotation}><blockquote>{sourceText.slice(annotation.start, annotation.end)}</blockquote><input className={ui.input} aria-label="标注备注" placeholder="给这处标注添加笔记…" value={annotation.note} onChange={(event) => setAnnotations((current) => current.map((item) => item.id === annotation.id ? { ...item, note: event.target.value } : item))} /><button className={ui.buttonGhost} type="button" onClick={() => setAnnotations((current) => current.filter((item) => item.id !== annotation.id))}>删除标注</button></div>)}</details>
       </section>
-      <section ref={questionPanel} className={ui.panel + " " + styles.questionPanel} aria-label="答题卡" tabIndex={0}>
+      <section ref={questionPanel} className={ui.panel + " " + styles.questionPanel} aria-label="答题卡" tabIndex={0} inert={frozen || recovering}>
         {set.questions.length > 0 && <><div className={isReading ? styles.answerPanelHeader : undefined} data-answer-header><div className={ui.panelHeader}><h2>{set.resource ? "Answer Sheet · 答题卡" : "Questions · 题目"}</h2><span className={ui.pill}>{passageAnsweredCount}/{visibleQuestions.length} 已答</span></div><nav className={styles.questionNav} aria-label="题目导航">{visibleQuestions.map(({ question, index }) => <button key={question.id} type="button" className={answers[question.id]?.trim() ? styles.answered : ""} aria-current={activeQuestion === index ? "step" : undefined} onClick={() => navigate(index)}>{question.originalQuestionNumber ?? index + 1}</button>)}</nav><p className={isReading ? styles.answerHint : undefined}>{currentPassage ? "当前篇答题 · " : set.resource ? "按左侧 PDF 题号作答 · " : ""}N / P 切题 · Ctrl / Cmd + Enter 提交{isReading ? "整卷" : ""}</p></div><div className={styles.questions + (set.resource ? " " + styles.answerSheet : "")}>
           {visibleQuestions.map(({ question, index }) => { const detail = attempt?.answers.find((answer) => answer.questionId === question.id); const options = questionOptions(question); const descriptor = QUESTION_TYPES[question.kind]; return <fieldset id={"question-" + index} className={styles.question + " " + (detail ? detail.correct ? styles.correct : styles.incorrect : "")} key={question.id} onFocus={() => setActiveQuestion(index)}><legend><span>{question.originalQuestionNumber ?? index + 1}</span>{!set.resource && question.prompt}</legend><small className={styles.questionType}>{descriptor.label}{question.maxWords ? " · NO MORE THAN " + question.maxWords + " WORDS" : ""}{question.answerGroup && " · 同组顺序不限，须填不同答案"}</small>
             {question.imageUrl && <figure>{/* eslint-disable-next-line @next/next/no-img-element */}
 <img className={styles.questionImage} src={question.imageUrl} alt="Map or diagram for this question" /></figure>}
-            {options.length ? descriptor.mode === "matching" ? <select className={ui.select} value={answers[question.id] || detail?.submitted || ""} disabled={Boolean(attempt)} aria-label={"Question " + (question.originalQuestionNumber ?? index + 1)} onChange={(event) => patchDraft({ answers: { ...answers, [question.id]: event.target.value } })}><option value="">请选择匹配项…</option>{options.map((option) => <option key={option}>{option}</option>)}</select> : <div className={styles.options}>{options.map((option) => <label key={option}><input type="radio" name={question.id} value={option} checked={(answers[question.id] || detail?.submitted) === option} disabled={Boolean(attempt)} onChange={(event) => patchDraft({ answers: { ...answers, [question.id]: event.target.value } })} /><span>{option}</span></label>)}</div> : <input className={ui.input} aria-label={"Question " + (question.originalQuestionNumber ?? index + 1)} value={answers[question.id] ?? detail?.submitted ?? ""} disabled={Boolean(attempt)} onChange={(event) => patchDraft({ answers: { ...answers, [question.id]: event.target.value } })} placeholder="Type your answer" />}
+            {options.length ? descriptor.mode === "matching" ? <select className={ui.select} value={answers[question.id] || detail?.submitted || ""} disabled={Boolean(attempt) || frozen || recovering || submissionPending} aria-label={"Question " + (question.originalQuestionNumber ?? index + 1)} onChange={(event) => patchDraft({ answers: { ...answers, [question.id]: event.target.value } })}><option value="">请选择匹配项…</option>{options.map((option) => <option key={option}>{option}</option>)}</select> : <div className={styles.options}>{options.map((option) => <label key={option}><input type="radio" name={question.id} value={option} checked={(answers[question.id] || detail?.submitted) === option} disabled={Boolean(attempt) || frozen || recovering || submissionPending} onChange={(event) => patchDraft({ answers: { ...answers, [question.id]: event.target.value } })} /><span>{option}</span></label>)}</div> : <input className={ui.input} aria-label={"Question " + (question.originalQuestionNumber ?? index + 1)} value={answers[question.id] ?? detail?.submitted ?? ""} disabled={Boolean(attempt) || frozen || recovering || submissionPending} onChange={(event) => patchDraft({ answers: { ...answers, [question.id]: event.target.value } })} placeholder="Type your answer" />}
             {detail && <div className={styles.evidence}><strong>{detail.correct ? "✓ Correct · 正确" : "✕ Wrong · 错误"}</strong><p>你的答案：{detail.submitted || "（未作答）"}</p><p>{question.answerGroup ? "同组正确选项（每个仅计一次）" : "正确答案"}：{detail.expected.join(" / ")}</p>{question.explanation && <p>{question.explanation}</p>}{question.evidence && <blockquote>{question.evidence}</blockquote>}{!set.resource && question.evidence && sourceText.toLowerCase().includes(question.evidence.toLowerCase()) ? <button className={ui.buttonGhost} type="button" onClick={() => findEvidence(question.evidence || "")}>Find Evidence · 定位证据</button> : <p>{set.resource ? "请结合左侧原版试卷与可展开的答案 PDF 核对；此题未提供可定位的逐字证据。" : "此题未提供可定位的逐字证据，请结合原文与解析核对。"}</p>}{!detail.correct && <label className={ui.field}>Mistake reason · 错误原因<select className={ui.select} value={reasons[question.id] || ""} onChange={(event) => classify(question.id, event.target.value)}><option value="">选择错误原因…</option>{MISTAKE_REASONS.map((reason) => <option key={reason}>{reason}</option>)}</select></label>}</div>}
           </fieldset>; })}
-        </div>{!attempt && !isReading && <button className={ui.button} type="submit" disabled={busy}>{busy ? "正在评分…" : "提交答案并保存"}</button>}</>}
+        </div>{!attempt && !isReading && <button className={ui.button} type="submit" disabled={busy || frozen || recovering}>{busy ? "正在评分…" : "提交答案并保存"}</button>}</>}
         {!isReading && <section className={styles.dictation}><h2>Dictation · 精听听写</h2><p>先听一个片段并输入，再展开参考文本。选择的参考文本应与 AB 片段一致，最多 500 个词。</p><label className={ui.field}>我听到的内容<textarea className={ui.textarea} value={draft.dictationText} onChange={(event) => { patchDraft({ dictationText: event.target.value }); setDictationResult(null); }} placeholder="Listen, then type here…" /></label><details><summary>设置参考 Transcript（核对时展开）</summary><label className={ui.field}>本次片段的准确原文<textarea className={ui.textarea} value={draft.dictationReference} onChange={(event) => { patchDraft({ dictationReference: event.target.value }); setDictationResult(null); }} /></label>{set.transcript && <button className={ui.buttonGhost} type="button" onClick={() => patchDraft({ dictationReference: set.transcript })}>使用全部 Transcript</button>}</details><button className={ui.button} type="button" disabled={busy || !draft.dictationReference.trim()} onClick={dictation}>核对并保存听写</button>{dictationResult && <div className={styles.dictationDiff}><p>漏词 · 多词 · 错词 · 疑似拼写</p>{dictationResult.map((token, index) => <span key={index} className={styles["diff_" + token.kind]} title={errorLabels[token.kind]}>{token.kind === "correct" ? token.expected : <>{token.actual && <del>{token.actual}</del>} {token.expected && <ins>{token.expected}</ins>}<small>{errorLabels[token.kind]}</small></>}</span>)}</div>}</section>}
         {isReading && !set.questions.length && <><h2>自由阅读</h2><p>选中左侧的英文词汇，可加入个人 Vocabulary。使用高亮、下划线和笔记记录阅读过程。</p><p>需要自动评分时，在 Materials 中为此资料添加 Questions + Answers，或配置 AI 生成题目。</p><Link className={ui.buttonGhost} href="/materials">返回资料库录入题目 →</Link></>}
       </section>

@@ -10,7 +10,8 @@ import { parseWritingFeedback } from "../lib/writing";
 vi.mock("server-only", () => ({}));
 vi.mock("./db", () => ({ getDatabase: () => { throw new Error("Tests must use the isolated database."); } }));
 
-import { createWritingRevision, getWritingDraft, initializeWritingTables, listWritingDrafts, saveWritingDraft, saveWritingEvaluation } from "./writing-drafts";
+import { createWritingRevision, getWritingDraft, initializeWritingTables, listWritingDrafts, saveWritingDraft, saveWritingEvaluation, saveProtectedWritingDraft, assertWritingDraftVersion } from "./writing-drafts";
+import { getDataEpoch, rotateDataEpoch } from "./data-integrity";
 
 let database: Database.Database;
 let directory: string;
@@ -35,13 +36,25 @@ describe("durable writing drafts", () => {
     draft.image = "data:image/png;base64,aGVsbG8=";
     saveWritingDraft(draft, database);
     database.close(); database = new Database(file);
-    expect(getWritingDraft(draft.id, database)).toEqual(draft);
+    expect(getWritingDraft(draft.id, database)).toMatchObject(draft);
     expect(database.prepare("SELECT COUNT(*) AS count FROM writing_submissions").get()).toEqual({ count: 0 });
   });
   it("ignores a delayed autosave older than the saved version", () => {
     saveWritingDraft({ ...draft, essay: "Newer text", updatedAt: "2026-10-04T10:00:05.000Z" }, database);
     saveWritingDraft(draft, database);
     expect(getWritingDraft(draft.id, database)?.essay).toBe("Newer text");
+  });
+  it("uses server revisions rather than client clocks and rejects old pages after restore", () => {
+    saveWritingDraft({ ...draft, updatedAt: "2099-01-01T00:00:00.000Z" }, database);
+    const epoch = getDataEpoch(database);
+    const first = saveProtectedWritingDraft({ ...draft, essay: "Current page edit" }, 0, epoch, database);
+    expect(first.essay).toBe("Current page edit"); expect(first.revision).toBe(1);
+    expect(() => saveProtectedWritingDraft({ ...draft, essay: "Stale second page" }, 0, epoch, database)).toThrow("另一页面");
+    expect(getWritingDraft(draft.id, database)?.essay).toBe("Current page edit");
+    rotateDataEpoch(database);
+    expect(() => saveProtectedWritingDraft(draft, 1, epoch, database)).toThrow("数据已恢复");
+    expect(() => assertWritingDraftVersion(draft.id, 1, epoch, database)).toThrow("数据已恢复");
+    expect(database.prepare("SELECT COUNT(*) AS count FROM writing_submissions").get()).toEqual({ count: 0 });
   });
   it("creates independent, sequential rewrites without overwriting the original", () => {
     saveWritingDraft(draft, database);

@@ -3,6 +3,7 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { SourceMaterial } from "@/lib/domain";
 import { countWritingWords, writingCategories, writingDraftSchema, type WritingDraft, type WritingDraftInput, type WritingFeedbackRecord } from "@/lib/writing";
+import { exportRecoveryCopy, useDataEpochGuard } from "@/lib/data-epoch-client";
 import ui from "./page-ui.module.css";
 import styles from "./writing.module.css";
 
@@ -48,7 +49,7 @@ function DraftFeedback({ feedback, taskType }: { feedback: WritingFeedbackRecord
   </>;
 }
 
-export function WritingWorkspace({ initialDrafts, materials }: { initialDrafts: WritingDraft[]; materials: SourceMaterial[] }) {
+export function WritingWorkspace({ initialDrafts, materials, initialDataEpoch = "" }: { initialDrafts: WritingDraft[]; materials: SourceMaterial[]; initialDataEpoch?: string }) {
   const [draft, setDraft] = useState<WritingDraft>(() => initialDrafts[0] ?? blankDraft("task-2"));
   const [history, setHistory] = useState(initialDrafts);
   const [running, setRunning] = useState(false);
@@ -61,39 +62,65 @@ export function WritingWorkspace({ initialDrafts, materials }: { initialDrafts: 
   const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
   const savedTimestamp = useRef(initialDrafts[0]?.updatedAt ?? "");
   const startedAt = useRef(0);
+  const epoch = useRef(initialDataEpoch || initialDrafts[0]?.dataEpoch || "");
+  const revisions = useRef(new Map(initialDrafts.map((item) => [item.id, item.revision ?? 0])));
+  const recoveryCopy = useRef<unknown>(null);
+  const [hasRecovery, setHasRecovery] = useState(false);
+  const { frozen, frozenRef, freeze, requestSignal } = useDataEpochGuard(() => { setRunning(false); setSaveStatus("页面已冻结，请复制或导出作文后刷新。"); });
 
   useEffect(() => {
     let mounted = true;
     async function recover() {
       try {
+        const response = await fetch("/api/writing/drafts", { signal: requestSignal() });
+        if (!response.ok) throw new Error("无法核对草稿状态。");
+        const state = await response.json() as { drafts: WritingDraft[]; dataEpoch: string };
+        if (!mounted) return;
+        if (epoch.current && epoch.current !== state.dataEpoch) { freeze(); return; }
+        epoch.current = state.dataEpoch;
+        revisions.current = new Map(state.drafts.map((item) => [item.id, item.revision ?? 0]));
+        setHistory(state.drafts);
         const raw = localStorage.getItem(cacheKey);
-        const restored = raw ? writingDraftSchema.safeParse(JSON.parse(raw)) : null;
-        if (mounted && restored?.success && restored.data.updatedAt > (initialDrafts[0]?.updatedAt ?? "")) {
-          const previous = initialDrafts.find((item) => item.id === restored.data.id);
+        const cached = raw ? JSON.parse(raw) : null;
+        const restored = cached ? writingDraftSchema.safeParse(cached.draft) : null;
+        recoveryCopy.current = cached; setHasRecovery(cached != null);
+        const previous = restored?.success ? state.drafts.find((item) => item.id === restored.data.id) : null;
+        if (restored?.success && cached.dataEpoch === state.dataEpoch && cached.baseRevision === (previous?.revision ?? 0)) {
           const recovered = { ...previous, ...restored.data };
           draftRef.current = recovered;
           setDraft(recovered);
           setSaveStatus("已恢复浏览器中未完成的草稿");
+          savedTimestamp.current = previous?.updatedAt ?? "";
+        } else {
+          const loaded = state.drafts.find((item) => item.id === draftRef.current.id) ?? state.drafts[0] ?? draftRef.current;
+          draftRef.current = loaded; setDraft(loaded); savedTimestamp.current = loaded.updatedAt;
+          if (cached) setError("浏览器旧草稿与服务端版本不同，未自动导入；可导出副本核对。");
         }
-      } catch { /* SQLite remains authoritative when browser storage is unavailable. */ }
+      } catch { freeze(); setError("无法核对草稿或浏览器缓存，已暂停保存，请导出当前内容后刷新。"); }
       if (mounted) setReady(true);
     }
     void recover();
     return () => { mounted = false; };
-  }, [initialDrafts]);
+  }, [initialDrafts, freeze, requestSignal]);
 
   const remember = useCallback((next: WritingDraft) => {
+    if (frozenRef.current) return;
     draftRef.current = next;
     setDraft(next);
-    try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch { /* Server autosave continues. */ }
-  }, []);
+    try { localStorage.setItem(cacheKey, JSON.stringify({ draft: next, dataEpoch: epoch.current, baseRevision: revisions.current.get(next.id) ?? 0 })); } catch { /* Server autosave continues. */ }
+  }, [frozenRef]);
 
   const persist = useCallback((snapshot: WritingDraftInput): Promise<void> => {
     setSaveStatus("正在保存…");
     const pending = saveQueue.current.catch(() => undefined).then(async () => {
-      const response = await fetch("/api/writing/drafts", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(snapshot) });
+      if (frozenRef.current || !epoch.current) return;
+      const response = await fetch("/api/writing/drafts", { method: "PUT", headers: { "Content-Type": "application/json" }, signal: requestSignal(), body: JSON.stringify({ ...snapshot, dataEpoch: epoch.current, expectedRevision: revisions.current.get(snapshot.id) ?? 0 }) });
+      if (response.status === 409) { freeze(); return; }
       const payload = await response.json() as { draft?: WritingDraft; error?: string };
       if (!response.ok || !payload.draft) throw new Error(payload.error ?? "保存失败");
+      if (frozenRef.current) return;
+      revisions.current.set(snapshot.id, payload.draft.revision ?? 0);
+      if (draftRef.current.id === snapshot.id) try { localStorage.setItem(cacheKey, JSON.stringify({ draft: draftRef.current, dataEpoch: epoch.current, baseRevision: payload.draft.revision ?? 0 })); } catch { /* Server acknowledgement remains authoritative. */ }
       savedTimestamp.current = snapshot.updatedAt;
       setHistory((items) => [payload.draft!, ...items.filter((item) => item.id !== snapshot.id)]);
       setSaveStatus(draftRef.current.updatedAt === snapshot.updatedAt ? "已保存到本地 SQLite" : "正在保存后续修改…");
@@ -104,17 +131,17 @@ export function WritingWorkspace({ initialDrafts, materials }: { initialDrafts: 
       setError(cause instanceof Error ? cause.message : "保存失败，请保留页面后重试。");
       throw cause;
     });
-  }, []);
+  }, [freeze, frozenRef, requestSignal]);
 
   useEffect(() => {
-    if (!ready || savedTimestamp.current === draft.updatedAt) return;
+    if (!ready || frozen || savedTimestamp.current === draft.updatedAt) return;
     // Flush at a fixed interval below as well, so continuous typing never starves autosave.
     const timeout = window.setTimeout(() => { void persist(draft).catch(() => undefined); }, 1200);
     return () => window.clearTimeout(timeout);
-  }, [draft, persist, ready]);
+  }, [draft, persist, ready, frozen]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || frozen) return;
     const interval = window.setInterval(() => {
       if (savedTimestamp.current !== draftRef.current.updatedAt) void persist(draftRef.current).catch(() => undefined);
     }, 5000);
@@ -127,17 +154,22 @@ export function WritingWorkspace({ initialDrafts, materials }: { initialDrafts: 
       window.removeEventListener("beforeunload", beforeUnload);
       if (savedTimestamp.current !== draftRef.current.updatedAt) void persist(draftRef.current).catch(() => undefined);
     };
-  }, [persist, ready]);
+  }, [persist, ready, frozen]);
 
   const update = useCallback((changes: Partial<WritingDraftInput>) => {
     remember({ ...draftRef.current, ...changes, updatedAt: new Date().toISOString() });
   }, [remember]);
 
   useEffect(() => {
-    if (!running) return;
+    if (!running || frozen) return;
     const interval = window.setInterval(() => update({ elapsedSeconds: Math.floor((Date.now() - startedAt.current) / 1000) }), 1000);
     return () => window.clearInterval(interval);
-  }, [running, update]);
+  }, [running, update, frozen]);
+  useEffect(() => {
+    const pause = () => { if (document.hidden) setRunning(false); };
+    document.addEventListener("visibilitychange", pause);
+    return () => document.removeEventListener("visibilitychange", pause);
+  }, []);
 
   async function switchDraft(next: WritingDraft) {
     setRunning(false); setBusy(true); setError("");
@@ -149,21 +181,26 @@ export function WritingWorkspace({ initialDrafts, materials }: { initialDrafts: 
     setRunning(false); setBusy(true); setError("");
     try {
       await persist(draftRef.current);
-      const response = await fetch("/api/writing/drafts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sourceId: draftRef.current.id, id: crypto.randomUUID() }) });
+      if (frozenRef.current) return;
+      const response = await fetch("/api/writing/drafts", { method: "POST", headers: { "Content-Type": "application/json" }, signal: requestSignal(), body: JSON.stringify({ sourceId: draftRef.current.id, id: crypto.randomUUID(), dataEpoch: epoch.current, expectedRevision: revisions.current.get(draftRef.current.id) ?? 0 }) });
+      if (response.status === 409) { freeze(); return; }
       const payload = await response.json() as { draft?: WritingDraft; error?: string };
       if (!response.ok || !payload.draft) throw new Error(payload.error ?? "创建版本失败");
+      revisions.current.set(payload.draft.id, payload.draft.revision ?? 0);
       setCompareId(draftRef.current.id); remember(payload.draft);
       setHistory((items) => [payload.draft!, ...items]);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "创建版本失败，原稿已保留。"); }
     finally { setBusy(false); }
   }
   async function evaluate() {
-    if (busy) return;
+    if (busy || frozenRef.current) return;
     setRunning(false); setBusy(true); setError("");
     const snapshot = draftRef.current;
     try {
       await persist(snapshot);
-      const response = await fetch("/api/writing/evaluate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(snapshot) });
+      if (frozenRef.current) return;
+      const response = await fetch("/api/writing/evaluate", { method: "POST", headers: { "Content-Type": "application/json" }, signal: requestSignal(), body: JSON.stringify({ ...snapshot, dataEpoch: epoch.current, expectedRevision: revisions.current.get(snapshot.id) ?? 0 }) });
+      if (response.status === 409) { freeze(); return; }
       const payload = await response.json() as { feedback?: WritingFeedbackRecord; error?: string };
       if (!response.ok || !payload.feedback) throw new Error(payload.error ?? "反馈请求失败；草稿已保留。");
       const next = { ...draftRef.current, feedback: payload.feedback };
@@ -201,39 +238,41 @@ export function WritingWorkspace({ initialDrafts, materials }: { initialDrafts: 
     <header className={ui.pageHeader}><div><p className={ui.eyebrow}>Academic Writing</p><h1>写作工作台</h1><p>独立写作 → 四项反馈 → 错误复习 → 改写对比。没有 AI 也能计时、保存与改写。</p></div>
       <div className={ui.headerActions}><span className={ui.pill}>{wordCount} / {targetWords}+ words</span><span className={styles.clock}>{formatTime(draft.timeLimitMinutes * 60 - draft.elapsedSeconds)}</span></div>
     </header>
+    {frozen && <div className={ui.error} role="alert">当前页面已冻结，不会再保存或提交。请复制或导出未保存内容后刷新。</div>}
+    {(frozen || hasRecovery) && <div className={styles.toolbar}><button type="button" className={ui.buttonSecondary} onClick={() => exportRecoveryCopy("writing-recovery.json", { draft: draftRef.current, dataEpoch: epoch.current })}>导出当前作文</button><button type="button" className={ui.buttonSecondary} onClick={() => void navigator.clipboard.writeText(draftRef.current.essay).catch(() => setError("复制失败，请使用导出。"))}>复制作文</button>{hasRecovery && <button type="button" className={ui.buttonSecondary} onClick={() => exportRecoveryCopy("writing-browser-recovery.json", recoveryCopy.current)}>导出浏览器旧草稿</button>}</div>}
     <div className={styles.toolbar}>
-      <label>草稿 / Improvement History<select value={draft.id} disabled={busy || !ready} onChange={(event) => { const next = history.find((item) => item.id === event.target.value); if (next) void switchDraft(next); }}>
+      <label>草稿 / Improvement History<select value={draft.id} disabled={frozen || busy || !ready} onChange={(event) => { const next = history.find((item) => item.id === event.target.value); if (next) void switchDraft(next); }}>
         {!history.some((item) => item.id === draft.id) && <option value={draft.id}>新草稿 · Draft {draft.version}</option>}
         {history.map((item) => <option key={item.id} value={item.id}>{item.taskType.toUpperCase()} · {item.category} · Draft {item.version} · {item.prompt.slice(0, 45)}</option>)}
       </select></label>
-      <button className={ui.buttonSecondary} disabled={busy || !ready} onClick={() => void switchDraft(blankDraft("task-1"))}>新建 Task 1</button>
-      <button className={ui.buttonSecondary} disabled={busy || !ready} onClick={() => void switchDraft(blankDraft("task-2"))}>新建 Task 2</button>
+      <button className={ui.buttonSecondary} disabled={frozen || busy || !ready} onClick={() => void switchDraft(blankDraft("task-1"))}>新建 Task 1</button>
+      <button className={ui.buttonSecondary} disabled={frozen || busy || !ready} onClick={() => void switchDraft(blankDraft("task-2"))}>新建 Task 2</button>
     </div>
     <div className={styles.writingGrid}>
       <section className={`${ui.panel} ${styles.editorPanel}`} data-source-material={`Writing ${draft.taskType} · ${draft.prompt.slice(0, 100)}`}>
         <div className={styles.taskTabs}><strong>{draft.taskType === "task-1" ? "Academic Task 1" : "Task 2"} · Draft {draft.version}</strong><span className={ui.pill}>{draft.status === "completed" ? "已完成" : "草稿"}</span></div>
         <div className={styles.settingsRow}>
-          <label>题型<select value={draft.category} disabled={busy} onChange={(event) => update({ category: event.target.value })}>{writingCategories[draft.taskType].map((category) => <option key={category}>{category}</option>)}</select></label>
-          <label>目标时长（分钟）<input type="number" min={1} max={240} value={draft.timeLimitMinutes} disabled={busy} onChange={(event) => { const value = Number(event.target.value); if (Number.isInteger(value) && value >= 1 && value <= 240) update({ timeLimitMinutes: value }); }} /></label>
-          <button className={ui.buttonSecondary} disabled={busy} onClick={() => { if (!running) startedAt.current = Date.now() - draft.elapsedSeconds * 1000; setRunning(!running); }}>{running ? "暂停计时" : "开始 / 继续"}</button>
+          <label>题型<select value={draft.category} disabled={frozen || busy} onChange={(event) => update({ category: event.target.value })}>{writingCategories[draft.taskType].map((category) => <option key={category}>{category}</option>)}</select></label>
+          <label>目标时长（分钟）<input type="number" min={1} max={240} value={draft.timeLimitMinutes} disabled={frozen || busy} onChange={(event) => { const value = Number(event.target.value); if (Number.isInteger(value) && value >= 1 && value <= 240) update({ timeLimitMinutes: value }); }} /></label>
+          <button className={ui.buttonSecondary} disabled={frozen || busy} onClick={() => { if (!running) startedAt.current = Date.now() - draft.elapsedSeconds * 1000; setRunning(!running); }}>{running ? "暂停计时" : "开始 / 继续"}</button>
           <span>已用 {formatTime(draft.elapsedSeconds)}</span>
         </div>
-        {materials.length > 0 && <label className={styles.importLabel}>从 Materials 导入题目<select defaultValue="" disabled={busy} onChange={(event) => { const item = materials.find((material) => material.id === Number(event.target.value)); if (item) update({ prompt: item.content.slice(0, 10000) }); event.target.value = ""; }}><option value="">选择 Writing prompt</option>{materials.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>}
-        <div className={ui.field}><label htmlFor="writing-prompt">Prompt · 题目（示例题目为原创，可替换）</label><textarea id="writing-prompt" className={`${ui.textarea} ${styles.promptInput}`} value={draft.prompt} disabled={busy} maxLength={10000} onChange={(event) => update({ prompt: event.target.value })} /></div>
-        <div className={styles.imageImport}><label>题目图片<input aria-label="导入题目图片" type="file" accept="image/png,image/jpeg,image/webp" onChange={importImage} disabled={busy} /></label>{draft.image && <button className={ui.buttonGhost} disabled={busy} onClick={() => update({ image: "" })}>移除图片</button>}</div>
+        {materials.length > 0 && <label className={styles.importLabel}>从 Materials 导入题目<select defaultValue="" disabled={frozen || busy} onChange={(event) => { const item = materials.find((material) => material.id === Number(event.target.value)); if (item) update({ prompt: item.content.slice(0, 10000) }); event.target.value = ""; }}><option value="">选择 Writing prompt</option>{materials.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>}
+        <div className={ui.field}><label htmlFor="writing-prompt">Prompt · 题目（示例题目为原创，可替换）</label><textarea id="writing-prompt" className={`${ui.textarea} ${styles.promptInput}`} value={draft.prompt} disabled={frozen || busy} maxLength={10000} onChange={(event) => update({ prompt: event.target.value })} /></div>
+        <div className={styles.imageImport}><label>题目图片<input aria-label="导入题目图片" type="file" accept="image/png,image/jpeg,image/webp" onChange={importImage} disabled={frozen || busy} /></label>{draft.image && <button className={ui.buttonGhost} disabled={frozen || busy} onClick={() => update({ image: "" })}>移除图片</button>}</div>
         {draft.image && <figure className={styles.promptFigure}>
           {/* eslint-disable-next-line @next/next/no-img-element -- Local user image data does not need an image optimizer. */}
           <img src={draft.image} alt="用户导入的写作题目图表" />
           <figcaption>图片保存在本地。AI 只接收文本；请在 Prompt 补充图表数据。</figcaption>
         </figure>}
-        <div className={styles.document}><textarea aria-label="Essay · 作文" value={draft.essay} disabled={busy} maxLength={100000} onChange={(event) => update({ essay: event.target.value, status: "draft" })} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") { event.preventDefault(); void finishDraft(); } }} placeholder="Write your response here. Separate paragraphs with a blank line…" spellCheck />
+        <div className={styles.document}><textarea aria-label="Essay · 作文" value={draft.essay} disabled={frozen || busy} maxLength={100000} onChange={(event) => update({ essay: event.target.value, status: "draft" })} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") { event.preventDefault(); void finishDraft(); } }} placeholder="Write your response here. Separate paragraphs with a blank line…" spellCheck />
           <footer><span>{wordCount < targetWords ? `距离建议最低字数还差 ${targetWords - wordCount} 词` : "已达到建议最低字数"}</span><span role="status">{saveStatus}</span></footer>
         </div>
         {error && <div className={ui.error} role="alert">{error}</div>}
         <div className={styles.submitRow}>
-          <button className={ui.buttonSecondary} disabled={busy || !ready} onClick={() => void persist(draftRef.current).catch(() => undefined)}>保存草稿</button>
-          <button className={ui.buttonSecondary} disabled={busy || !ready || !draft.essay.trim()} onClick={() => void finishDraft()}>完成并保存</button>
-          <button className={ui.button} disabled={busy || !ready || draft.essay.trim().length < 40} onClick={() => void evaluate()}>{busy ? "处理中…" : "请求 AI 反馈"}</button>
+          <button className={ui.buttonSecondary} disabled={frozen || busy || !ready} onClick={() => void persist(draftRef.current).catch(() => undefined)}>保存草稿</button>
+          <button className={ui.buttonSecondary} disabled={frozen || busy || !ready || !draft.essay.trim()} onClick={() => void finishDraft()}>完成并保存</button>
+          <button className={ui.button} disabled={frozen || busy || !ready || draft.essay.trim().length < 40} onClick={() => void evaluate()}>{busy ? "处理中…" : "请求 AI 反馈"}</button>
         </div>
         <small className={styles.help}>Ctrl / Cmd + Enter 完成并保存。请求 AI 反馈会把题目和作文发送到已配置的 Provider。未配置时不生成评分。</small>
       </section>
@@ -243,8 +282,8 @@ export function WritingWorkspace({ initialDrafts, materials }: { initialDrafts: 
           {feedback ? <><p className={styles.help}>训练估分，非官方 IELTS 成绩 · {feedback.provider}</p>{feedback.evaluatedEssay !== draft.essay && <p className={styles.notice}>作文已有修改；以下反馈对应上次提交的文本。</p>}<DraftFeedback feedback={feedback} taskType={draft.taskType} /></> : <div className={ui.empty}>先完成草稿，再请求 AI 反馈。这里仅显示实际 AI 返回的四项评估，不会根据字数模拟分数。</div>}
         </section>
         <section className={ui.panel}><p className={ui.eyebrow}>Revision loop</p><h2>保留原稿，创建改写</h2><p>每个版本独立保存；依据反馈逐项修改，再检查论证、词汇与语法是否改善。</p>
-          <button className={ui.buttonSecondary} disabled={busy || !ready || !draft.essay.trim()} onClick={() => void newRevision()}>创建 Draft {Math.max(draft.version, ...samePrompt.map((item) => item.version)) + 1}</button>
-          <div className={styles.history}>{samePrompt.map((item) => <button key={item.id} className={item.id === draft.id ? styles.selectedHistory : ""} disabled={busy} onClick={() => void switchDraft(item)}><span>Draft {item.version} · {countWritingWords(item.essay)} words</span><small>{item.feedback ? `AI Estimated Band ${item.feedback.overallBand.toFixed(1)}` : "未评分"}</small></button>)}</div>
+          <button className={ui.buttonSecondary} disabled={frozen || busy || !ready || !draft.essay.trim()} onClick={() => void newRevision()}>创建 Draft {Math.max(draft.version, ...samePrompt.map((item) => item.version)) + 1}</button>
+          <div className={styles.history}>{samePrompt.map((item) => <button key={item.id} className={item.id === draft.id ? styles.selectedHistory : ""} disabled={frozen || busy} onClick={() => void switchDraft(item)}><span>Draft {item.version} · {countWritingWords(item.essay)} words</span><small>{item.feedback ? `AI Estimated Band ${item.feedback.overallBand.toFixed(1)}` : "未评分"}</small></button>)}</div>
           {samePrompt.length > 1 && <label className={styles.importLabel}>Compare · 与历史版本对比<select value={compareId} onChange={(event) => setCompareId(event.target.value)}><option value="">选择历史版本</option>{samePrompt.filter((item) => item.id !== draft.id).map((item) => <option key={item.id} value={item.id}>Draft {item.version}</option>)}</select></label>}
         </section>
       </aside>

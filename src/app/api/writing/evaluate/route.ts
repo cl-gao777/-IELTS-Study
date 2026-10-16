@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
 import { parseWritingFeedback, writingDraftSchema, writingFeedbackInstructions } from "@/lib/writing";
 import { generateAiText } from "@/server/ai";
-import { saveWritingDraft, saveWritingEvaluation } from "@/server/writing-drafts";
+import { saveWritingEvaluation, assertWritingDraftVersion } from "@/server/writing-drafts";
+import { assertDataEpoch, dataConflictResponse } from "@/server/data-integrity";
+import { z } from "zod";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   let draftSaved = false;
   try {
-    const parsed = writingDraftSchema.safeParse(await request.json());
+    const body = await request.json().catch(() => null);
+    assertDataEpoch(body?.dataEpoch);
+    const protocol = z.object({ dataEpoch: z.string().min(1), expectedRevision: z.number().int().nonnegative() }).parse(body);
+    const parsed = writingDraftSchema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "草稿格式无效，未请求 AI。" }, { status: 400 });
-    const draft = saveWritingDraft(parsed.data);
+    const draft = assertWritingDraftVersion(parsed.data.id, protocol.expectedRevision, protocol.dataEpoch);
+    if (!draft || draft.essay !== parsed.data.essay || draft.prompt !== parsed.data.prompt) return NextResponse.json({ error: "先保存当前作文，再请求反馈。" }, { status: 409 });
     draftSaved = true;
     if (draft.essay.trim().length < 40 || !draft.prompt.trim()) {
       return NextResponse.json({ error: "草稿已保存。请填写题目及至少 40 个字符，再请求反馈。", draftSaved }, { status: 400 });
@@ -24,8 +30,10 @@ export async function POST(request: Request) {
     try { feedback = parseWritingFeedback(result.text); } catch {
       return NextResponse.json({ error: "草稿已保存。AI 返回的反馈格式不完整，请重试；本次没有记录评分。", draftSaved }, { status: 502 });
     }
+    assertWritingDraftVersion(draft.id, protocol.expectedRevision, protocol.dataEpoch);
     return NextResponse.json({ feedback: saveWritingEvaluation(draft, feedback, result.provider), draftSaved });
-  } catch {
+  } catch (error) {
+    const conflict = dataConflictResponse(error); if (conflict) return conflict;
     return NextResponse.json({ error: draftSaved ? "草稿已保存，反馈服务暂时失败，请重试。" : "无法保存草稿，未请求 AI。请保留页面后重试。", draftSaved }, { status: 500 });
   }
 }
