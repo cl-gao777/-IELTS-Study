@@ -46,6 +46,15 @@ function checkInput(input: SubmissionInput, database: Database.Database) {
   return row;
 }
 
+/** A completed retry remains valid after its workspace starts another run. Never claims or creates a receipt. */
+export function findCompletedSubmission(input: SubmissionInput, database: Database.Database = getDatabase()): { result: unknown } | null {
+  assertDataEpoch(input.dataEpoch, database);
+  const table = database.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='submission_receipts'").get();
+  if (!table) return null;
+  const row = checkInput(input, database);
+  return row?.status === "completed" ? { result: JSON.parse(row.result_json!) as unknown } : null;
+}
+
 export function beginSubmission(input: SubmissionInput, database: Database.Database = getDatabase()): SubmissionClaim {
   ensureSubmissionTables(database);
   return database.transaction(() => {

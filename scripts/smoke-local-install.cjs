@@ -110,6 +110,12 @@ async function main() {
   const firstAttempt = await json('/api/practice/attempts', post(practiceRequest));
   assert.deepEqual(await json('/api/practice/attempts', post(practiceRequest)), firstAttempt);
   await rejects('/api/practice/attempts', { ...practiceRequest, durationSeconds: 6 }, 409, 'POST');
+  const completedWorkspace = await json(practiceRoute);
+  const nextWorkspace = await json(practiceRoute, put({ dataEpoch: epoch, expectedRevision: completedWorkspace.revision, runId: completedWorkspace.runId,
+    restart: true, draft: { ...completedWorkspace.draft, answers: {}, elapsed: 0, isRetry: true }, annotations: completedWorkspace.annotations }));
+  assert.notEqual(nextWorkspace.runId, workspace.runId);
+  assert.deepEqual(await json('/api/practice/attempts', post(practiceRequest)), firstAttempt, 'An old completed round must still return its original receipt after explicit retry.');
+  await rejects('/api/practice/attempts', { ...practiceRequest, durationSeconds: 6 }, 409, 'POST');
   assert.equal((await json(`/api/submissions/${workspace.submissionId}?dataEpoch=${epoch}`)).status, 'completed');
   const writingId = randomUUID();
   const writingRequest = { id: writingId, groupId: writingId, version: 1, taskType: 'task-2', category: 'Opinion', prompt: 'Discuss local public transport.',
@@ -175,7 +181,7 @@ async function main() {
   await rejects('/api/backup', { confirm: 'RESTORE', backup: invalidBackup }, 400, 'POST');
   assert.equal((await json('/api/data-state')).dataEpoch, newEpoch);
   console.log(JSON.stringify({ passed: true, pages: 7, publicWords: 3766, contexts: 7532, backupVersion: 5, pdfImport: true, cardRestoredAfterRestart: true,
-    examRestoredAfterRestart: true, idempotentSubmissions: true, oldPagesBlocked: true, duplicateTimeSeconds: 5, unavailableAIUnassessed: true }));
+    examRestoredAfterRestart: true, idempotentSubmissions: true, oldRoundRetry: true, oldPagesBlocked: true, duplicateTimeSeconds: 5, unavailableAIUnassessed: true }));
   succeeded = true;
 }
 

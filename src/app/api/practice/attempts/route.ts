@@ -2,7 +2,7 @@ import { z } from "zod";
 import { submitPracticeAttempt } from "@/server/store";
 import { assertPracticeRun, completePracticeRun } from "@/server/learning-workspace-store";
 import { assertDataEpoch, dataConflictResponse } from "@/server/data-integrity";
-import { beginSubmission, completeSubmission, failSubmission } from "@/server/submissions";
+import { beginSubmission, completeSubmission, failSubmission, findCompletedSubmission } from "@/server/submissions";
 const schema = z.object({ setId: z.string().min(1), answers: z.record(z.string(), z.string()), durationSeconds: z.number().min(0).max(86400), dataEpoch: z.string().min(1), runId: z.string().uuid(), submissionId: z.string().uuid() });
 export async function POST(request: Request) {
   try {
@@ -11,8 +11,10 @@ export async function POST(request: Request) {
     const parsed = schema.safeParse(body);
     if (!parsed.success) return Response.json({ error: "提交格式无效。" }, { status: 400 });
     const data = parsed.data;
-    assertPracticeRun(data.setId, data.runId, data.submissionId, data.dataEpoch);
     const input = { kind: "practice" as const, scopeId: data.runId, submissionId: data.submissionId, dataEpoch: data.dataEpoch, payload: { setId: data.setId, answers: data.answers, durationSeconds: data.durationSeconds } };
+    const completed = findCompletedSubmission(input);
+    if (completed) return Response.json(completed.result);
+    assertPracticeRun(data.setId, data.runId, data.submissionId, data.dataEpoch);
     const claim = beginSubmission(input);
     if (claim.status === "completed") return Response.json(claim.result);
     if (!claim.acquired) return Response.json({ status: "processing" }, { status: 202 });

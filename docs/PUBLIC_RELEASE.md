@@ -57,7 +57,7 @@ content, practice/mock submissions have stable identities and atomic results,
 mock exams support selected frozen papers and paused recovery, vocabulary time
 uses cumulative segments, and course edits address the exact sense.
 
-- 395 tests across 44 files pass, with type checking, lint and production build.
+- 397 tests across 44 files pass, with type checking, lint and production build.
 - The production installation smoke tests backup v5, original PDF import,
   process restart, exact card/exam recovery, repeat submissions, stale-page
   rejection, 5-second replay remaining 5 seconds, and unavailable-AI essays.
