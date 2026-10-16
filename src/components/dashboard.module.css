@@ -1,2 +1,56 @@
-.overview{display:flex;justify-content:space-between;gap:32px;padding:28px 32px;border:1px solid var(--line);border-left:3px solid var(--leaf);border-radius:8px;background:var(--cream)}.overview h2{font-size:24px;font-weight:600;letter-spacing:-.5px;margin:12px 0}.overview p{color:var(--muted);font-size:13px}.overview a{margin-top:10px;min-width:148px;justify-content:space-between}.progress{text-align:right;min-width:210px}.progress>span{font-size:48px;letter-spacing:-2px;font-weight:600}.progress>span small{font-size:20px;letter-spacing:0;color:var(--muted)}.progress p{margin:3px 0 14px}.progress>div{height:4px;background:var(--line);width:200px;margin-left:auto;margin-bottom:10px}.progress i{height:100%;display:block;background:var(--leaf)}.progress>small{color:var(--muted);font-size:11px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);padding:24px 0;margin:4px 0 18px;border-bottom:1px solid var(--line)}.metrics>div{padding:0 24px;border-right:1px solid var(--line)}.metrics>div:first-child{padding-left:0}.metrics>div:last-child{border:0}.metrics small,.metrics strong{display:block}.metrics small{color:var(--muted);font-size:11px}.metrics strong{font-size:27px;font-weight:600;margin-top:10px}.metrics i{font-size:11px;font-weight:400;color:var(--muted);font-style:normal}.content{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr);gap:20px}.tasks{display:grid}.task{display:grid;grid-template-columns:32px 1fr auto 16px;gap:16px;align-items:center;padding:22px 0;border-top:1px solid var(--line)}.task>a{text-decoration:none}.task a small,.task a strong,.task a span{display:block}.task a small{font-size:10px;color:var(--leaf);margin-bottom:5px}.task a strong{font-size:14px;font-weight:550}.task a span{font-size:11px;color:var(--muted);margin-top:5px}.task>small{font-size:11px;color:var(--muted)}.check{width:30px;height:30px;border:1px solid var(--line);background:var(--cream);color:var(--muted);border-radius:5px;font-size:11px}.task[data-done=true] .check{background:var(--leaf-soft);color:var(--leaf);border-color:var(--leaf)}.task[data-done=true] strong{text-decoration:line-through;color:var(--muted)}.note{font-size:11px!important;padding-top:10px}.signal{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:14px 0;font-size:12px}.signal b{font-size:14px;font-weight:600}
-@media(max-width:1150px){.content{grid-template-columns:1fr}.overview{padding:24px}}@media(max-width:700px){.overview{display:block}.progress{text-align:left;margin-top:20px}.progress>div{margin-left:0}.metrics{grid-template-columns:repeat(2,1fr);gap:20px}.task{gap:10px}.metrics>div{padding:0;border:0}}
+.overview { display:flex; justify-content:space-between; gap:32px; padding:32px; border:1px solid var(--line); border-radius:12px; background:var(--cream); }
+.focus { min-width:0; }
+.focusLabel { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:14px; color:var(--leaf); margin:0; font-weight:600; }
+.focusLabel>span { width:6px; height:6px; border-radius:50%; background:var(--leaf); }
+.focusLabel small { margin-left:4px; font-size:13px; letter-spacing:1px; color:var(--muted); font-weight:400; }
+.overview h2 { font-size:clamp(24px,2.1vw,28px); line-height:1.5; font-weight:600; letter-spacing:-.5px; margin:16px 0 8px; }
+.overview p { line-height:1.8; }
+.focus>p:not(:first-child) { color:var(--muted); font-size:16px; margin:0 0 24px; }
+.focus>a { min-width:160px; justify-content:space-between; }
+.progress { text-align:right; min-width:200px; align-self:center; }
+.progress>span { font-size:56px; line-height:1; letter-spacing:-2px; font-weight:600; font-variant-numeric:tabular-nums; }
+.progress>span small { font-size:22px; letter-spacing:0; margin-left:4px; color:var(--muted); }
+.progress p { margin:8px 0 16px; font-size:14px; color:var(--muted); }
+.progress progress { appearance:none; height:6px; width:200px; display:block; margin-left:auto; border:0; border-radius:4px; overflow:hidden; background:var(--line); accent-color:var(--leaf); }
+.progress progress::-webkit-progress-bar { background:var(--line); }
+.progress progress::-webkit-progress-value { background:var(--leaf); }
+.progress progress::-moz-progress-bar { background:var(--leaf); }
+.progress>small { display:flex; align-items:center; justify-content:flex-end; gap:6px; color:var(--muted); font-size:13px; margin-top:12px; }
+.metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); padding:28px 0; margin-bottom:16px; border-bottom:1px solid var(--line); }
+.metrics>div { padding:0 24px; border-right:1px solid var(--line); }
+.metrics>div:first-child { padding-left:0; }
+.metrics>div:last-child { border:0; }
+.metrics small,.metrics strong { display:block; }
+.metrics small { color:var(--muted); font-size:14px; }
+.metrics strong { font-size:32px; font-weight:600; margin-top:8px; line-height:1.2; font-variant-numeric:tabular-nums; }
+.metrics i { font-size:13px; font-weight:400; color:var(--muted); font-style:normal; margin-left:8px; }
+.content { display:grid; grid-template-columns:minmax(0,1.8fr) minmax(260px,1fr); gap:32px; }
+.schedule,.insights { min-width:0; padding-top:12px; }
+.schedule h2,.insights h2 { font-size:20px; font-weight:600; margin:6px 0 12px; }
+.tasks { display:grid; }
+.task { display:grid; grid-template-columns:44px minmax(0,1fr) auto 32px; gap:16px; align-items:center; padding:24px 0; border-top:1px solid var(--line); }
+.task>a { text-decoration:none; }
+.task a small,.task a strong,.task a span { display:block; }
+.task a small { font-size:13px; color:var(--leaf); margin-bottom:4px; }
+.task a strong { font-size:16px; font-weight:600; }
+.task a span { font-size:13px; color:var(--muted); margin-top:6px; }
+.task>small { font-size:13px; color:var(--muted); white-space:nowrap; }
+.check { width:44px; height:44px; display:grid; place-items:center; border:1px solid var(--line); background:var(--cream); color:var(--muted); border-radius:8px; font-size:14px; }
+.taskOpen { min-width:32px; min-height:44px; display:grid; place-items:center; color:var(--muted); border-radius:8px; }
+.taskOpen:hover,.check:hover { background:var(--leaf-soft); color:var(--leaf); }
+.task[data-done=true] .check { background:var(--leaf-soft); color:var(--leaf); border-color:var(--leaf); }
+.task[data-done=true] strong { text-decoration:line-through; color:var(--muted); }
+.note { font-size:13px; color:var(--muted); line-height:1.8; margin:16px 0; }
+.insights { padding-left:28px; border-left:1px solid var(--line); }
+.signal { display:flex; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); padding:16px 0; font-size:14px; color:var(--muted); }
+.signal b { font-size:20px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
+.textLink { display:inline-flex; align-items:center; gap:8px; min-height:44px; color:var(--leaf); text-decoration:none; font-size:14px; font-weight:600; }
+.textLink:hover { text-decoration:underline; }
+.materials { display:flex; align-items:flex-start; gap:12px; padding-top:24px; margin-top:24px; border-top:1px solid var(--line); }
+.materials>svg { color:var(--muted); margin-top:4px; }
+.materials h3 { font-size:16px; margin:0 0 8px; font-weight:600; }
+.materials p,.baseline p { font-size:14px; color:var(--muted); margin:0 0 8px; line-height:1.8; }
+.baseline { margin-top:16px; padding-top:16px; border-top:1px solid var(--line); font-size:14px; }
+.baseline summary { color:var(--muted); min-height:44px; }
+@media(max-width:1100px) { .content { grid-template-columns:minmax(0,1fr); } .insights { padding:24px 0 0; border-left:0; border-top:1px solid var(--line); } }
+@media(max-width:600px) { .overview { display:block; padding:24px; } .progress { text-align:left; margin-top:28px; } .progress progress { margin-left:0; width:100%; } .progress>small { justify-content:flex-start; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; } .metrics>div { padding:0; border:0; } .task { grid-template-columns:44px minmax(0,1fr) 44px; gap:12px; } .task>small { grid-column:2; grid-row:auto; margin-top:-12px; } .taskOpen { grid-column:3; grid-row:1 / span 2; min-width:44px; } .task { position:relative; } .focusLabel small { margin-left:0; } }

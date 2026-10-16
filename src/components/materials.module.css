@@ -1,112 +1,39 @@
-.materialGrid {
-  display: grid;
-  grid-template-columns: minmax(400px, 0.8fr) minmax(0, 1.2fr);
-  gap: 18px;
-}
-
-.materialInput {
-  min-height: 350px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-}
-
-.materialList {
-  max-height: calc(100vh - 210px);
-  overflow-y: auto;
-  display: grid;
-  gap: 9px;
-}
-
-.materialList details {
-  padding: 13px;
-  background: rgba(255, 255, 255, 0.52);
-  border: 1px solid var(--line);
-  border-radius: 13px;
-}
-
-.materialList summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  cursor: pointer;
-}
-
-.materialList strong,
-.materialList small {
-  display: block;
-}
-
-.materialList strong {
-  font-size: 10px;
-}
-
-.materialList small {
-  margin-top: 4px;
-  color: #7e8782;
-  font-size: 8px;
-}
-
-.materialList i {
-  color: #7f8983;
-  font-size: 8px;
-  font-style: normal;
-}
-
-.materialList pre {
-  max-height: 330px;
-  overflow: auto;
-  margin: 13px 0;
-  padding: 13px;
-  color: #47544d;
-  background: #eeeae1;
-  border-radius: 10px;
-  font-family: var(--font-mono);
-  font-size: 8px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-.materialList a {
-  display: inline-block;
-  margin-right: 12px;
-  color: #2f6c50;
-  font-size: 8px;
-  font-weight: 800;
-}
-
-.materialList button {
-  margin-top: 12px;
-}
-
-.materialList audio {
-  width: 100%;
-  margin: 2px 0 12px;
-}
-
-.previewImage {
-  max-width: 100%;
-  max-height: 360px;
-  display: block;
-  margin: 2px 0 12px;
-  border-radius: 10px;
-  object-fit: contain;
-}
-
-.filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
-.filters input { flex: 1 1 180px; }
-.filters select { flex: 1 1 100px; }
-.materialCard { padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--cream); }
+.materialGrid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: 24px; }
+.materialGrid > * { min-width: 0; }
+.materialInput { min-height: 280px; font-family: var(--font-serif); font-size: 16px; line-height: 1.85; }
+.materialList { display: grid; align-content: start; gap: 0; min-width: 0; }
+.materialList details { padding: 20px 0; background: var(--cream); border-bottom: 1px solid var(--line); }
+.materialList summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; cursor: pointer; }
+.materialList strong, .materialList small { display: block; }
+.materialList strong { font-size: 16px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
+.materialList small { margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.materialList i { color: var(--muted); font-size: 13px; font-style: normal; }
+.materialList pre { max-height: 360px; overflow: auto; margin: 16px 0; padding: 16px; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 8px; font-family: var(--font-mono); font-size: 13px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+.materialList a { color: var(--leaf); font-size: 14px; font-weight: 600; }
+.materialList button { margin-top: 12px; }
+.materialList audio { width: 100%; margin: 4px 0 16px; }
+.previewImage { max-width: 100%; max-height: 360px; display: block; margin: 4px 0 16px; border: 1px solid var(--line); border-radius: 8px; object-fit: contain; }
+.filters { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 8px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.filters input { flex: 1 1 220px; min-width: 0; }
+.filters select { flex: 1 1 120px; min-width: 0; }
+.materialCard { min-width: 0; padding: 24px 0; border-bottom: 1px solid var(--line); background: var(--cream); }
+.materialCard:last-child { border-bottom: 0; padding-bottom: 0; }
 .materialCard strong { font-size: 17px; }
-.materialCard small { font-size: 12px; line-height: 1.7; color: var(--muted); }
-.materialCard p { font-size: 14px; }
-.materialCard a { font-size: 13px; }
-.materialInput { min-height: 280px; font-size: 15px; line-height: 1.8; }
-.materialList { max-height: none; }
-.materialGrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-.actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.questionEditor { display: grid; gap: 12px; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
-.questionEditor textarea { min-height: 70px; }
+.materialCard p { margin: 12px 0 16px; color: var(--muted); font-size: 15px; line-height: 1.75; overflow-wrap: anywhere; }
+.materialCard a { min-height: 44px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.questionEditor { display: grid; gap: 16px; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 20px; background: var(--page); }
+.questionEditor textarea { min-height: 88px; }
 .audio { width: 100%; }
-.plainText { white-space: pre-wrap; line-height: 1.8; font-size: 17px; }
-@media(max-width: 1000px) { .materialGrid { grid-template-columns: 1fr; } }
+.plainText { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.85; font-family: var(--font-serif); font-size: 17px; }
+@media (max-width: 1100px) { .materialGrid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 650px) {
+  .materialGrid { gap: 16px; }
+  .materialInput { min-height: 220px; }
+  .filters { gap: 8px; }
+  .filters input { flex-basis: 100%; }
+  .filters select { flex-basis: 100%; min-height: 44px; }
+  .materialCard { padding: 20px 0; }
+  .actions > * { min-height: 44px; max-width: 100%; }
+  .questionEditor { padding: 16px; }
+}
