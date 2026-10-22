@@ -9,10 +9,13 @@ const crypto = require('node:crypto');
 const topics = require('./morphology-topics.cjs');
 const notes = require('./morphology-lesson-notes.cjs');
 const authoredDistractors = require('./morphology-distractors.cjs');
+const { translationIndex, resolveTranslation, assertTranslationCoverage } = require('./morphology-translations.cjs');
 const root = path.resolve(__dirname, '..');
 const read = p => JSON.parse(fs.readFileSync(path.join(root,p),'utf8'));
 const write = (p,v) => fs.writeFileSync(path.join(root,p),JSON.stringify(v,null,2)+'\n');
 const reviewedAt = '2026-10-22';
+const translations = translationIndex(read('scripts/morphology-translations.json').entries);
+const translatedExampleIds = new Set();
 const normal = s => s.trim().toLocaleLowerCase('en').replace(/[’‘]/g,"'").replace(/\s+/g,' ');
 const hash = s => crypto.createHash('sha256').update(s).digest('hex').slice(0,16);
 const manifestPath='scripts/morphology-source-manifest.json';
@@ -120,7 +123,10 @@ function makeWord(term,kind,id,form,meaning,variants){
     if(['modernise','standardise','specialise'].includes(term))acceptedAnswers.push(targetSurface.replace(/ise$/,'ize'));
     if(term==='hypoglycaemia')acceptedAnswers.push('hypoglycemia');
     if(term==='neighbourhood')acceptedAnswers.push('neighborhood');
-    return{id:oldExample?.id??`morph-example:${hash(frozenId+':'+sentence)}`,sentence,targetSurface,acceptedAnswers,meaningZh:data.meaningZh};
+    const exampleId=oldExample?.id??`morph-example:${hash(frozenId+':'+sentence)}`;
+    const translation=resolveTranslation(translations,exampleId,sentence,data.meaningZh);
+    translatedExampleIds.add(exampleId);
+    return{id:exampleId,sentence,targetSurface,acceptedAnswers,meaningZh:translation};
   });
   return{id:old?.id??frozenId,term,partOfSpeech:data.partOfSpeech,meaningZh:data.meaningZh,definitionEn:data.definitionEn,
     level:level?.level??null,levelSource:level?`${level.source} · ${level.url} · ${level.note}；等级对应词＋词性，不声称此处具体义项单独定级。`:'未找到本次已核对的 Oxford B2/C1 词＋词性等级；不推定为基础词。',relation,segments,explanationZh,examples,sourceIds:sources.map(s=>s.id),illustrative:knownBasic.has(term)&&!level};
@@ -140,7 +146,7 @@ const lessons=flattened.map((topic,index)=>{
   const unrelated=flattened.filter(t=>t.kind==='root'&&t.id!==id&&!t.terms.some(term=>terms.includes(term))).map(t=>t.terms[0]).filter(term=>!variants.some(v=>term.includes(v.replace(/-/g,''))));
   const options=[answer,...unrelated.slice((index*3)%Math.max(1,unrelated.length-3),(index*3)%Math.max(1,unrelated.length-3)+3)];
   if(options.length<4)throw new Error('Missing curated family distractors');
-  return{id:`morph-${kind}-${id}`,version:2,status:'published',kind,rank,form,titleZh:meaningZh,meaningZh,variants,
+  return{id:`morph-${kind}-${id}`,version:3,status:'published',kind,rank,form,titleZh:meaningZh,meaningZh,variants,
     overviewZh:note.overview,spellingZh:note.limits,limitsZh:'构词关系分为现代派生与历史词源，不将熟词强行拆分。'+note.limits+' 本课词＋词性等级仅在有公开依据时标 B2/C1；未定级不等于简单。标为构词示例的词用于说明关系，不自动成为词汇待学词。',meaningDistractors,words,sources,
     structureQuestion:{prompt:'下列哪个词属于本课所学构词部件的词群？',options,answer,explanation:`${answer} 属于本课「${form}」词群。${note.overview} ${note.limits}`}};
 });
@@ -157,10 +163,11 @@ for(const lesson of lessons){
   }
 }
 if(errors.length)throw new Error(errors.join('\n'));
-const bundle={version:2,lessons};
+assertTranslationCoverage(translations,translatedExampleIds);
+const bundle={version:3,lessons};
 write('src/data/morphology-curriculum.json',bundle);
 const words=lessons.flatMap(l=>l.words),uniqueWords=[...new Map(words.map(w=>[w.id,w])).values()];
-const audit={version:2,reviewedAt,lessons:lessons.length,byKind:Object.fromEntries(['root','prefix','suffix'].map(k=>[k,lessons.filter(l=>l.kind===k).length])),wordSlots:words.length,uniqueWordSenses:uniqueWords.length,contextSlots:words.reduce((n,w)=>n+w.examples.length,0),distinctSentences:new Set(words.flatMap(w=>w.examples.map(e=>e.sentence))).size,
+const audit={version:3,reviewedAt,lessons:lessons.length,byKind:Object.fromEntries(['root','prefix','suffix'].map(k=>[k,lessons.filter(l=>l.kind===k).length])),wordSlots:words.length,uniqueWordSenses:uniqueWords.length,contextSlots:words.reduce((n,w)=>n+w.examples.length,0),uniqueTranslatedExamples:translatedExampleIds.size,distinctSentences:new Set(words.flatMap(w=>w.examples.map(e=>e.sentence))).size,
   levels:Object.fromEntries(['B2','C1','unknown'].map(level=>[level,uniqueWords.filter(w=>(w.level??'unknown')===level).length])),illustrative:uniqueWords.filter(w=>w.illustrative).length,uniqueSourceRevisions:new Set(lessons.flatMap(l=>l.sources.filter(s=>s.id.startsWith('wikt:')).map(s=>s.url))).size,
   authoredWords:authored.size,publicCatalogWords:uniqueWords.filter(w=>!authored.has(w.term)).length,validationErrors:errors,
   exceptions:['reg-/rect- merged as Latin regō/rēctus; replaced duplicate root slot with rupt-.','livelihood excluded from regular -hood examples; adulthood used.','-cy/-acy, -ous/-ious, -ory/-tory/-atory and -ion/-tion/-sion/-ation variants grouped.','pro-environmental is productive pro- + environmental; actual two component entries cited, no claim of an existing whole-word entry.','hypoglycaemia and modernise cite canonical spelling entries; -ing nouns cite nominal definitions, bases and actual -ing entry.','Each sense has two aligned sentences; mixed-sense catalog entries were replaced with original editorial overrides.'],contentLicense:'CC BY-SA 4.0; application code licence remains separate.'};

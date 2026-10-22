@@ -1,0 +1,4638 @@
+{
+  "version": 1,
+  "reviewedAt": "2026-10-22",
+  "license": "CC BY-SA 4.0",
+  "attribution": "Original Chinese sentence translations by IELTS Studio contributors, 2026. English examples retain the curriculum attribution and licence; see docs/morphology-curriculum.md.",
+  "entries": [
+    {
+      "exampleId": "morph-example:335a586ec597ebcb",
+      "sentence": "Immediate action is needed to protect the habitat.",
+      "translationZh": "必须立即采取行动保护这一栖息地。"
+    },
+    {
+      "exampleId": "morph-example:96d1bcc212e2aa9e",
+      "sentence": "The council announced action to improve road safety.",
+      "translationZh": "市政委员会宣布将采取行动改善道路安全。"
+    },
+    {
+      "exampleId": "morph-example:82107f976bd18c20",
+      "sentence": "The animals are most active at night.",
+      "translationZh": "这些动物在夜间最为活跃。"
+    },
+    {
+      "exampleId": "morph-example:492c203f2900ef1d",
+      "sentence": "She remains an active community volunteer.",
+      "translationZh": "她仍然是一名积极参与社区事务的志愿者。"
+    },
+    {
+      "exampleId": "morph-example:bccac7a8ef9b0343",
+      "sentence": "Her reaction to the news was immediate.",
+      "translationZh": "她听到这则消息后立即作出了反应。"
+    },
+    {
+      "exampleId": "morph-example:2fbc2c7f25e7319e",
+      "sentence": "The proposal received a mixed reaction.",
+      "translationZh": "这项提议引起了褒贬不一的反应。"
+    },
+    {
+      "exampleId": "morph-example:0f3c2176962be6f3",
+      "sentence": "Aquatic plants provide shelter for young fish.",
+      "translationZh": "水生植物为幼鱼提供藏身之处。"
+    },
+    {
+      "exampleId": "morph-example:d3002b21fe7caef7",
+      "sentence": "The survey recorded the loss of several aquatic species.",
+      "translationZh": "这次调查记录了几种水生物种的消失。"
+    },
+    {
+      "exampleId": "morph-example:ff5c6f2281e82f6b",
+      "sentence": "The aquarium uses a filtration system to keep the water clean.",
+      "translationZh": "这个水族箱使用过滤系统来保持水质清洁。"
+    },
+    {
+      "exampleId": "morph-example:7e6ce9463f76e8ca",
+      "sentence": "Visitors can observe coral fish in the public aquarium.",
+      "translationZh": "游客可以在公共水族馆观察珊瑚鱼。"
+    },
+    {
+      "exampleId": "morph-example:2cfe65481ca1cfa8",
+      "sentence": "Aquaculture provides income for many coastal communities.",
+      "translationZh": "水产养殖为许多沿海社区提供收入。"
+    },
+    {
+      "exampleId": "morph-example:156730ee8dec0827",
+      "sentence": "Poorly managed aquaculture can damage nearby habitats.",
+      "translationZh": "管理不善的水产养殖可能破坏附近的栖息地。"
+    },
+    {
+      "exampleId": "morph-example:61673b2674469e73",
+      "sentence": "The warning signal must be audible above the machinery.",
+      "translationZh": "警报信号必须足够响亮，使人们在机器运转声中仍能听见。"
+    },
+    {
+      "exampleId": "morph-example:700ec9c00b5fbc40",
+      "sentence": "Her voice was barely audible at the back of the room.",
+      "translationZh": "在房间后部几乎听不见她的声音。"
+    },
+    {
+      "exampleId": "morph-example:5fb92ece8db7900d",
+      "sentence": "The experiment compared visual and auditory memory.",
+      "translationZh": "这项实验比较了视觉记忆与听觉记忆。"
+    },
+    {
+      "exampleId": "morph-example:7748e096d930710e",
+      "sentence": "Auditory signals help drivers respond to hazards.",
+      "translationZh": "声音信号有助于驾驶员对危险作出反应。"
+    },
+    {
+      "exampleId": "morph-example:c809c5cb1c6ef751",
+      "sentence": "The speaker invited questions from the audience.",
+      "translationZh": "演讲者邀请听众提问。"
+    },
+    {
+      "exampleId": "morph-example:20a16f5e6a3173e0",
+      "sentence": "The documentary reached an audience far beyond the university.",
+      "translationZh": "这部纪录片的观众范围远远超出了这所大学。"
+    },
+    {
+      "exampleId": "morph-example:988e2c9d47d8a97c",
+      "sentence": "One benefit of public transport is reduced traffic.",
+      "translationZh": "公共交通的一个好处是减少交通流量。"
+    },
+    {
+      "exampleId": "morph-example:1a27421d6bda2dd3",
+      "sentence": "The changes brought little benefit to rural families.",
+      "translationZh": "这些变化给农村家庭带来的益处很少。"
+    },
+    {
+      "exampleId": "morph-example:1499f5533b3a9abe",
+      "sentence": "Regular exercise is beneficial to mental health.",
+      "translationZh": "经常锻炼有益于心理健康。"
+    },
+    {
+      "exampleId": "morph-example:913a15fca741ec68",
+      "sentence": "The changes were beneficial to both workers and employers.",
+      "translationZh": "这些变化对雇员和雇主双方都有益处。"
+    },
+    {
+      "exampleId": "morph-example:8cbc0f204e90bcd9",
+      "sentence": "A benevolent donor paid for the new community library.",
+      "translationZh": "一位乐善好施的捐赠者出资建造了新的社区图书馆。"
+    },
+    {
+      "exampleId": "morph-example:ca850312174b0b7b",
+      "sentence": "The ruler presented himself as a benevolent leader.",
+      "translationZh": "这位统治者把自己塑造成一位仁慈的领袖。"
+    },
+    {
+      "exampleId": "morph-example:fa702e3764b1a148",
+      "sentence": "The students carried out a simple experiment in biology class.",
+      "translationZh": "学生们在生物课上做了一个简单的实验。"
+    },
+    {
+      "exampleId": "morph-example:7ad1c86fe7166ac5",
+      "sentence": "Her interest in biology began during a visit to the aquarium.",
+      "translationZh": "她对生物学的兴趣始于一次水族馆之行。"
+    },
+    {
+      "exampleId": "morph-example:3c242d55be6760c4",
+      "sentence": "The laboratory collects biological samples from the river.",
+      "translationZh": "这家实验室从河流中采集生物样本。"
+    },
+    {
+      "exampleId": "morph-example:3b6f738d7c4abaa6",
+      "sentence": "The lesson explains several biological processes in plants.",
+      "translationZh": "这节课讲解了植物体内的几种生物过程。"
+    },
+    {
+      "exampleId": "morph-example:62632f7682e9b5ef",
+      "sentence": "The biography draws on letters held in a private archive.",
+      "translationZh": "这部传记参考了私人档案中保存的信件。"
+    },
+    {
+      "exampleId": "morph-example:8fa648da0491c869",
+      "sentence": "She is writing a biography of a pioneering scientist.",
+      "translationZh": "她正在为一位具有开拓精神的科学家撰写传记。"
+    },
+    {
+      "exampleId": "morph-example:b66b0c4351906266",
+      "sentence": "Rescuers tried to capture the injured animal.",
+      "translationZh": "救援人员试图捕获那只受伤的动物。"
+    },
+    {
+      "exampleId": "morph-example:78e38a00240b698a",
+      "sentence": "The police hoped to capture the escaped prisoner.",
+      "translationZh": "警方希望抓获那名越狱的囚犯。"
+    },
+    {
+      "exampleId": "morph-example:09e130c24a9a2a96",
+      "sentence": "The mountains interfere with radio reception.",
+      "translationZh": "这些山脉干扰了无线电信号的接收。"
+    },
+    {
+      "exampleId": "morph-example:c2fad01919bb120c",
+      "sentence": "The new aerial improved television reception in the village.",
+      "translationZh": "新的天线改善了村里的电视信号接收效果。"
+    },
+    {
+      "exampleId": "morph-example:7232cc524baaf893",
+      "sentence": "The teacher explained the concept of pressure.",
+      "translationZh": "老师解释了压力这一概念。"
+    },
+    {
+      "exampleId": "morph-example:9a04c75a94565177",
+      "sentence": "This concept underlies the entire design.",
+      "translationZh": "这一概念是整个设计的基础。"
+    },
+    {
+      "exampleId": "morph-example:dc1ad3a1267cab75",
+      "sentence": "The inspection can proceed after approval.",
+      "translationZh": "获得批准后，检查便可继续进行。"
+    },
+    {
+      "exampleId": "morph-example:194f0c473a25f647",
+      "sentence": "Please proceed to the next section.",
+      "translationZh": "请继续进入下一部分。"
+    },
+    {
+      "exampleId": "morph-example:a4e3c20b5df8b421",
+      "sentence": "Residents waited for the floodwater to recede.",
+      "translationZh": "居民们等待洪水退去。"
+    },
+    {
+      "exampleId": "morph-example:7b5ddba7e3523c26",
+      "sentence": "The noise began to recede as the train left the station.",
+      "translationZh": "随着火车驶离车站，噪声开始渐渐远去。"
+    },
+    {
+      "exampleId": "morph-example:615d119fcc20b1aa",
+      "sentence": "A succession of storms damaged the coastline.",
+      "translationZh": "接连发生的风暴破坏了海岸线。"
+    },
+    {
+      "exampleId": "morph-example:68e0db06ec7febc9",
+      "sentence": "The law sets out the rules of succession to the throne.",
+      "translationZh": "这部法律规定了王位继承的规则。"
+    },
+    {
+      "exampleId": "morph-example:8ccfdbadf778f3d8",
+      "sentence": "The documents establish a clear chronology of the conflict.",
+      "translationZh": "这些文件明确了这场冲突中各事件发生的先后顺序。"
+    },
+    {
+      "exampleId": "morph-example:9c24d125513bd9b4",
+      "sentence": "The museum presents a chronology of medical discoveries.",
+      "translationZh": "博物馆展示了一份医学发现年表。"
+    },
+    {
+      "exampleId": "morph-example:0c0d72a773a989ff",
+      "sentence": "The letters are displayed in chronological order.",
+      "translationZh": "这些信件按时间顺序陈列。"
+    },
+    {
+      "exampleId": "morph-example:1cb5681792fbb582",
+      "sentence": "Please give a chronological account of the events.",
+      "translationZh": "请按时间顺序叙述这些事件。"
+    },
+    {
+      "exampleId": "morph-example:54ccaf3b995cc9b0",
+      "sentence": "The village faces a chronic shortage of clean water.",
+      "translationZh": "这个村庄长期面临清洁水源短缺的问题。"
+    },
+    {
+      "exampleId": "morph-example:7d3a66b0e03f78de",
+      "sentence": "The study examined the causes of chronic inflammation.",
+      "translationZh": "这项研究考察了慢性炎症的成因。"
+    },
+    {
+      "exampleId": "morph-example:7d0d55d78fcc1c21",
+      "sentence": "The fees include access to the library.",
+      "translationZh": "这些费用包含使用图书馆的权限。"
+    },
+    {
+      "exampleId": "morph-example:11d07e91a70cbc2a",
+      "sentence": "Please include references in your report.",
+      "translationZh": "请在报告中列出参考文献。"
+    },
+    {
+      "exampleId": "morph-example:bb758ccd23557e93",
+      "sentence": "The club cannot exclude members without a valid reason.",
+      "translationZh": "没有正当理由，俱乐部不能将会员除名。"
+    },
+    {
+      "exampleId": "morph-example:85ba49d2ee87d264",
+      "sentence": "The calculation should exclude temporary expenses.",
+      "translationZh": "计算时应排除临时性支出。"
+    },
+    {
+      "exampleId": "morph-example:f4ecdf416938a7bd",
+      "sentence": "The evidence supports a different conclusion.",
+      "translationZh": "这些证据支持另一种结论。"
+    },
+    {
+      "exampleId": "morph-example:5c6f519fde5e4df8",
+      "sentence": "We reached the same conclusion independently.",
+      "translationZh": "我们各自独立地得出了相同的结论。"
+    },
+    {
+      "exampleId": "morph-example:b3a0e906d044573a",
+      "sentence": "The research examines the relationship between sleep and cognition.",
+      "translationZh": "这项研究考察睡眠与认知之间的关系。"
+    },
+    {
+      "exampleId": "morph-example:6495bd28be29562f",
+      "sentence": "Language is one important aspect of human cognition.",
+      "translationZh": "语言是人类认知的一个重要方面。"
+    },
+    {
+      "exampleId": "morph-example:5205fd84ac38a866",
+      "sentence": "The experiment measured cognitive performance with a memory task.",
+      "translationZh": "这项实验通过一项记忆任务测量认知表现。"
+    },
+    {
+      "exampleId": "morph-example:18a2d073582d7612",
+      "sentence": "Researchers compared cognitive development across several age groups.",
+      "translationZh": "研究人员比较了几个年龄组的认知发展情况。"
+    },
+    {
+      "exampleId": "morph-example:c5dd7becbd6f603f",
+      "sentence": "The agreement marks official recognition of their rights.",
+      "translationZh": "这项协议标志着他们的权利获得了正式承认。"
+    },
+    {
+      "exampleId": "morph-example:5ca3b6c1915c6da0",
+      "sentence": "Her research gained international recognition.",
+      "translationZh": "她的研究获得了国际认可。"
+    },
+    {
+      "exampleId": "morph-example:97daeb780b851b42",
+      "sentence": "The report examines corporate spending.",
+      "translationZh": "这份报告考察企业支出。"
+    },
+    {
+      "exampleId": "morph-example:04f3ebbe7d008341",
+      "sentence": "The event attracted several corporate sponsors.",
+      "translationZh": "这次活动吸引了几家企业赞助商。"
+    },
+    {
+      "exampleId": "morph-example:266fdce3a342e321",
+      "sentence": "The corporation employs thousands of workers.",
+      "translationZh": "这家公司雇用了数千名工人。"
+    },
+    {
+      "exampleId": "morph-example:472e24f1a47a7495",
+      "sentence": "A multinational corporation funded the research centre.",
+      "translationZh": "一家跨国公司为这所研究中心提供了资金。"
+    },
+    {
+      "exampleId": "morph-example:dbcbdccea0dddd30",
+      "sentence": "The revised plan will incorporate residents' suggestions.",
+      "translationZh": "修订后的计划将纳入居民的建议。"
+    },
+    {
+      "exampleId": "morph-example:7b1aa5f7c9c92cb2",
+      "sentence": "The designer wanted to incorporate natural light into every room.",
+      "translationZh": "设计师希望让每个房间都能利用自然光。"
+    },
+    {
+      "exampleId": "morph-example:8b81676b3685b839",
+      "sentence": "The claim needs support from a credible source.",
+      "translationZh": "这一说法需要可靠来源的支持。"
+    },
+    {
+      "exampleId": "morph-example:4218fba5ec7228a1",
+      "sentence": "The government has not offered a credible explanation.",
+      "translationZh": "政府尚未给出可信的解释。"
+    },
+    {
+      "exampleId": "morph-example:9e84d62445ed025a",
+      "sentence": "The shop allows customers to buy on credit.",
+      "translationZh": "这家商店允许顾客赊购。"
+    },
+    {
+      "exampleId": "morph-example:e7f6ae1a5961a1fc",
+      "sentence": "Access to credit can help small businesses grow.",
+      "translationZh": "获得信贷有助于小企业发展。"
+    },
+    {
+      "exampleId": "morph-example:d6cd740dfe57dd25",
+      "sentence": "The missing records damaged the report's credibility.",
+      "translationZh": "记录的缺失损害了这份报告的可信度。"
+    },
+    {
+      "exampleId": "morph-example:4ceef5380976cbab",
+      "sentence": "Publishing the full data would improve the study's credibility.",
+      "translationZh": "公布全部数据将提高这项研究的可信度。"
+    },
+    {
+      "exampleId": "morph-example:269ad7f6f85acaa7",
+      "sentence": "The current carries sediment towards the coast.",
+      "translationZh": "水流将泥沙带向海岸。"
+    },
+    {
+      "exampleId": "morph-example:25256247963f7e61",
+      "sentence": "A strong current made it difficult to reach the island.",
+      "translationZh": "强劲的水流使人们难以到达那座岛。"
+    },
+    {
+      "exampleId": "morph-example:77ee691e1f1b6a45",
+      "sentence": "The shop accepts only local currency.",
+      "translationZh": "这家商店只接受当地货币。"
+    },
+    {
+      "exampleId": "morph-example:d3a7023a35b3d2c8",
+      "sentence": "The value of the currency fell during the crisis.",
+      "translationZh": "这种货币在危机期间贬值了。"
+    },
+    {
+      "exampleId": "morph-example:05f8128a2335a888",
+      "sentence": "The school added coding to its curriculum.",
+      "translationZh": "学校在课程体系中增加了编程课程。"
+    },
+    {
+      "exampleId": "morph-example:dbf9bdf448501351",
+      "sentence": "Students helped review the engineering curriculum.",
+      "translationZh": "学生们协助审查了工程专业的课程体系。"
+    },
+    {
+      "exampleId": "morph-example:9bab8cd5807d52bc",
+      "sentence": "The diagram shows the water cycle.",
+      "translationZh": "这张示意图展示了水循环。"
+    },
+    {
+      "exampleId": "morph-example:4edd498430a85840",
+      "sentence": "Each production cycle takes forty minutes.",
+      "translationZh": "每个生产周期需要四十分钟。"
+    },
+    {
+      "exampleId": "morph-example:90753cf39117fad5",
+      "sentence": "The factory can recycle most of its waste water.",
+      "translationZh": "这家工厂能够回收利用其大部分废水。"
+    },
+    {
+      "exampleId": "morph-example:96dbaf991026f3ec",
+      "sentence": "Residents are encouraged to recycle glass and paper.",
+      "translationZh": "居民们被鼓励回收利用玻璃和纸张。"
+    },
+    {
+      "exampleId": "morph-example:b90427dad58ea072",
+      "sentence": "The cyclone destroyed homes along the coast.",
+      "translationZh": "这场气旋摧毁了沿海地区的房屋。"
+    },
+    {
+      "exampleId": "morph-example:46414d39699bc3ba",
+      "sentence": "Scientists used satellites to track the cyclone.",
+      "translationZh": "科学家们利用卫星追踪了这场气旋。"
+    },
+    {
+      "exampleId": "morph-example:d652843d479eca68",
+      "sentence": "Free elections are central to democracy.",
+      "translationZh": "自由选举是民主制度的核心。"
+    },
+    {
+      "exampleId": "morph-example:0492a37beffc4a0d",
+      "sentence": "The course examines the development of democracy.",
+      "translationZh": "这门课程考察民主制度的发展。"
+    },
+    {
+      "exampleId": "morph-example:0bc063f37769b4fd",
+      "sentence": "Demographic changes are increasing demand for healthcare.",
+      "translationZh": "人口变化正在增加医疗保健需求。"
+    },
+    {
+      "exampleId": "morph-example:41ab85dcda21d995",
+      "sentence": "The report compares demographic trends across the region.",
+      "translationZh": "这份报告比较了该地区各地的人口变化趋势。"
+    },
+    {
+      "exampleId": "morph-example:14c90a3324371142",
+      "sentence": "The epidemic placed heavy pressure on local hospitals.",
+      "translationZh": "这场流行病给当地医院带来了巨大压力。"
+    },
+    {
+      "exampleId": "morph-example:d5d7239efeb22ac6",
+      "sentence": "Officials collected data on the spread of the epidemic.",
+      "translationZh": "官员们收集了有关这场流行病传播的数据。"
+    },
+    {
+      "exampleId": "morph-example:4a0da1f9aa18158e",
+      "sentence": "The manager will dictate the letter to her assistant.",
+      "translationZh": "经理将口述这封信，由她的助理记录。"
+    },
+    {
+      "exampleId": "morph-example:706215a875ce7df9",
+      "sentence": "You can dictate notes into the recording application.",
+      "translationZh": "你可以通过口述，将笔记录入录音应用程序。"
+    },
+    {
+      "exampleId": "morph-example:bb17cd6ec42e9272",
+      "sentence": "Scientists cannot predict every volcanic eruption.",
+      "translationZh": "科学家无法预测每一次火山喷发。"
+    },
+    {
+      "exampleId": "morph-example:ce35ad7dd89db780",
+      "sentence": "The model can predict short-term changes.",
+      "translationZh": "这个模型可以预测短期变化。"
+    },
+    {
+      "exampleId": "morph-example:457784edee397f72",
+      "sentence": "These measurements contradict the earlier report.",
+      "translationZh": "这些测量结果与先前的报告相矛盾。"
+    },
+    {
+      "exampleId": "morph-example:3e56c5de6d34baa8",
+      "sentence": "Please do not contradict yourself during the interview.",
+      "translationZh": "请不要在面试中自相矛盾。"
+    },
+    {
+      "exampleId": "morph-example:ed405c55d7a9cf8b",
+      "sentence": "The doctrine influenced foreign policy for several decades.",
+      "translationZh": "这一学说影响了数十年的外交政策。"
+    },
+    {
+      "exampleId": "morph-example:b5efc7ca38b00236",
+      "sentence": "Students compare the economic doctrine with later theories.",
+      "translationZh": "学生们将这一经济学说与后来的理论进行比较。"
+    },
+    {
+      "exampleId": "morph-example:429cf05db28fe372",
+      "sentence": "Please sign the document on the final page.",
+      "translationZh": "请在文件的最后一页签名。"
+    },
+    {
+      "exampleId": "morph-example:722998ed6f827294",
+      "sentence": "The original document is stored in the archive.",
+      "translationZh": "原始文件保存在档案馆中。"
+    },
+    {
+      "exampleId": "morph-example:55fefcb2786fd69f",
+      "sentence": "The doctor asked the patient about her symptoms.",
+      "translationZh": "医生向这位女患者询问了她的症状。"
+    },
+    {
+      "exampleId": "morph-example:1be279cbece00897",
+      "sentence": "A local doctor provides care for families in remote villages.",
+      "translationZh": "一名当地医生为偏远村庄的家庭提供医疗服务。"
+    },
+    {
+      "exampleId": "morph-example:de7c32d9e739298f",
+      "sentence": "The team will conduct a survey of local residents.",
+      "translationZh": "该团队将对当地居民开展一项调查。"
+    },
+    {
+      "exampleId": "morph-example:40742b7df1c6693c",
+      "sentence": "Researchers conduct interviews with every participant.",
+      "translationZh": "研究人员对每一位参与者进行访谈。"
+    },
+    {
+      "exampleId": "morph-example:bf1e1951f777e984",
+      "sentence": "Let me introduce our guest speaker.",
+      "translationZh": "让我介绍一下我们的特邀演讲嘉宾。"
+    },
+    {
+      "exampleId": "morph-example:2ed3f2e5598073d0",
+      "sentence": "The guide will introduce you to the local team.",
+      "translationZh": "导游会把你介绍给当地团队。"
+    },
+    {
+      "exampleId": "morph-example:08715204bd444569",
+      "sentence": "Better insulation can reduce heating costs.",
+      "translationZh": "改善保温性能可以降低供暖费用。"
+    },
+    {
+      "exampleId": "morph-example:c28421574b125575",
+      "sentence": "The city hopes to reduce traffic near schools.",
+      "translationZh": "这座城市希望减少学校附近的交通流量。"
+    },
+    {
+      "exampleId": "morph-example:8142aa7bd3fd7a6c",
+      "sentence": "Divide the material into equal portions.",
+      "translationZh": "将这些材料分成大小相等的几份。"
+    },
+    {
+      "exampleId": "morph-example:abc742fb6ba5d577",
+      "sentence": "Both groups received equal amounts of funding.",
+      "translationZh": "两个小组获得了等额资助。"
+    },
+    {
+      "exampleId": "morph-example:810cd87b6e2a64eb",
+      "sentence": "The organisation campaigns for equality in education.",
+      "translationZh": "该组织致力于争取教育平等。"
+    },
+    {
+      "exampleId": "morph-example:1643368a1ad8472a",
+      "sentence": "The new law promotes equality of opportunity.",
+      "translationZh": "这部新法律促进机会平等。"
+    },
+    {
+      "exampleId": "morph-example:60407438674b02a8",
+      "sentence": "The two courses offer equivalent qualifications.",
+      "translationZh": "这两门课程授予同等效力的资格。"
+    },
+    {
+      "exampleId": "morph-example:07e75a4bcc598660",
+      "sentence": "The alternative material provides equivalent protection at a lower cost.",
+      "translationZh": "这种替代材料以更低的成本提供同等的保护。"
+    },
+    {
+      "exampleId": "morph-example:f9b717cdba76bd10",
+      "sentence": "The factory produces electrical components.",
+      "translationZh": "这家工厂生产电气元件。"
+    },
+    {
+      "exampleId": "morph-example:780f83c775af5f4c",
+      "sentence": "The old factory now houses a museum.",
+      "translationZh": "这座旧工厂如今成为了一家博物馆的馆舍。"
+    },
+    {
+      "exampleId": "morph-example:22b0e4f2a9fdee08",
+      "sentence": "The factory will manufacture electric motors.",
+      "translationZh": "这家工厂将生产电动机。"
+    },
+    {
+      "exampleId": "morph-example:5f47719049d8ac3a",
+      "sentence": "Local firms manufacture equipment for farms.",
+      "translationZh": "当地企业制造农场用设备。"
+    },
+    {
+      "exampleId": "morph-example:fe4544371ccaa1bc",
+      "sentence": "The new engine is more efficient.",
+      "translationZh": "这台新发动机的效率更高。"
+    },
+    {
+      "exampleId": "morph-example:31bb809b4c0512d8",
+      "sentence": "An efficient booking system reduces waiting times.",
+      "translationZh": "高效的预约系统可以缩短等候时间。"
+    },
+    {
+      "exampleId": "morph-example:83b1b6df1a4a279d",
+      "sentence": "Please transfer the files to this folder.",
+      "translationZh": "请将这些文件移到这个文件夹中。"
+    },
+    {
+      "exampleId": "morph-example:c0c4a2a00387bd92",
+      "sentence": "Pipes transfer water between the reservoirs.",
+      "translationZh": "管道在各个水库之间输送水。"
+    },
+    {
+      "exampleId": "morph-example:ea6a6ea686841820",
+      "sentence": "The authors refer to several earlier studies.",
+      "translationZh": "作者们引用了几项较早的研究。"
+    },
+    {
+      "exampleId": "morph-example:3161125c2ff80648",
+      "sentence": "These figures refer to households rather than individuals.",
+      "translationZh": "这些数字指的是家庭，而非个人。"
+    },
+    {
+      "exampleId": "morph-example:9352733bebe73769",
+      "sentence": "Researchers cannot infer causation from this correlation alone.",
+      "translationZh": "研究人员不能仅凭这种相关性推断因果关系。"
+    },
+    {
+      "exampleId": "morph-example:727283418fd7d39f",
+      "sentence": "We can infer the animal's diet from its teeth.",
+      "translationZh": "我们可以根据这种动物的牙齿推断它的食性。"
+    },
+    {
+      "exampleId": "morph-example:d78d67b056a28105",
+      "sentence": "The final chapter summarises the main findings.",
+      "translationZh": "最后一章总结了主要研究发现。"
+    },
+    {
+      "exampleId": "morph-example:b6f091323dd2cddb",
+      "sentence": "We made one final check before departure.",
+      "translationZh": "出发前，我们又作了最后一次检查。"
+    },
+    {
+      "exampleId": "morph-example:356476e010d18098",
+      "sentence": "The project has a finite budget.",
+      "translationZh": "这个项目的预算是有限的。"
+    },
+    {
+      "exampleId": "morph-example:c9594fe65f677101",
+      "sentence": "Fresh water is a finite resource in this region.",
+      "translationZh": "在这个地区，淡水是一种有限的资源。"
+    },
+    {
+      "exampleId": "morph-example:6d6c09685d5ab380",
+      "sentence": "The race had a surprisingly close finish.",
+      "translationZh": "这场比赛结束时，选手之间的差距小得出人意料。"
+    },
+    {
+      "exampleId": "morph-example:3d0627c8abc0bebc",
+      "sentence": "We watched the performance from start to finish.",
+      "translationZh": "我们从头到尾观看了这场演出。"
+    },
+    {
+      "exampleId": "morph-example:4b5b5ff121b0b900",
+      "sentence": "A flexible schedule allows employees to balance work and family life.",
+      "translationZh": "灵活的日程安排使员工能够兼顾工作与家庭生活。"
+    },
+    {
+      "exampleId": "morph-example:2ae6b6576346c9d0",
+      "sentence": "The plan must remain flexible enough to respond to new evidence.",
+      "translationZh": "这个计划必须保持足够的灵活性，以便根据新证据作出调整。"
+    },
+    {
+      "exampleId": "morph-example:f923a0a6c0b723da",
+      "sentence": "The test compares the flexibility of different plastics.",
+      "translationZh": "这项测试比较不同塑料的柔韧性。"
+    },
+    {
+      "exampleId": "morph-example:74ddb172686ad2d2",
+      "sentence": "Regular movement helped maintain the flexibility of her joints.",
+      "translationZh": "经常活动有助于保持她关节的灵活性。"
+    },
+    {
+      "exampleId": "morph-example:b517f81698d44383",
+      "sentence": "Blinking is a protective reflex.",
+      "translationZh": "眨眼是一种保护性反射。"
+    },
+    {
+      "exampleId": "morph-example:4e559b63f366addb",
+      "sentence": "The doctor tested the patient's knee reflex.",
+      "translationZh": "医生检查了患者的膝反射。"
+    },
+    {
+      "exampleId": "morph-example:13037a15fc4fe6ff",
+      "sentence": "The mechanic checked the level of brake fluid.",
+      "translationZh": "机械师检查了制动液的液位。"
+    },
+    {
+      "exampleId": "morph-example:9fbe8e4018a6714d",
+      "sentence": "A clear fluid was flowing through the tube.",
+      "translationZh": "一种透明液体正流经这根管子。"
+    },
+    {
+      "exampleId": "morph-example:bd9d81331e68fa4a",
+      "sentence": "She became fluent in French while working in Paris.",
+      "translationZh": "她在巴黎工作期间学会了流利地使用法语。"
+    },
+    {
+      "exampleId": "morph-example:ee3125189beb4b68",
+      "sentence": "The role requires fluent written and spoken English.",
+      "translationZh": "这个职位要求具备流利的英语书面及口头表达能力。"
+    },
+    {
+      "exampleId": "morph-example:589758a72a82e043",
+      "sentence": "Advertising can influence children's food choices.",
+      "translationZh": "广告能够影响儿童对食物的选择。"
+    },
+    {
+      "exampleId": "morph-example:2e625abd3f7e2d39",
+      "sentence": "Local conditions influence the design of rural houses.",
+      "translationZh": "当地条件影响着乡村房屋的设计。"
+    },
+    {
+      "exampleId": "morph-example:8a1ff78314fd1006",
+      "sentence": "The government plans to reform the tax system.",
+      "translationZh": "政府计划改革税收制度。"
+    },
+    {
+      "exampleId": "morph-example:7ef9b5a7eadac51f",
+      "sentence": "Campaigners want to reform unfair employment practices.",
+      "translationZh": "活动人士希望改革不公平的用工方式。"
+    },
+    {
+      "exampleId": "morph-example:4aaa1a26c96e4382",
+      "sentence": "The renovation will transform the old warehouse.",
+      "translationZh": "这次翻修将彻底改变这座旧仓库的面貌。"
+    },
+    {
+      "exampleId": "morph-example:33714c864ba52a07",
+      "sentence": "Better transport could transform life in the village.",
+      "translationZh": "更便利的交通可能会彻底改变村里的生活。"
+    },
+    {
+      "exampleId": "morph-example:904e349067b88c7e",
+      "sentence": "Every guard wears the same uniform.",
+      "translationZh": "每位警卫都穿着相同的制服。"
+    },
+    {
+      "exampleId": "morph-example:cdb9a3fb0a36aac4",
+      "sentence": "The school changed the colour of its uniform.",
+      "translationZh": "学校更改了校服的颜色。"
+    },
+    {
+      "exampleId": "morph-example:681349257e125df5",
+      "sentence": "The inspection revealed a fracture in the metal frame.",
+      "translationZh": "检查发现了金属框架中的一处裂缝。"
+    },
+    {
+      "exampleId": "morph-example:b373e9e76a9cfc1a",
+      "sentence": "The scan confirmed a small fracture in her wrist.",
+      "translationZh": "扫描证实她的手腕有一处轻微骨折。"
+    },
+    {
+      "exampleId": "morph-example:8f554c40e9f7a445",
+      "sentence": "The archaeologist found a fragment of painted pottery.",
+      "translationZh": "考古学家发现了一块彩陶碎片。"
+    },
+    {
+      "exampleId": "morph-example:8777a68899a10bdd",
+      "sentence": "A fragment of the original letter survives in the archive.",
+      "translationZh": "原信的一块残片仍保存在档案馆中。"
+    },
+    {
+      "exampleId": "morph-example:20b6874f63fd7229",
+      "sentence": "Only a fraction of the original forest remains.",
+      "translationZh": "原有森林只剩下一小部分。"
+    },
+    {
+      "exampleId": "morph-example:398450d11a211ab6",
+      "sentence": "The new process uses a fraction of the energy required by the old method.",
+      "translationZh": "新工艺消耗的能源仅为旧方法所需能源的一小部分。"
+    },
+    {
+      "exampleId": "morph-example:626e947c893c713d",
+      "sentence": "Wind turbines generate electricity.",
+      "translationZh": "风力涡轮机产生电能。"
+    },
+    {
+      "exampleId": "morph-example:bd89c07fa518cf74",
+      "sentence": "The exhibition will generate interest in local history.",
+      "translationZh": "这次展览将激发人们对当地历史的兴趣。"
+    },
+    {
+      "exampleId": "morph-example:77a17f1608f507d6",
+      "sentence": "Each generation faces different social challenges.",
+      "translationZh": "每一代人都面临不同的社会挑战。"
+    },
+    {
+      "exampleId": "morph-example:6a37a119b544edce",
+      "sentence": "The younger generation uses public transport more frequently.",
+      "translationZh": "年轻一代更频繁地使用公共交通。"
+    },
+    {
+      "exampleId": "morph-example:201af12e5ca7acd4",
+      "sentence": "The researchers compared genetic data from several populations.",
+      "translationZh": "研究人员比较了几个种群的遗传数据。"
+    },
+    {
+      "exampleId": "morph-example:da1613eafd87ef28",
+      "sentence": "Some characteristics reflect both genetic and environmental influences.",
+      "translationZh": "有些特征同时反映了遗传和环境的影响。"
+    },
+    {
+      "exampleId": "morph-example:a95d54f23f4faccb",
+      "sentence": "The geography of the region limits road construction.",
+      "translationZh": "该地区的地理条件限制了道路建设。"
+    },
+    {
+      "exampleId": "morph-example:8e58e7616ddb2524",
+      "sentence": "Students study human geography as well as physical landscapes.",
+      "translationZh": "学生们既学习自然景观，也学习人文地理。"
+    },
+    {
+      "exampleId": "morph-example:3a88f9353ea548b4",
+      "sentence": "The geology of the island explains its unusual cliffs.",
+      "translationZh": "这座岛的地质构造解释了其悬崖为何如此独特。"
+    },
+    {
+      "exampleId": "morph-example:915e18f4704a4dd1",
+      "sentence": "A knowledge of geology is useful when assessing earthquake risks.",
+      "translationZh": "地质学知识有助于评估地震风险。"
+    },
+    {
+      "exampleId": "morph-example:4fc00c63d762eb6b",
+      "sentence": "The town uses geothermal energy to heat its homes.",
+      "translationZh": "这个城镇利用地热能为居民住宅供暖。"
+    },
+    {
+      "exampleId": "morph-example:c6c9a9d2b9d17be9",
+      "sentence": "Geothermal activity has created hot springs in the valley.",
+      "translationZh": "地热活动在山谷中形成了温泉。"
+    },
+    {
+      "exampleId": "morph-example:6bf850d8ae857157",
+      "sentence": "The work should progress more quickly now.",
+      "translationZh": "现在这项工作的进展应该会更快。"
+    },
+    {
+      "exampleId": "morph-example:3a9857b5fa73d821",
+      "sentence": "Students progress at different rates.",
+      "translationZh": "学生们的进步速度各不相同。"
+    },
+    {
+      "exampleId": "morph-example:7f0e305bb1803e2d",
+      "sentence": "The data show a gradual decline in air pollution.",
+      "translationZh": "数据显示，空气污染正在逐渐减轻。"
+    },
+    {
+      "exampleId": "morph-example:d325012e809a4df3",
+      "sentence": "A gradual change may be easier for staff to accept.",
+      "translationZh": "渐进式的改变可能更容易被员工接受。"
+    },
+    {
+      "exampleId": "morph-example:8ce686d31679c4ba",
+      "sentence": "Many students graduate with substantial debts.",
+      "translationZh": "许多学生毕业时背负着沉重的债务。"
+    },
+    {
+      "exampleId": "morph-example:de650b215d146026",
+      "sentence": "She hopes to graduate from university next summer.",
+      "translationZh": "她希望明年夏天大学毕业。"
+    },
+    {
+      "exampleId": "morph-example:a45160b70ed4b8f9",
+      "sentence": "The graphic design makes the information easier to follow.",
+      "translationZh": "这种平面设计让信息更容易理解。"
+    },
+    {
+      "exampleId": "morph-example:cde066eec437755d",
+      "sentence": "The report includes a graphic representation of the results.",
+      "translationZh": "这份报告用图形展示了研究结果。"
+    },
+    {
+      "exampleId": "morph-example:f768c841c1d75e4f",
+      "sentence": "The opening paragraph introduces the main question.",
+      "translationZh": "开头一段引出了主要问题。"
+    },
+    {
+      "exampleId": "morph-example:82be61ed06f39ba4",
+      "sentence": "Please write a short paragraph about your local environment.",
+      "translationZh": "请写一小段文字介绍你所在地的环境。"
+    },
+    {
+      "exampleId": "morph-example:8e0d2a8cdaceb165",
+      "sentence": "The photograph shows the village before redevelopment.",
+      "translationZh": "这张照片展示了改造前的村庄。"
+    },
+    {
+      "exampleId": "morph-example:c2c8c3907709dc3c",
+      "sentence": "She found an old photograph in the archive.",
+      "translationZh": "她在档案中发现了一张老照片。"
+    },
+    {
+      "exampleId": "morph-example:1db99490d00fe7c3",
+      "sentence": "The laboratory stores hydrogen in a labelled cylinder.",
+      "translationZh": "实验室将氢气储存在一个贴有标签的气瓶中。"
+    },
+    {
+      "exampleId": "morph-example:7735041420fe6423",
+      "sentence": "Water contains both hydrogen and oxygen.",
+      "translationZh": "水既含氢，也含氧。"
+    },
+    {
+      "exampleId": "morph-example:b55449c8fb5cb75d",
+      "sentence": "A hydraulic system controls the movement of the lift.",
+      "translationZh": "一套液压系统控制着升降机的运行。"
+    },
+    {
+      "exampleId": "morph-example:e3de83de5968f30f",
+      "sentence": "The engineers replaced a damaged hydraulic pipe.",
+      "translationZh": "工程师们更换了一根损坏的液压管。"
+    },
+    {
+      "exampleId": "morph-example:d6ae969898b4ff6d",
+      "sentence": "Severe dehydration can affect concentration.",
+      "translationZh": "严重脱水会影响注意力。"
+    },
+    {
+      "exampleId": "morph-example:149c0b284c15270f",
+      "sentence": "The workers were given water to prevent dehydration.",
+      "translationZh": "工人们得到了饮用水，以防脱水。"
+    },
+    {
+      "exampleId": "morph-example:989b2d6972883cbc",
+      "sentence": "The project will restore a damaged wetland.",
+      "translationZh": "这个项目将修复一片受损的湿地。"
+    },
+    {
+      "exampleId": "morph-example:34f5e0e49b7824a1",
+      "sentence": "Each student presented a research project at the exhibition.",
+      "translationZh": "每位学生都在展览中展示了一个研究项目。"
+    },
+    {
+      "exampleId": "morph-example:e1b03c6ac0873c94",
+      "sentence": "The panel may reject incomplete applications.",
+      "translationZh": "评审组可能会拒收不完整的申请。"
+    },
+    {
+      "exampleId": "morph-example:2e223b30301d52a3",
+      "sentence": "Researchers should reject explanations unsupported by evidence.",
+      "translationZh": "研究人员应当摒弃缺乏证据支持的解释。"
+    },
+    {
+      "exampleId": "morph-example:890be781bf54104d",
+      "sentence": "The nurse prepared to inject the medicine.",
+      "translationZh": "护士准备注射药物。"
+    },
+    {
+      "exampleId": "morph-example:32b42f94f8ae6a80",
+      "sentence": "A trained technician will inject the contrast agent before the scan.",
+      "translationZh": "一位经过培训的技术人员将在扫描前注射造影剂。"
+    },
+    {
+      "exampleId": "morph-example:d1bd8202e1557ef9",
+      "sentence": "The jury listened carefully to each witness.",
+      "translationZh": "陪审团认真听取了每一位证人的陈述。"
+    },
+    {
+      "exampleId": "morph-example:5b5a89135b99e0f3",
+      "sentence": "A jury of local artists selected the winning sculpture.",
+      "translationZh": "由当地艺术家组成的评审团选出了获胜的雕塑作品。"
+    },
+    {
+      "exampleId": "morph-example:692f1f6f361fcbc0",
+      "sentence": "The dispute falls outside the court's jurisdiction.",
+      "translationZh": "这场纠纷不属于该法院的管辖范围。"
+    },
+    {
+      "exampleId": "morph-example:c5aef02007992483",
+      "sentence": "Several agencies share jurisdiction over the coastline.",
+      "translationZh": "几个机构共同管辖这段海岸线。"
+    },
+    {
+      "exampleId": "morph-example:ebf543009596c222",
+      "sentence": "The course introduces students to comparative jurisprudence.",
+      "translationZh": "这门课程向学生介绍比较法理学。"
+    },
+    {
+      "exampleId": "morph-example:6baed607d0b478f3",
+      "sentence": "Her research examines a major debate in jurisprudence.",
+      "translationZh": "她的研究考察了法理学中的一场重要争论。"
+    },
+    {
+      "exampleId": "morph-example:03500508f0862fb7",
+      "sentence": "Please select one answer from the list.",
+      "translationZh": "请从列表中选择一个答案。"
+    },
+    {
+      "exampleId": "morph-example:a51b7e4829a492af",
+      "sentence": "Researchers select samples using a random process.",
+      "translationZh": "研究人员通过随机程序选取样本。"
+    },
+    {
+      "exampleId": "morph-example:5be3ef84c031452c",
+      "sentence": "The museum has an impressive collection of maps.",
+      "translationZh": "这家博物馆收藏了一批令人赞叹的地图。"
+    },
+    {
+      "exampleId": "morph-example:692a96fdc1d0471a",
+      "sentence": "Her stamp collection includes several rare examples.",
+      "translationZh": "她的邮票收藏中有几枚稀有邮票。"
+    },
+    {
+      "exampleId": "morph-example:da8547a2a1b2b352",
+      "sentence": "The election will take place in November.",
+      "translationZh": "选举将于十一月举行。"
+    },
+    {
+      "exampleId": "morph-example:5f4288117f56b1bb",
+      "sentence": "Public transport became a major election issue.",
+      "translationZh": "公共交通成为了一个重要的选举议题。"
+    },
+    {
+      "exampleId": "morph-example:c216d863acf1bed8",
+      "sentence": "Her parents hold fairly liberal views.",
+      "translationZh": "她父母的观念相当开明。"
+    },
+    {
+      "exampleId": "morph-example:63032e7034e42a2b",
+      "sentence": "The party supports a liberal approach to social policy.",
+      "translationZh": "该党支持以开明的方式处理社会政策问题。"
+    },
+    {
+      "exampleId": "morph-example:645b21fc591984ba",
+      "sentence": "The debate concerns the balance between security and liberty.",
+      "translationZh": "这场辩论涉及安全与自由之间的平衡。"
+    },
+    {
+      "exampleId": "morph-example:2513449102656a52",
+      "sentence": "The law protects individual liberty.",
+      "translationZh": "这部法律保护个人自由。"
+    },
+    {
+      "exampleId": "morph-example:74048dfa3b72af70",
+      "sentence": "The reform aimed to liberate farmers from debt.",
+      "translationZh": "这项改革旨在使农民摆脱债务。"
+    },
+    {
+      "exampleId": "morph-example:b81c05aaacb626e6",
+      "sentence": "New technology can liberate workers from repetitive tasks.",
+      "translationZh": "新技术可以使工人摆脱重复性劳动。"
+    },
+    {
+      "exampleId": "morph-example:878fc03286ec12c9",
+      "sentence": "The region has considerable linguistic diversity.",
+      "translationZh": "该地区的语言具有相当大的多样性。"
+    },
+    {
+      "exampleId": "morph-example:05c96f4fa5285863",
+      "sentence": "The test measures several linguistic abilities.",
+      "translationZh": "这项测试测量多种语言能力。"
+    },
+    {
+      "exampleId": "morph-example:e0dc4aeae6b7abfb",
+      "sentence": "The school offers a bilingual education programme.",
+      "translationZh": "这所学校提供双语教育项目。"
+    },
+    {
+      "exampleId": "morph-example:c186037867cde919",
+      "sentence": "A bilingual guide helped the visitors understand the exhibition.",
+      "translationZh": "一位会两种语言的导游帮助游客理解了展览内容。"
+    },
+    {
+      "exampleId": "morph-example:5342dbbfb91da1dc",
+      "sentence": "The city provides multilingual information for new arrivals.",
+      "translationZh": "这座城市为新迁入者提供多种语言的信息。"
+    },
+    {
+      "exampleId": "morph-example:5574c9984872a7d8",
+      "sentence": "A multilingual team helped translate the survey.",
+      "translationZh": "一个多语种团队协助翻译了调查问卷。"
+    },
+    {
+      "exampleId": "morph-example:28c0b4a4296e2602",
+      "sentence": "A literal translation may sound unnatural.",
+      "translationZh": "直译听起来可能不自然。"
+    },
+    {
+      "exampleId": "morph-example:7d1adbdb9758ac62",
+      "sentence": "The phrase should not be understood in a literal sense.",
+      "translationZh": "不应按字面意思理解这个短语。"
+    },
+    {
+      "exampleId": "morph-example:522a796c094a1455",
+      "sentence": "She studied English literature at university.",
+      "translationZh": "她在大学学习了英国文学。"
+    },
+    {
+      "exampleId": "morph-example:8c78528bf7aa2b24",
+      "sentence": "The festival celebrates contemporary children's literature.",
+      "translationZh": "这个节庆活动旨在弘扬当代儿童文学。"
+    },
+    {
+      "exampleId": "morph-example:a7eb1fcdc1ef00bf",
+      "sentence": "Adult literacy improved after the programme was introduced.",
+      "translationZh": "该项目推出后，成年人的读写能力有所提高。"
+    },
+    {
+      "exampleId": "morph-example:40623e91bab18f31",
+      "sentence": "Digital literacy is increasingly important at work.",
+      "translationZh": "数字素养在工作中变得越来越重要。"
+    },
+    {
+      "exampleId": "morph-example:f4c635a564cdad31",
+      "sentence": "Local residents helped design the new park.",
+      "translationZh": "当地居民协助设计了这座新公园。"
+    },
+    {
+      "exampleId": "morph-example:e5ccbbb5674c1e3a",
+      "sentence": "The museum preserves local history.",
+      "translationZh": "这家博物馆保存着当地的历史。"
+    },
+    {
+      "exampleId": "morph-example:9388985cb3c3cfdb",
+      "sentence": "The map helps visitors locate the entrance.",
+      "translationZh": "这张地图帮助游客找到入口。"
+    },
+    {
+      "exampleId": "morph-example:5da99d2b3094aba2",
+      "sentence": "Engineers used sensors to locate the leak.",
+      "translationZh": "工程师们使用传感器找到了泄漏点。"
+    },
+    {
+      "exampleId": "morph-example:4493ad1ffa8bcea4",
+      "sentence": "The map shows the exact location.",
+      "translationZh": "地图标出了确切的位置。"
+    },
+    {
+      "exampleId": "morph-example:f02fbe6cd7bedae1",
+      "sentence": "The committee chose a more accessible location.",
+      "translationZh": "委员会选择了一个更便于到达的地点。"
+    },
+    {
+      "exampleId": "morph-example:6fbabac4d5551c9d",
+      "sentence": "The talks opened a dialogue between the two communities.",
+      "translationZh": "这些会谈开启了两个社区之间的对话。"
+    },
+    {
+      "exampleId": "morph-example:701ed719c865bd8b",
+      "sentence": "Constructive dialogue can help resolve disagreements.",
+      "translationZh": "建设性的对话有助于解决分歧。"
+    },
+    {
+      "exampleId": "morph-example:58081985b5c0ae52",
+      "sentence": "The actor delivered a powerful monologue.",
+      "translationZh": "这位演员表演了一段极具感染力的独白。"
+    },
+    {
+      "exampleId": "morph-example:f401e5d04fa6d93d",
+      "sentence": "The interview became a monologue rather than a discussion.",
+      "translationZh": "这次访谈变成了独白，而不是讨论。"
+    },
+    {
+      "exampleId": "morph-example:d206cafc4ad2014c",
+      "sentence": "The prologue establishes the historical setting.",
+      "translationZh": "序言交代了历史背景。"
+    },
+    {
+      "exampleId": "morph-example:cdc6dd4feb5d1a7a",
+      "sentence": "A brief prologue explains why the investigation began.",
+      "translationZh": "一段简短的序言解释了调查为何开始。"
+    },
+    {
+      "exampleId": "morph-example:c620f8b08da729c4",
+      "sentence": "The experiment may illuminate the causes of the disease.",
+      "translationZh": "这项实验或许能帮助阐明该疾病的成因。"
+    },
+    {
+      "exampleId": "morph-example:d4ffbfe6679186c1",
+      "sentence": "Historical records can illuminate the origins of the dispute.",
+      "translationZh": "历史记录有助于阐明这场争端的起源。"
+    },
+    {
+      "exampleId": "morph-example:87a76b53c033abfb",
+      "sentence": "Luminous signs mark the emergency exits.",
+      "translationZh": "发光标志标明了紧急出口的位置。"
+    },
+    {
+      "exampleId": "morph-example:5de7517645847e7c",
+      "sentence": "The researchers observed luminous organisms in the ocean.",
+      "translationZh": "研究人员观察了海洋中的发光生物。"
+    },
+    {
+      "exampleId": "morph-example:f823b97f86d476c8",
+      "sentence": "The building requires better illumination at night.",
+      "translationZh": "这座建筑在夜间需要更好的照明。"
+    },
+    {
+      "exampleId": "morph-example:0d2a9f690c6a64b1",
+      "sentence": "The discovery provided fresh illumination of the problem.",
+      "translationZh": "这一发现使人们对这个问题有了新的认识。"
+    },
+    {
+      "exampleId": "morph-example:5da9fb2faf7771de",
+      "sentence": "The factory still relies on manual labour for delicate tasks.",
+      "translationZh": "这家工厂的精细作业仍然依赖手工劳动。"
+    },
+    {
+      "exampleId": "morph-example:a7c0c039c9113441",
+      "sentence": "The new equipment reduces the need for manual sorting.",
+      "translationZh": "新设备减少了人工分拣的需要。"
+    },
+    {
+      "exampleId": "morph-example:1778e6e0eab3df6b",
+      "sentence": "The author sent her manuscript to the publisher.",
+      "translationZh": "这位作者把她的书稿寄给了出版商。"
+    },
+    {
+      "exampleId": "morph-example:a180a65fc16d7377",
+      "sentence": "The library displays a medieval manuscript in a protected case.",
+      "translationZh": "图书馆在一个带有防护措施的展柜中陈列着一份中世纪手稿。"
+    },
+    {
+      "exampleId": "morph-example:b9c4c133f57b67ff",
+      "sentence": "Plastic waste threatens marine ecosystems.",
+      "translationZh": "塑料废弃物威胁着海洋生态系统。"
+    },
+    {
+      "exampleId": "morph-example:e0a0b1534354e268",
+      "sentence": "The team studied marine life around the reef.",
+      "translationZh": "该团队研究了珊瑚礁周围的海洋生物。"
+    },
+    {
+      "exampleId": "morph-example:e74d32ac4189215f",
+      "sentence": "The port has a long maritime history.",
+      "translationZh": "这个港口有着悠久的海事历史。"
+    },
+    {
+      "exampleId": "morph-example:2905e3dcec655d2d",
+      "sentence": "The agreement improves maritime safety.",
+      "translationZh": "这项协议提高了海上安全水平。"
+    },
+    {
+      "exampleId": "morph-example:9e56cda0c4d7771f",
+      "sentence": "The submarine returned to the surface near the island.",
+      "translationZh": "潜艇在岛屿附近重新浮出水面。"
+    },
+    {
+      "exampleId": "morph-example:d3a3c5d21b0eb589",
+      "sentence": "Researchers used a submarine to inspect the seabed.",
+      "translationZh": "研究人员使用潜艇考察了海床。"
+    },
+    {
+      "exampleId": "morph-example:4c673c6ea0e9ab45",
+      "sentence": "An independent expert was invited to mediate the dispute.",
+      "translationZh": "一位独立专家应邀调解这场纠纷。"
+    },
+    {
+      "exampleId": "morph-example:ff81f5c5907e5c28",
+      "sentence": "The council offered to mediate between the residents and the developer.",
+      "translationZh": "市政委员会表示愿意在居民与开发商之间进行调解。"
+    },
+    {
+      "exampleId": "morph-example:fbc725ab7399bb5b",
+      "sentence": "Radio remains an important medium for public information.",
+      "translationZh": "广播仍然是传播公共信息的重要媒介。"
+    },
+    {
+      "exampleId": "morph-example:0ec324c9ec15033f",
+      "sentence": "The artist used film as a medium for exploring memory.",
+      "translationZh": "这位艺术家以电影为媒介探索记忆这一主题。"
+    },
+    {
+      "exampleId": "morph-example:75b6d6fc3387246b",
+      "sentence": "The train stops at three intermediate stations.",
+      "translationZh": "这趟列车在途中停靠三个车站。"
+    },
+    {
+      "exampleId": "morph-example:0bd6652a032d2066",
+      "sentence": "This class is suitable for learners at an intermediate level.",
+      "translationZh": "这门课适合中等水平的学习者。"
+    },
+    {
+      "exampleId": "morph-example:a7c80d859a518f2e",
+      "sentence": "Her earliest memory was of a seaside holiday.",
+      "translationZh": "她最早的记忆是一次海滨度假。"
+    },
+    {
+      "exampleId": "morph-example:9b6f6c9483d81440",
+      "sentence": "The photograph brought back a happy memory.",
+      "translationZh": "这张照片勾起了一段快乐的回忆。"
+    },
+    {
+      "exampleId": "morph-example:9c07e3e521803f11",
+      "sentence": "The visit was a memorable part of her education.",
+      "translationZh": "这次参观是她受教育经历中难忘的一部分。"
+    },
+    {
+      "exampleId": "morph-example:6351ee6117a27a08",
+      "sentence": "A memorable example can make an argument clearer.",
+      "translationZh": "一个令人印象深刻的例子可以使论点更清晰。"
+    },
+    {
+      "exampleId": "morph-example:101ecaebeca587cc",
+      "sentence": "A memorial stands beside the old railway station.",
+      "translationZh": "旧火车站旁矗立着一座纪念碑。"
+    },
+    {
+      "exampleId": "morph-example:f32f652c9f027ec9",
+      "sentence": "The town held a memorial for the victims.",
+      "translationZh": "这个镇为遇难者举行了一场纪念活动。"
+    },
+    {
+      "exampleId": "morph-example:2772951f8ab68176",
+      "sentence": "The laboratory uses metric units.",
+      "translationZh": "这家实验室使用公制单位。"
+    },
+    {
+      "exampleId": "morph-example:f6d63a904bfe4ce7",
+      "sentence": "All measurements must be recorded on a metric scale.",
+      "translationZh": "所有测量结果都必须以公制单位记录。"
+    },
+    {
+      "exampleId": "morph-example:2da4f46121f9da02",
+      "sentence": "The pipe has a diameter of ten centimetres.",
+      "translationZh": "这根管子的直径为十厘米。"
+    },
+    {
+      "exampleId": "morph-example:a497dab6bab8c4e3",
+      "sentence": "Measure the diameter of the circle through its centre.",
+      "translationZh": "请经过圆心测量这个圆的直径。"
+    },
+    {
+      "exampleId": "morph-example:394a85b2d02dc645",
+      "sentence": "The thermometer recorded a sharp fall in temperature.",
+      "translationZh": "温度计记录到温度急剧下降。"
+    },
+    {
+      "exampleId": "morph-example:8a6d967ae2215dfd",
+      "sentence": "Place the thermometer away from direct sunlight.",
+      "translationZh": "请将温度计放在阳光无法直射的地方。"
+    },
+    {
+      "exampleId": "morph-example:a868e7b77c16080f",
+      "sentence": "Many birds migrate south for the winter.",
+      "translationZh": "许多鸟类会向南迁徙过冬。"
+    },
+    {
+      "exampleId": "morph-example:8268a561c82b8b23",
+      "sentence": "Young workers often migrate to larger cities.",
+      "translationZh": "年轻劳动者经常迁往更大的城市。"
+    },
+    {
+      "exampleId": "morph-example:f239ef05d7852cd8",
+      "sentence": "The study traces migration from rural areas.",
+      "translationZh": "这项研究追踪了人们从农村地区迁出的情况。"
+    },
+    {
+      "exampleId": "morph-example:4c2c3de303442516",
+      "sentence": "The reserve lies on a major bird migration route.",
+      "translationZh": "这片保护区位于一条重要的鸟类迁徙路线上。"
+    },
+    {
+      "exampleId": "morph-example:d88711a655c2d068",
+      "sentence": "The interview follows an immigrant building a new life abroad.",
+      "translationZh": "这段访谈记录了一位移民在国外建立新生活的经历。"
+    },
+    {
+      "exampleId": "morph-example:80570c733a840810",
+      "sentence": "She arrived as an immigrant and later opened a successful shop.",
+      "translationZh": "她以移民身份来到这里，后来开了一家生意兴隆的商店。"
+    },
+    {
+      "exampleId": "morph-example:bf3a837ffca008a5",
+      "sentence": "The station will transmit the programme tonight.",
+      "translationZh": "这个电台今晚将播出该节目。"
+    },
+    {
+      "exampleId": "morph-example:a8516556e4d130c3",
+      "sentence": "The sensors transmit readings to a central computer.",
+      "translationZh": "传感器将读数传输到一台中央计算机。"
+    },
+    {
+      "exampleId": "morph-example:30ba541216407ee9",
+      "sentence": "The team began a difficult rescue mission.",
+      "translationZh": "该团队开始执行一项艰巨的救援任务。"
+    },
+    {
+      "exampleId": "morph-example:244c646bfee210a6",
+      "sentence": "Her mission was to document local traditions.",
+      "translationZh": "她的任务是记录当地传统。"
+    },
+    {
+      "exampleId": "morph-example:ae5480db398188b0",
+      "sentence": "The filter reduced the emission of smoke.",
+      "translationZh": "过滤器减少了烟雾排放。"
+    },
+    {
+      "exampleId": "morph-example:31fed1e8f736be1f",
+      "sentence": "The detector recorded a brief emission of radiation.",
+      "translationZh": "探测器记录到一次短暂的辐射释放。"
+    },
+    {
+      "exampleId": "morph-example:fdef0e2b767514a1",
+      "sentence": "A mobile clinic visits remote communities.",
+      "translationZh": "一家流动诊所前往偏远社区提供服务。"
+    },
+    {
+      "exampleId": "morph-example:992ba9df3265b139",
+      "sentence": "The equipment is mounted on a mobile platform.",
+      "translationZh": "这套设备安装在一个可移动的平台上。"
+    },
+    {
+      "exampleId": "morph-example:39f1731a8afd9ede",
+      "sentence": "The lift improves mobility within the building.",
+      "translationZh": "电梯使人们在楼内移动更加方便。"
+    },
+    {
+      "exampleId": "morph-example:dcce82b76d6b98f1",
+      "sentence": "The survey examines labour mobility between regions.",
+      "translationZh": "这项调查考察不同地区之间的劳动力流动情况。"
+    },
+    {
+      "exampleId": "morph-example:2a2cd6f7d4dc21ad",
+      "sentence": "The camera records the motion of the waves.",
+      "translationZh": "摄像机记录着波浪的运动。"
+    },
+    {
+      "exampleId": "morph-example:11222d63a7c9f0bb",
+      "sentence": "A smooth circular motion keeps the mixture moving.",
+      "translationZh": "平稳的圆周运动使混合物保持流动。"
+    },
+    {
+      "exampleId": "morph-example:363e4aa72b646d47",
+      "sentence": "The study compares the morphology of closely related plant species.",
+      "translationZh": "这项研究比较了亲缘关系密切的植物物种的形态。"
+    },
+    {
+      "exampleId": "morph-example:372c4c82017f49f9",
+      "sentence": "Changes in leaf morphology help the plants survive in dry conditions.",
+      "translationZh": "叶片形态的变化有助于这些植物在干旱条件下生存。"
+    },
+    {
+      "exampleId": "morph-example:fa537a60bf6cf67b",
+      "sentence": "The two species show clear morphological differences.",
+      "translationZh": "这两个物种在形态上存在明显差异。"
+    },
+    {
+      "exampleId": "morph-example:8ccf72bc0b910c0f",
+      "sentence": "The researchers recorded morphological changes in the leaves.",
+      "translationZh": "研究人员记录了叶片的形态变化。"
+    },
+    {
+      "exampleId": "morph-example:08e673141040482f",
+      "sentence": "The caterpillar undergoes metamorphosis before becoming a butterfly.",
+      "translationZh": "毛毛虫在变成蝴蝶之前会经历变态发育。"
+    },
+    {
+      "exampleId": "morph-example:5f8ddc1c335e83e8",
+      "sentence": "The district has experienced a remarkable metamorphosis.",
+      "translationZh": "这个地区经历了显著的蜕变。"
+    },
+    {
+      "exampleId": "morph-example:bcb544045ea2b61a",
+      "sentence": "The poem reminds readers that humans are mortal.",
+      "translationZh": "这首诗提醒读者，人终有一死。"
+    },
+    {
+      "exampleId": "morph-example:b50b53fb4d4a8e3f",
+      "sentence": "The character discovers that even the heroes are mortal.",
+      "translationZh": "这个人物发现，即使是英雄也终有一死。"
+    },
+    {
+      "exampleId": "morph-example:4a4d33593bc76e0e",
+      "sentence": "The poem reflects on human mortality.",
+      "translationZh": "这首诗思索了人类生命终有尽头这一事实。"
+    },
+    {
+      "exampleId": "morph-example:8130a1824f435776",
+      "sentence": "The experience forced him to confront his own mortality.",
+      "translationZh": "这段经历迫使他直面自己终将死去这一事实。"
+    },
+    {
+      "exampleId": "morph-example:3cf66cec3374581c",
+      "sentence": "The story describes an immortal ruler.",
+      "translationZh": "这个故事描写了一位长生不死的统治者。"
+    },
+    {
+      "exampleId": "morph-example:9123baaf8b207c62",
+      "sentence": "The poet hoped that his work would make his name immortal.",
+      "translationZh": "这位诗人希望自己的作品能使他的名字永垂不朽。"
+    },
+    {
+      "exampleId": "morph-example:1ba0cf42aee42236",
+      "sentence": "The team developed a novel method for storing energy.",
+      "translationZh": "该团队开发了一种新颖的储能方法。"
+    },
+    {
+      "exampleId": "morph-example:9813bc89f1cf2c62",
+      "sentence": "The study offers a novel explanation for the pattern.",
+      "translationZh": "这项研究为这一规律提供了一种新颖的解释。"
+    },
+    {
+      "exampleId": "morph-example:6dee5e5f16bcebdb",
+      "sentence": "The project offers an innovative approach to water conservation.",
+      "translationZh": "这个项目提供了一种创新的节水方法。"
+    },
+    {
+      "exampleId": "morph-example:14630659aa4c7454",
+      "sentence": "Innovative teaching methods can encourage participation.",
+      "translationZh": "创新的教学方法能够鼓励学生参与。"
+    },
+    {
+      "exampleId": "morph-example:8a4eaa308d37c32c",
+      "sentence": "The novelty of the device attracted early customers.",
+      "translationZh": "这款设备的新奇之处吸引了最初一批顾客。"
+    },
+    {
+      "exampleId": "morph-example:3cb111db0837950f",
+      "sentence": "After a few weeks the novelty began to fade.",
+      "translationZh": "几个星期后，新鲜感开始消退。"
+    },
+    {
+      "exampleId": "morph-example:4afaaaee28504198",
+      "sentence": "The plan attracted numerous objections.",
+      "translationZh": "这个计划引来了许多反对意见。"
+    },
+    {
+      "exampleId": "morph-example:695c4857d50c7774",
+      "sentence": "The archive contains numerous photographs of the old town.",
+      "translationZh": "档案馆保存着大量老城区的照片。"
+    },
+    {
+      "exampleId": "morph-example:4d6fc8299d754a6e",
+      "sentence": "The report presents the findings in numerical form.",
+      "translationZh": "这份报告以数字形式呈现了研究发现。"
+    },
+    {
+      "exampleId": "morph-example:f6343a720f81cdda",
+      "sentence": "Students checked the numerical values in the table.",
+      "translationZh": "学生们核对了表格中的数值。"
+    },
+    {
+      "exampleId": "morph-example:8c55ac2671434853",
+      "sentence": "The report will enumerate the risks of each option.",
+      "translationZh": "报告将逐一列举每种方案的风险。"
+    },
+    {
+      "exampleId": "morph-example:102350299757da3c",
+      "sentence": "Please enumerate the main reasons for your decision.",
+      "translationZh": "请逐一列举你作出这一决定的主要理由。"
+    },
+    {
+      "exampleId": "morph-example:338525f512aef5cb",
+      "sentence": "The appeal attracted public sympathy for the families.",
+      "translationZh": "这次呼吁引起了公众对这些家庭的同情。"
+    },
+    {
+      "exampleId": "morph-example:426ea84a1f338e12",
+      "sentence": "She expressed sympathy for those who had lost their jobs.",
+      "translationZh": "她向那些已经失业的人表达了同情。"
+    },
+    {
+      "exampleId": "morph-example:936d9b0284ff708d",
+      "sentence": "The training encourages empathy with patients.",
+      "translationZh": "这项培训鼓励人们设身处地地理解患者。"
+    },
+    {
+      "exampleId": "morph-example:029347d6a17fc90a",
+      "sentence": "Reading fiction may help children develop empathy.",
+      "translationZh": "阅读小说可能有助于儿童培养共情能力。"
+    },
+    {
+      "exampleId": "morph-example:9d21460065340c5b",
+      "sentence": "The samples were sent to the pathology department.",
+      "translationZh": "这些样本被送到了病理科。"
+    },
+    {
+      "exampleId": "morph-example:1667231a5fdc9977",
+      "sentence": "The lecture explains the pathology of the condition.",
+      "translationZh": "这场讲座解释了这种疾病的病理机制。"
+    },
+    {
+      "exampleId": "morph-example:028deb8cabdb29bf",
+      "sentence": "A pedestrian crossed the road at the lights.",
+      "translationZh": "一名行人在交通信号灯处穿过了马路。"
+    },
+    {
+      "exampleId": "morph-example:330855e57f5a624d",
+      "sentence": "The new bridge provides a safe route for every pedestrian.",
+      "translationZh": "这座新桥为每一位行人提供了一条安全的通行路线。"
+    },
+    {
+      "exampleId": "morph-example:7c081c08e7a20354",
+      "sentence": "Press the pedal gently to slow the machine.",
+      "translationZh": "轻轻踩下踏板，让机器减速。"
+    },
+    {
+      "exampleId": "morph-example:96a36a9e759abcde",
+      "sentence": "The bicycle has a damaged pedal.",
+      "translationZh": "这辆自行车有一个损坏的踏板。"
+    },
+    {
+      "exampleId": "morph-example:2ad99fc8214ce629",
+      "sentence": "The expedition collected samples from the glacier.",
+      "translationZh": "考察队从冰川采集了样本。"
+    },
+    {
+      "exampleId": "morph-example:bafff16ea0fe73ec",
+      "sentence": "Funding for the scientific expedition was approved.",
+      "translationZh": "这次科学考察的经费获得了批准。"
+    },
+    {
+      "exampleId": "morph-example:61ec949c8447dd15",
+      "sentence": "A public telephone stood outside the station.",
+      "translationZh": "车站外设有一部公用电话。"
+    },
+    {
+      "exampleId": "morph-example:e994a41816cbef92",
+      "sentence": "The office telephone rang during the meeting.",
+      "translationZh": "开会时，办公室的电话响了。"
+    },
+    {
+      "exampleId": "morph-example:ef76c4ffab95780b",
+      "sentence": "The dictionary provides a phonetic transcription.",
+      "translationZh": "这本词典提供了音标标注。"
+    },
+    {
+      "exampleId": "morph-example:0f597148c547a2f3",
+      "sentence": "Students compared the phonetic features of two accents.",
+      "translationZh": "学生们比较了两种口音的语音特征。"
+    },
+    {
+      "exampleId": "morph-example:5d1a356f0156cb55",
+      "sentence": "The speaker adjusted the microphone before the lecture.",
+      "translationZh": "演讲者在讲座开始前调整了麦克风。"
+    },
+    {
+      "exampleId": "morph-example:55d33d1ce2baa489",
+      "sentence": "A microphone recorded the calls of the birds.",
+      "translationZh": "一支麦克风录下了鸟的鸣叫声。"
+    },
+    {
+      "exampleId": "morph-example:9ceb52be50c21cb7",
+      "sentence": "Photosynthesis removes carbon dioxide from the atmosphere.",
+      "translationZh": "光合作用从大气中吸收二氧化碳。"
+    },
+    {
+      "exampleId": "morph-example:a70ba50170e9353a",
+      "sentence": "The experiment measures the rate of photosynthesis.",
+      "translationZh": "这项实验测量光合作用的速率。"
+    },
+    {
+      "exampleId": "morph-example:49bd150c8bf9401b",
+      "sentence": "The archive contains valuable photographic records.",
+      "translationZh": "档案馆保存着珍贵的照片记录。"
+    },
+    {
+      "exampleId": "morph-example:53aed50e6d528eb9",
+      "sentence": "She developed her photographic skills during the course.",
+      "translationZh": "她在课程学习期间提高了自己的摄影技能。"
+    },
+    {
+      "exampleId": "morph-example:93ed243f3bb51d99",
+      "sentence": "Trucks transport fresh produce overnight.",
+      "translationZh": "卡车在夜间运输新鲜农产品。"
+    },
+    {
+      "exampleId": "morph-example:9b8b17789ff95630",
+      "sentence": "Special containers transport the fragile instruments safely.",
+      "translationZh": "专用集装箱安全地运送这些易损仪器。"
+    },
+    {
+      "exampleId": "morph-example:08c055fdc6e7e981",
+      "sentence": "The island must import most of its fuel.",
+      "translationZh": "这座岛屿的大部分燃料必须依靠进口。"
+    },
+    {
+      "exampleId": "morph-example:c09fb4fb49b687be",
+      "sentence": "Local shops import coffee from several countries.",
+      "translationZh": "当地商店从几个国家进口咖啡。"
+    },
+    {
+      "exampleId": "morph-example:943c7b7cd05ac39e",
+      "sentence": "The clinic uses a portable scanner.",
+      "translationZh": "这家诊所使用一台便携式扫描仪。"
+    },
+    {
+      "exampleId": "morph-example:fffbded6da115342",
+      "sentence": "Portable equipment is essential for field research.",
+      "translationZh": "便携式设备对于野外研究必不可少。"
+    },
+    {
+      "exampleId": "morph-example:6c8177b09c5adee9",
+      "sentence": "Mark the position of each sample on the map.",
+      "translationZh": "请在地图上标出每个样本的位置。"
+    },
+    {
+      "exampleId": "morph-example:3b107d7ac74a1942",
+      "sentence": "The sensor must stay in the same position.",
+      "translationZh": "传感器必须保持在同一个位置。"
+    },
+    {
+      "exampleId": "morph-example:e2d575a32be5e861",
+      "sentence": "Students were asked to compose a short poem.",
+      "translationZh": "学生们被要求创作一首短诗。"
+    },
+    {
+      "exampleId": "morph-example:a0cba2c24c63c48e",
+      "sentence": "The musician will compose a new piece for the festival.",
+      "translationZh": "这位音乐家将为艺术节创作一首新曲。"
+    },
+    {
+      "exampleId": "morph-example:1ac7af86da5496ba",
+      "sentence": "We paid a deposit to reserve the apartment.",
+      "translationZh": "我们支付了一笔订金，以预订这套公寓。"
+    },
+    {
+      "exampleId": "morph-example:c2d3680af2dd60a8",
+      "sentence": "The supplier requires a deposit before manufacturing can begin.",
+      "translationZh": "供应商要求先支付订金，然后才能开始生产。"
+    },
+    {
+      "exampleId": "morph-example:87a6fc496511f935",
+      "sentence": "She studied psychology before becoming a researcher.",
+      "translationZh": "她在成为研究人员之前学习过心理学。"
+    },
+    {
+      "exampleId": "morph-example:be38d13dccee9884",
+      "sentence": "The course explores the psychology of decision making.",
+      "translationZh": "这门课程探讨决策过程中的心理机制。"
+    },
+    {
+      "exampleId": "morph-example:ba0b235de45ab530",
+      "sentence": "The study examined the psychological effects of isolation.",
+      "translationZh": "这项研究考察了隔离对心理的影响。"
+    },
+    {
+      "exampleId": "morph-example:a0bf5b6ceb92b2a8",
+      "sentence": "The interview included questions about psychological well-being.",
+      "translationZh": "访谈中包含了有关心理健康状况的问题。"
+    },
+    {
+      "exampleId": "morph-example:a2cb9220af16ac81",
+      "sentence": "A psychiatrist assessed the patient's symptoms.",
+      "translationZh": "一位精神科医生评估了这名患者的症状。"
+    },
+    {
+      "exampleId": "morph-example:e727a653631325ce",
+      "sentence": "The team includes a psychologist and a psychiatrist.",
+      "translationZh": "团队中包括一位心理学家和一位精神科医生。"
+    },
+    {
+      "exampleId": "morph-example:b7bcfe375015e43a",
+      "sentence": "A sudden rupture in the pipeline released oil into the river.",
+      "translationZh": "管道突然破裂，导致石油泄入河流。"
+    },
+    {
+      "exampleId": "morph-example:cf8a874c12a354b6",
+      "sentence": "Engineers designed the tank to resist rupture under pressure.",
+      "translationZh": "工程师设计了这个储罐，使其在承压时不易破裂。"
+    },
+    {
+      "exampleId": "morph-example:17b3ea1a9d5a3727",
+      "sentence": "Please do not interrupt the speaker until the presentation ends.",
+      "translationZh": "请不要打断演讲者，等到演讲结束再发言。"
+    },
+    {
+      "exampleId": "morph-example:398e7dc64c6f196c",
+      "sentence": "A power failure can interrupt the production process.",
+      "translationZh": "停电可能导致生产过程中断。"
+    },
+    {
+      "exampleId": "morph-example:2180b36c03c262b5",
+      "sentence": "Severe weather can disrupt transport networks.",
+      "translationZh": "恶劣天气可能扰乱交通网络的运行。"
+    },
+    {
+      "exampleId": "morph-example:0ff8ed662bce0a60",
+      "sentence": "Frequent equipment failures disrupt the laboratory's work.",
+      "translationZh": "设备频繁发生故障，扰乱了实验室的工作。"
+    },
+    {
+      "exampleId": "morph-example:32599a9b58246656",
+      "sentence": "Signs direct drivers towards the temporary entrance.",
+      "translationZh": "指示牌引导驾驶员前往临时入口。"
+    },
+    {
+      "exampleId": "morph-example:8b80ceda8a05687a",
+      "sentence": "The supervisor will direct staff to their work areas.",
+      "translationZh": "主管将指引员工前往各自的工作区域。"
+    },
+    {
+      "exampleId": "morph-example:74c4f9113569797a",
+      "sentence": "Check that the address is correct.",
+      "translationZh": "请检查地址是否正确。"
+    },
+    {
+      "exampleId": "morph-example:b7f171f91a862af7",
+      "sentence": "Only one answer is correct in this exercise.",
+      "translationZh": "这道练习题只有一个答案是正确的。"
+    },
+    {
+      "exampleId": "morph-example:bcae6524680e0cd8",
+      "sentence": "Local authorities regulate the use of public parks.",
+      "translationZh": "地方政府对公共公园的使用进行管理。"
+    },
+    {
+      "exampleId": "morph-example:9ab2aa296eeb1417",
+      "sentence": "The new rules regulate how factories dispose of waste.",
+      "translationZh": "新规定对工厂如何处置废物作出了规范。"
+    },
+    {
+      "exampleId": "morph-example:99c04648e90652e1",
+      "sentence": "The equipment needs regular maintenance.",
+      "translationZh": "这台设备需要定期维护。"
+    },
+    {
+      "exampleId": "morph-example:2f58083ad01b8ab0",
+      "sentence": "She makes regular visits to the library.",
+      "translationZh": "她经常去图书馆。"
+    },
+    {
+      "exampleId": "morph-example:384502fa88b1ba96",
+      "sentence": "Draw a rectangle around the relevant section.",
+      "translationZh": "请在相关部分的周围画一个矩形框。"
+    },
+    {
+      "exampleId": "morph-example:743fdd644ff58271",
+      "sentence": "The garden forms a narrow rectangle.",
+      "translationZh": "这座花园呈狭长的矩形。"
+    },
+    {
+      "exampleId": "morph-example:ce8d9e65ce8ea2fb",
+      "sentence": "Please describe the changes shown in the diagram.",
+      "translationZh": "请描述图中显示的变化。"
+    },
+    {
+      "exampleId": "morph-example:d095308944af8061",
+      "sentence": "The report will describe the testing procedure.",
+      "translationZh": "报告将描述测试流程。"
+    },
+    {
+      "exampleId": "morph-example:47a75e8fc17317ca",
+      "sentence": "The regulations prescribe minimum safety standards.",
+      "translationZh": "这些法规规定了最低安全标准。"
+    },
+    {
+      "exampleId": "morph-example:bc3ab7fab616f48e",
+      "sentence": "The contract will prescribe how the data may be used.",
+      "translationZh": "合同将规定这些数据可以如何使用。"
+    },
+    {
+      "exampleId": "morph-example:6adaafbd2170e928",
+      "sentence": "This section of the report covers costs.",
+      "translationZh": "报告的这一部分涉及成本。"
+    },
+    {
+      "exampleId": "morph-example:db6a9197e930e9b3",
+      "sentence": "The quiet section of the library is upstairs.",
+      "translationZh": "图书馆的安静区在楼上。"
+    },
+    {
+      "exampleId": "morph-example:6032f03520961fe2",
+      "sentence": "Students dissect a flower to identify its structures.",
+      "translationZh": "学生们通过解剖一朵花来辨认其各个结构。"
+    },
+    {
+      "exampleId": "morph-example:dfc51f6e058dd11f",
+      "sentence": "The essay will dissect the assumptions behind the policy.",
+      "translationZh": "这篇文章将详细剖析该政策背后的假设。"
+    },
+    {
+      "exampleId": "morph-example:ecc7f942f7030806",
+      "sentence": "Traffic lights were installed at the intersection.",
+      "translationZh": "这个交叉路口安装了交通信号灯。"
+    },
+    {
+      "exampleId": "morph-example:b6df351fce0adb1f",
+      "sentence": "The study explores the intersection of law and technology.",
+      "translationZh": "这项研究探讨法律与技术的交叉领域。"
+    },
+    {
+      "exampleId": "morph-example:2f5591774cb066df",
+      "sentence": "Some animals can sense changes in air pressure.",
+      "translationZh": "有些动物能够感知气压的变化。"
+    },
+    {
+      "exampleId": "morph-example:838dbf16a072b1db",
+      "sentence": "The device can sense movement in darkness.",
+      "translationZh": "这台设备能够在黑暗中感知移动。"
+    },
+    {
+      "exampleId": "morph-example:c11ba699f149ddef",
+      "sentence": "Taking a spare battery was a sensible precaution.",
+      "translationZh": "带上一块备用电池是一项明智的预防措施。"
+    },
+    {
+      "exampleId": "morph-example:750d0a0651e28ca0",
+      "sentence": "The committee proposed a sensible compromise.",
+      "translationZh": "委员会提出了一个合理的折中方案。"
+    },
+    {
+      "exampleId": "morph-example:6090cd806e8c4f79",
+      "sentence": "The equipment is sensitive to changes in temperature.",
+      "translationZh": "这台设备对温度变化很敏感。"
+    },
+    {
+      "exampleId": "morph-example:4fe85fb2510e1a6a",
+      "sentence": "Her skin is sensitive to strong sunlight.",
+      "translationZh": "她的皮肤对强烈的阳光很敏感。"
+    },
+    {
+      "exampleId": "morph-example:bcc1138ba1e59f82",
+      "sentence": "Place the events in the correct sequence.",
+      "translationZh": "请将这些事件按正确的顺序排列。"
+    },
+    {
+      "exampleId": "morph-example:a661d6a4be505b37",
+      "sentence": "The machine follows a programmed sequence.",
+      "translationZh": "这台机器按照预先编好的程序顺序运行。"
+    },
+    {
+      "exampleId": "morph-example:ba2d19ddf334ad5d",
+      "sentence": "Flooding was an unexpected consequence of the development.",
+      "translationZh": "洪水是这项开发活动造成的意外后果。"
+    },
+    {
+      "exampleId": "morph-example:a5dafd44d5085fcc",
+      "sentence": "Every decision may have a wider consequence.",
+      "translationZh": "每一个决定都可能产生更广泛的影响。"
+    },
+    {
+      "exampleId": "morph-example:f186254503b561ae",
+      "sentence": "The first trial failed, but subsequent attempts succeeded.",
+      "translationZh": "第一次试验失败了，但随后的尝试取得了成功。"
+    },
+    {
+      "exampleId": "morph-example:daca0cdc75a5528a",
+      "sentence": "The agreement shaped subsequent discussions.",
+      "translationZh": "这项协议影响了后续讨论的走向。"
+    },
+    {
+      "exampleId": "morph-example:01c8a582ce00903a",
+      "sentence": "The museum works to preserve local traditions.",
+      "translationZh": "这家博物馆致力于保护当地传统。"
+    },
+    {
+      "exampleId": "morph-example:de7d326341e2ed46",
+      "sentence": "Low temperatures help preserve these fragile samples.",
+      "translationZh": "低温有助于保存这些脆弱的样本。"
+    },
+    {
+      "exampleId": "morph-example:1002d83b38920013",
+      "sentence": "The charity funds wetland conservation along the coast.",
+      "translationZh": "这家慈善机构资助沿海湿地保护工作。"
+    },
+    {
+      "exampleId": "morph-example:3a1111aba4f7ca45",
+      "sentence": "Soil conservation became a priority after heavy rain damaged the farms.",
+      "translationZh": "暴雨损毁农田后，土壤保护成为了首要任务。"
+    },
+    {
+      "exampleId": "morph-example:26e0ff632da81fdd",
+      "sentence": "Please reserve a seat for the guest speaker.",
+      "translationZh": "请为特邀演讲嘉宾预留一个座位。"
+    },
+    {
+      "exampleId": "morph-example:a06e34efc2417a78",
+      "sentence": "The council will reserve part of the land for public use.",
+      "translationZh": "地方议会将留出部分土地供公众使用。"
+    },
+    {
+      "exampleId": "morph-example:inspect:1",
+      "sentence": "Engineers inspect the bridge for cracks every spring.",
+      "translationZh": "工程师们每年春天都会检查这座桥是否有裂缝。"
+    },
+    {
+      "exampleId": "morph-example:inspect:2",
+      "sentence": "The researchers inspect each sample before recording its weight.",
+      "translationZh": "研究人员在记录每个样本的重量之前，都会先检查样本。"
+    },
+    {
+      "exampleId": "morph-example:respect:1",
+      "sentence": "Researchers must respect the privacy of everyone in the study.",
+      "translationZh": "研究人员必须尊重每一位研究参与者的隐私。"
+    },
+    {
+      "exampleId": "morph-example:respect:2",
+      "sentence": "The new policy should respect the needs of local communities.",
+      "translationZh": "新政策应当尊重当地社区的需求。"
+    },
+    {
+      "exampleId": "morph-example:perspective:1",
+      "sentence": "The report examines the proposal from an environmental perspective.",
+      "translationZh": "这份报告从环境角度审视该提案。"
+    },
+    {
+      "exampleId": "morph-example:perspective:2",
+      "sentence": "Working abroad gave her a different perspective on education.",
+      "translationZh": "在国外工作的经历让她对教育有了不同的看法。"
+    },
+    {
+      "exampleId": "morph-example:0256a9d108c31191",
+      "sentence": "The exhibition may inspire visitors to try painting.",
+      "translationZh": "这场展览可能会激发参观者尝试绘画的兴趣。"
+    },
+    {
+      "exampleId": "morph-example:6a87431d1dff5bfc",
+      "sentence": "Her example helped inspire a new generation of scientists.",
+      "translationZh": "她的榜样作用激励了新一代科学家。"
+    },
+    {
+      "exampleId": "morph-example:918ccab92832d27f",
+      "sentence": "The permit will expire at the end of June.",
+      "translationZh": "这张许可证将于六月底到期。"
+    },
+    {
+      "exampleId": "morph-example:175428749fbca915",
+      "sentence": "Members receive a reminder before their subscriptions expire.",
+      "translationZh": "会员会在订阅到期前收到提醒。"
+    },
+    {
+      "exampleId": "morph-example:915e4f50e545b167",
+      "sentence": "Cellular respiration releases energy from nutrients.",
+      "translationZh": "细胞呼吸作用从营养物质中释放能量。"
+    },
+    {
+      "exampleId": "morph-example:31e578e551e0f9ff",
+      "sentence": "The experiment measured how temperature affected respiration in plant cells.",
+      "translationZh": "这项实验测量了温度对植物细胞呼吸作用的影响。"
+    },
+    {
+      "exampleId": "morph-example:47a751c5b5802bed",
+      "sentence": "The temperature remained stable throughout the test.",
+      "translationZh": "整个测试期间，温度始终保持稳定。"
+    },
+    {
+      "exampleId": "morph-example:c6dffd10aebd125c",
+      "sentence": "The bridge rests on stable foundations.",
+      "translationZh": "这座桥建在稳固的地基上。"
+    },
+    {
+      "exampleId": "morph-example:0c2c14f1ee7dbdfb",
+      "sentence": "The engineers tested the stability of the new platform.",
+      "translationZh": "工程师们测试了这个新平台的稳定性。"
+    },
+    {
+      "exampleId": "morph-example:fbecb3814cee1230",
+      "sentence": "The agreement brought greater stability to the organisation.",
+      "translationZh": "这项协议使该组织更加稳定。"
+    },
+    {
+      "exampleId": "morph-example:984a9ff57d08fa91",
+      "sentence": "The camera remained stationary throughout the experiment.",
+      "translationZh": "在整个实验过程中，相机始终保持静止。"
+    },
+    {
+      "exampleId": "morph-example:b673c7ae071d835a",
+      "sentence": "The train was stationary when the passengers boarded.",
+      "translationZh": "乘客上车时，火车处于静止状态。"
+    },
+    {
+      "exampleId": "morph-example:c3a2ed9812c978fb",
+      "sentence": "The diagram shows the structure of a leaf.",
+      "translationZh": "这张图展示了一片叶子的结构。"
+    },
+    {
+      "exampleId": "morph-example:2e3a4ba282647612",
+      "sentence": "The company changed its management structure.",
+      "translationZh": "这家公司改变了管理结构。"
+    },
+    {
+      "exampleId": "morph-example:85f3f4db4b811227",
+      "sentence": "The council will construct a new footbridge.",
+      "translationZh": "地方议会将修建一座新的人行桥。"
+    },
+    {
+      "exampleId": "morph-example:47cf502c620d0ada",
+      "sentence": "Students construct simple models from recycled materials.",
+      "translationZh": "学生们用回收材料制作简单的模型。"
+    },
+    {
+      "exampleId": "morph-example:449ac5a9897de780",
+      "sentence": "The fire caused the destruction of several old buildings.",
+      "translationZh": "火灾毁坏了几栋老建筑。"
+    },
+    {
+      "exampleId": "morph-example:4bae601e9510f85f",
+      "sentence": "The report documents the destruction of coastal habitats.",
+      "translationZh": "这份报告记录了沿海栖息地遭到的破坏。"
+    },
+    {
+      "exampleId": "morph-example:c452e2f1e61861ab",
+      "sentence": "Please contact the office if your plans change.",
+      "translationZh": "如果你的计划有变，请联系办公室。"
+    },
+    {
+      "exampleId": "morph-example:ed3761e6c213ec37",
+      "sentence": "Researchers will contact participants again after six months.",
+      "translationZh": "研究人员将在六个月后再次联系参与者。"
+    },
+    {
+      "exampleId": "morph-example:d9a4854a9f8f8e36",
+      "sentence": "The investment produced tangible benefits for residents.",
+      "translationZh": "这笔投资给居民带来了实实在在的好处。"
+    },
+    {
+      "exampleId": "morph-example:8446c9bd9c57eff7",
+      "sentence": "The researchers found little tangible evidence of progress.",
+      "translationZh": "研究人员几乎没有找到能证明取得进展的确凿证据。"
+    },
+    {
+      "exampleId": "morph-example:faa7f35f69570622",
+      "sentence": "The container survived the journey intact.",
+      "translationZh": "这个容器经过一路运输仍然完好无损。"
+    },
+    {
+      "exampleId": "morph-example:00d61cc39f932875",
+      "sentence": "Most of the historic building remains intact.",
+      "translationZh": "这座历史建筑的大部分仍然完好。"
+    },
+    {
+      "exampleId": "morph-example:fcdaf71c59843f58",
+      "sentence": "A temporary bridge restored access to the village.",
+      "translationZh": "一座临时桥使通往村庄的交通恢复了。"
+    },
+    {
+      "exampleId": "morph-example:87ff15a85ded06e5",
+      "sentence": "The museum moved into temporary accommodation.",
+      "translationZh": "博物馆搬进了临时场所。"
+    },
+    {
+      "exampleId": "morph-example:c778c14f158a6848",
+      "sentence": "The museum displays contemporary art from several countries.",
+      "translationZh": "博物馆展出了来自几个国家的当代艺术作品。"
+    },
+    {
+      "exampleId": "morph-example:3be7436275068a21",
+      "sentence": "The course examines contemporary debates about urban development.",
+      "translationZh": "这门课程探讨当今关于城市发展的争论。"
+    },
+    {
+      "exampleId": "morph-example:36c1a6a109f56e2b",
+      "sentence": "The study examines temporal changes in rainfall.",
+      "translationZh": "这项研究考察降雨量随时间发生的变化。"
+    },
+    {
+      "exampleId": "morph-example:dbdeed7943b3f13f",
+      "sentence": "The model includes both spatial and temporal variation.",
+      "translationZh": "这个模型同时考虑了空间和时间上的变化。"
+    },
+    {
+      "exampleId": "morph-example:fc910b9df48b6dba",
+      "sentence": "The treaty defined the limits of the territory.",
+      "translationZh": "这项条约明确了该领土的边界。"
+    },
+    {
+      "exampleId": "morph-example:0f05be342ade045e",
+      "sentence": "The expedition crossed unfamiliar territory.",
+      "translationZh": "考察队穿越了陌生的地域。"
+    },
+    {
+      "exampleId": "morph-example:ad6f0148c78597e2",
+      "sentence": "The survey compared marine and terrestrial habitats.",
+      "translationZh": "这项调查比较了海洋和陆地栖息地。"
+    },
+    {
+      "exampleId": "morph-example:b878da31f69d9bd5",
+      "sentence": "Terrestrial ecosystems are affected by rising temperatures.",
+      "translationZh": "陆地生态系统受到气温上升的影响。"
+    },
+    {
+      "exampleId": "morph-example:6c0ffa441ccbe8b5",
+      "sentence": "The rough terrain made travel difficult.",
+      "translationZh": "崎岖的地形使行进变得困难。"
+    },
+    {
+      "exampleId": "morph-example:8357c6219939a387",
+      "sentence": "The vehicle was designed for mountainous terrain.",
+      "translationZh": "这款车辆是为山地地形设计的。"
+    },
+    {
+      "exampleId": "morph-example:db1a2cde0b4dc82b",
+      "sentence": "The walls provide good thermal insulation.",
+      "translationZh": "这些墙壁具有良好的隔热性能。"
+    },
+    {
+      "exampleId": "morph-example:a960e03002ac07be",
+      "sentence": "The camera records thermal images of the building.",
+      "translationZh": "这台相机记录建筑物的热成像图像。"
+    },
+    {
+      "exampleId": "morph-example:a14aef8a2c982e87",
+      "sentence": "Bright flowers attract pollinating insects.",
+      "translationZh": "鲜艳的花朵会吸引传粉昆虫。"
+    },
+    {
+      "exampleId": "morph-example:a6b768c0fa10d1a5",
+      "sentence": "The exhibition will attract visitors from abroad.",
+      "translationZh": "这场展览将吸引来自国外的参观者。"
+    },
+    {
+      "exampleId": "morph-example:7270941f99170021",
+      "sentence": "The machine can extract juice from fresh fruit.",
+      "translationZh": "这台机器可以从新鲜水果中榨取果汁。"
+    },
+    {
+      "exampleId": "morph-example:77ffc83023838332",
+      "sentence": "Researchers extract useful information from the satellite images.",
+      "translationZh": "研究人员从卫星图像中提取有用的信息。"
+    },
+    {
+      "exampleId": "morph-example:042461dea7503a49",
+      "sentence": "Read the contract carefully before signing.",
+      "translationZh": "签署之前，请仔细阅读合同。"
+    },
+    {
+      "exampleId": "morph-example:13ca9408aa24f1c5",
+      "sentence": "The company won a contract to repair roads.",
+      "translationZh": "这家公司获得了一份道路维修合同。"
+    },
+    {
+      "exampleId": "morph-example:d5d3aa170ad394c7",
+      "sentence": "The council will convene a meeting next week.",
+      "translationZh": "地方议会将在下周召集一次会议。"
+    },
+    {
+      "exampleId": "morph-example:9b56770262cbfadd",
+      "sentence": "The committee will convene to discuss the findings.",
+      "translationZh": "委员会将召开会议讨论研究结果。"
+    },
+    {
+      "exampleId": "morph-example:0a81680f35e0f607",
+      "sentence": "The annual convention brings together local business owners.",
+      "translationZh": "一年一度的大会将当地企业主聚集在一起。"
+    },
+    {
+      "exampleId": "morph-example:9f520ce4a340007a",
+      "sentence": "She presented her research at a professional convention.",
+      "translationZh": "她在一次专业会议上介绍了自己的研究。"
+    },
+    {
+      "exampleId": "morph-example:e5182024a00e6861",
+      "sentence": "Early intervention helped prevent further damage.",
+      "translationZh": "早期干预有助于防止进一步的损害。"
+    },
+    {
+      "exampleId": "morph-example:4880b2e78964167c",
+      "sentence": "The dispute was resolved without government intervention.",
+      "translationZh": "这起争端在没有政府干预的情况下得到了解决。"
+    },
+    {
+      "exampleId": "morph-example:450393bc34516097",
+      "sentence": "Researchers must verify the results independently.",
+      "translationZh": "研究人员必须独立核实这些结果。"
+    },
+    {
+      "exampleId": "morph-example:8c42884d1b4a2f86",
+      "sentence": "Please verify the figures before publishing the report.",
+      "translationZh": "发布报告之前，请核实这些数字。"
+    },
+    {
+      "exampleId": "morph-example:0367f199d167c37f",
+      "sentence": "The documents cast doubt on the witness's veracity.",
+      "translationZh": "这些文件使人们对证人陈述的真实性产生了怀疑。"
+    },
+    {
+      "exampleId": "morph-example:0643f750df6bc125",
+      "sentence": "Independent evidence supported the veracity of the account.",
+      "translationZh": "独立证据支持了这份叙述的真实性。"
+    },
+    {
+      "exampleId": "morph-example:f46f0143ed2cca4e",
+      "sentence": "The jury returned a verdict after three days.",
+      "translationZh": "陪审团在三天后作出了裁决。"
+    },
+    {
+      "exampleId": "morph-example:e34b302398a81911",
+      "sentence": "The final verdict on the policy will depend on its results.",
+      "translationZh": "对这项政策的最终评价将取决于其成效。"
+    },
+    {
+      "exampleId": "morph-example:b78b73c5c99c7c03",
+      "sentence": "The lighthouse is visible from the beach.",
+      "translationZh": "从海滩上可以看见这座灯塔。"
+    },
+    {
+      "exampleId": "morph-example:de36f35b62e5fcdc",
+      "sentence": "There was a visible improvement in the water quality.",
+      "translationZh": "水质有了明显改善。"
+    },
+    {
+      "exampleId": "morph-example:dae9ac208a864821",
+      "sentence": "The injury temporarily affected her vision.",
+      "translationZh": "这次受伤暂时影响了她的视力。"
+    },
+    {
+      "exampleId": "morph-example:2d2e7cb03f756c62",
+      "sentence": "Some animals have excellent night vision.",
+      "translationZh": "有些动物具有极佳的夜视能力。"
+    },
+    {
+      "exampleId": "morph-example:a3b63ab42ada5874",
+      "sentence": "The evidence supports a link between exercise and better sleep.",
+      "translationZh": "这些证据支持运动与睡眠改善之间存在关联这一观点。"
+    },
+    {
+      "exampleId": "morph-example:69c179e7e641fed2",
+      "sentence": "Police found no evidence of forced entry.",
+      "translationZh": "警方没有发现强行进入的证据。"
+    },
+    {
+      "exampleId": "morph-example:cd4c0994819ee129",
+      "sentence": "Residents became increasingly vocal in their opposition.",
+      "translationZh": "居民们越来越公开地表达反对意见。"
+    },
+    {
+      "exampleId": "morph-example:59cb929bbf6818d2",
+      "sentence": "The proposal met resistance from a vocal group of local campaigners.",
+      "translationZh": "该提案遭到了一群积极发声的当地活动人士的抵制。"
+    },
+    {
+      "exampleId": "morph-example:e1f0749dfa289d26",
+      "sentence": "Reading widely can expand a learner's vocabulary.",
+      "translationZh": "广泛阅读可以扩大学习者的词汇量。"
+    },
+    {
+      "exampleId": "morph-example:1ecac72566455fa4",
+      "sentence": "The course introduces vocabulary used in academic discussions.",
+      "translationZh": "这门课程介绍学术讨论中使用的词汇。"
+    },
+    {
+      "exampleId": "morph-example:2636ca6862cfe664",
+      "sentence": "Several researchers advocate stronger protection for wetlands.",
+      "translationZh": "几位研究人员主张加强对湿地的保护。"
+    },
+    {
+      "exampleId": "morph-example:9cdbe1d3fda1828c",
+      "sentence": "These charities advocate equal access to education.",
+      "translationZh": "这些慈善机构倡导人人享有平等的受教育机会。"
+    },
+    {
+      "exampleId": "morph-example:d3057e9ccaed8827",
+      "sentence": "Participation in the survey is entirely voluntary.",
+      "translationZh": "参与这项调查完全出于自愿。"
+    },
+    {
+      "exampleId": "morph-example:d5f3e17caa32db20",
+      "sentence": "The museum relies on voluntary help from local residents.",
+      "translationZh": "这家博物馆依靠当地居民的志愿帮助。"
+    },
+    {
+      "exampleId": "morph-example:644c63ab4d463958",
+      "sentence": "A volunteer guided visitors around the museum.",
+      "translationZh": "一名志愿者带领游客参观了博物馆。"
+    },
+    {
+      "exampleId": "morph-example:4feccb6d04fda9b5",
+      "sentence": "Each volunteer received basic safety training.",
+      "translationZh": "每一名志愿者都接受了基本的安全培训。"
+    },
+    {
+      "exampleId": "morph-example:5194e2e44c5e9b74",
+      "sentence": "She joined the project of her own volition.",
+      "translationZh": "她自愿加入了这个项目。"
+    },
+    {
+      "exampleId": "morph-example:174f20d603240813",
+      "sentence": "Participants were free to leave of their own volition.",
+      "translationZh": "参与者可以自行决定离开。"
+    },
+    {
+      "exampleId": "morph-example:df6a1eea9ed159a3",
+      "sentence": "The researchers measured asymmetry in the shape of the leaves.",
+      "translationZh": "研究人员测量了叶片形状的不对称性。"
+    },
+    {
+      "exampleId": "morph-example:7f2aab8fe57123f9",
+      "sentence": "There is an asymmetry of power between the two organisations.",
+      "translationZh": "这两个组织之间存在权力不对等的情况。"
+    },
+    {
+      "exampleId": "morph-example:151b86b0c8f6edb7",
+      "sentence": "The building has an asymmetric roof.",
+      "translationZh": "这座建筑有一个不对称的屋顶。"
+    },
+    {
+      "exampleId": "morph-example:d0d19c8ceff34c31",
+      "sentence": "The agreement created an asymmetric relationship between the partners.",
+      "translationZh": "这项协议使合作双方形成了不对等的关系。"
+    },
+    {
+      "exampleId": "morph-example:007e72e424ef0d0e",
+      "sentence": "The survey was completed by an anonymous group of volunteers.",
+      "translationZh": "一群未透露身份的志愿者完成了这项调查。"
+    },
+    {
+      "exampleId": "morph-example:6df62f6e54233806",
+      "sentence": "The museum received an anonymous donation.",
+      "translationZh": "博物馆收到了一笔匿名捐款。"
+    },
+    {
+      "exampleId": "morph-example:f10ae913489b446d",
+      "sentence": "The test detected an abnormal pattern of activity.",
+      "translationZh": "这项检测发现了一种异常的活动模式。"
+    },
+    {
+      "exampleId": "morph-example:dba1402b575a2ae8",
+      "sentence": "An abnormal rise in temperature triggered the alarm.",
+      "translationZh": "温度的异常升高触发了警报。"
+    },
+    {
+      "exampleId": "morph-example:4e548ad70220be19",
+      "sentence": "Several members were absent from the meeting.",
+      "translationZh": "几位成员缺席了会议。"
+    },
+    {
+      "exampleId": "morph-example:255d1e09e8b233b9",
+      "sentence": "Reliable data are absent from much of the report.",
+      "translationZh": "报告的大部分内容缺乏可靠的数据。"
+    },
+    {
+      "exampleId": "morph-example:8e7b2325d9146fca",
+      "sentence": "Young children sometimes find abstract ideas difficult to understand.",
+      "translationZh": "年幼的孩子有时觉得抽象概念难以理解。"
+    },
+    {
+      "exampleId": "morph-example:df044f7d43042413",
+      "sentence": "The discussion moved from practical examples to abstract principles.",
+      "translationZh": "讨论从实际例子转向了抽象原理。"
+    },
+    {
+      "exampleId": "morph-example:5ce56dcb5ce12a3c",
+      "sentence": "The school will adapt its timetable for working adults.",
+      "translationZh": "这所学校将调整课程时间表，以适应在职成年人的需要。"
+    },
+    {
+      "exampleId": "morph-example:b5ea6052eb1357b1",
+      "sentence": "Animals must adapt to changes in their environment.",
+      "translationZh": "动物必须适应环境的变化。"
+    },
+    {
+      "exampleId": "morph-example:19f91828d776c789",
+      "sentence": "The two classes meet in adjacent rooms.",
+      "translationZh": "这两个班在相邻的教室上课。"
+    },
+    {
+      "exampleId": "morph-example:67b1bd8f65a1b9e9",
+      "sentence": "The factory bought the adjacent land for future expansion.",
+      "translationZh": "工厂买下了相邻的土地，以备将来扩建。"
+    },
+    {
+      "exampleId": "morph-example:2fc5e38f3293b6e6",
+      "sentence": "The classrooms adjoin a shared courtyard.",
+      "translationZh": "这些教室紧邻一个共用庭院。"
+    },
+    {
+      "exampleId": "morph-example:8c2c78961da1cc94",
+      "sentence": "The two properties adjoin each other at the rear.",
+      "translationZh": "这两处房产的后部彼此相邻。"
+    },
+    {
+      "exampleId": "morph-example:ba3e43a3c4d4cb08",
+      "sentence": "The laboratory tested a new antibiotic against the bacteria.",
+      "translationZh": "实验室测试了一种新抗生素对这些细菌的作用。"
+    },
+    {
+      "exampleId": "morph-example:c533ed530ace83b3",
+      "sentence": "The report compared resistance to the same antibiotic in several samples.",
+      "translationZh": "这份报告比较了几个样本对同一种抗生素的耐药性。"
+    },
+    {
+      "exampleId": "morph-example:ae89ab0f6d12f955",
+      "sentence": "The council introduced measures to reduce antisocial behaviour.",
+      "translationZh": "地方议会采取了措施，以减少反社会行为。"
+    },
+    {
+      "exampleId": "morph-example:a91d0484bd569e25",
+      "sentence": "Loud music at night can be considered antisocial.",
+      "translationZh": "夜间播放嘈杂的音乐可能被视为妨害他人的行为。"
+    },
+    {
+      "exampleId": "morph-example:fe619a85e204d2cc",
+      "sentence": "The laboratory measured the antioxidant content of the extract.",
+      "translationZh": "实验室测量了提取物中的抗氧化剂含量。"
+    },
+    {
+      "exampleId": "morph-example:359f7f1294a823c7",
+      "sentence": "The study examined whether the antioxidant protected the cells.",
+      "translationZh": "这项研究考察了这种抗氧化剂是否保护了细胞。"
+    },
+    {
+      "exampleId": "morph-example:2836e1e3b690ae97",
+      "sentence": "An automatic sensor switches off the lights.",
+      "translationZh": "一个自动传感器会关掉灯。"
+    },
+    {
+      "exampleId": "morph-example:007ea8217fff9407",
+      "sentence": "The machine has an automatic safety mechanism.",
+      "translationZh": "这台机器具有自动安全机制。"
+    },
+    {
+      "exampleId": "morph-example:458d8ed22d6c3290",
+      "sentence": "The department gained greater autonomy over its budget.",
+      "translationZh": "该部门获得了更大的预算自主权。"
+    },
+    {
+      "exampleId": "morph-example:b9d9193dfc39e1e2",
+      "sentence": "The policy allows teachers more autonomy in planning lessons.",
+      "translationZh": "这项政策让教师在备课方面拥有更多自主权。"
+    },
+    {
+      "exampleId": "morph-example:880308366d3404f2",
+      "sentence": "Her autobiography describes her early scientific training.",
+      "translationZh": "她的自传描述了她早年的科研训练经历。"
+    },
+    {
+      "exampleId": "morph-example:ad988671d7187027",
+      "sentence": "The historian compared the autobiography with contemporary letters.",
+      "translationZh": "这位历史学家将这本自传与同时代的信件进行了比较。"
+    },
+    {
+      "exampleId": "morph-example:2db3a9b8831017ad",
+      "sentence": "The two countries signed a bilateral agreement.",
+      "translationZh": "两国签署了一项双边协议。"
+    },
+    {
+      "exampleId": "morph-example:257e752ed322f2b7",
+      "sentence": "Bilateral talks resumed after several months.",
+      "translationZh": "双边会谈在数月后恢复。"
+    },
+    {
+      "exampleId": "morph-example:0a1ffdf15de794f6",
+      "sentence": "The city hosts a biennial arts festival.",
+      "translationZh": "这座城市举办每两年一届的艺术节。"
+    },
+    {
+      "exampleId": "morph-example:bfe984219ee637d5",
+      "sentence": "The committee published its biennial review.",
+      "translationZh": "委员会发布了每两年一次的评估报告。"
+    },
+    {
+      "exampleId": "morph-example:840db6a2c96b538e",
+      "sentence": "One unusual circumstance changed the investigation.",
+      "translationZh": "一个不寻常的情况改变了调查的走向。"
+    },
+    {
+      "exampleId": "morph-example:b5d83bea9c641bf0",
+      "sentence": "Financial hardship was a relevant circumstance in her case.",
+      "translationZh": "经济困难是审理她的案件时需要考虑的一项相关情况。"
+    },
+    {
+      "exampleId": "morph-example:73581cfb65b06692",
+      "sentence": "The company tried to circumvent the regulations.",
+      "translationZh": "这家公司试图规避相关法规。"
+    },
+    {
+      "exampleId": "morph-example:6364501040de3f60",
+      "sentence": "Researchers developed a method to circumvent this technical limitation.",
+      "translationZh": "研究人员开发了一种绕过这一技术限制的方法。"
+    },
+    {
+      "exampleId": "morph-example:47338e8553e94ad9",
+      "sentence": "The expedition planned to circumnavigate the island.",
+      "translationZh": "考察队计划绕岛航行一周。"
+    },
+    {
+      "exampleId": "morph-example:a6ca538134194a19",
+      "sentence": "The team will circumnavigate the globe in a research vessel.",
+      "translationZh": "团队将乘坐科考船环绕地球航行。"
+    },
+    {
+      "exampleId": "morph-example:50379fecc6389997",
+      "sentence": "The agencies must cooperate to protect the river.",
+      "translationZh": "这些机构必须合作保护这条河流。"
+    },
+    {
+      "exampleId": "morph-example:7869feccedccf52f",
+      "sentence": "Researchers from several countries cooperate on the project.",
+      "translationZh": "来自几个国家的研究人员在这个项目上开展合作。"
+    },
+    {
+      "exampleId": "morph-example:f1a12aff28739e4b",
+      "sentence": "The study asks how different species coexist in one habitat.",
+      "translationZh": "这项研究探讨不同物种如何在同一栖息地共存。"
+    },
+    {
+      "exampleId": "morph-example:299197cda24c924a",
+      "sentence": "Traditional businesses can coexist with new digital services.",
+      "translationZh": "传统企业可以与新的数字服务共存。"
+    },
+    {
+      "exampleId": "morph-example:7919e69929c9b91e",
+      "sentence": "The agency will coordinate the emergency response.",
+      "translationZh": "该机构将协调应急响应工作。"
+    },
+    {
+      "exampleId": "morph-example:0bdbd4b1ebe95d28",
+      "sentence": "Several departments coordinate their work on the project.",
+      "translationZh": "几个部门协调推进各自在这个项目中的工作。"
+    },
+    {
+      "exampleId": "morph-example:20b3d7aa098089d0",
+      "sentence": "The committee reached a contrary conclusion after reviewing the evidence.",
+      "translationZh": "委员会审查证据后得出了相反的结论。"
+    },
+    {
+      "exampleId": "morph-example:48ce3a54d26355ed",
+      "sentence": "She held a contrary opinion about the proposed route.",
+      "translationZh": "她对拟议的路线持相反意见。"
+    },
+    {
+      "exampleId": "morph-example:1906e64ac8dfc270",
+      "sentence": "The clinician checked for any contraindication before prescribing the drug.",
+      "translationZh": "临床医生在开药前检查了是否存在任何用药禁忌症。"
+    },
+    {
+      "exampleId": "morph-example:5aaf5f271343703b",
+      "sentence": "Pregnancy may be a contraindication for this particular treatment.",
+      "translationZh": "怀孕可能是接受这种特定治疗的禁忌情况。"
+    },
+    {
+      "exampleId": "morph-example:1ed2fb129982aa97",
+      "sentence": "Trees can help counteract the effects of urban heat.",
+      "translationZh": "树木有助于抵消城市高温带来的影响。"
+    },
+    {
+      "exampleId": "morph-example:f32b4f035f5b8815",
+      "sentence": "The new measures aim to counteract the decline in investment.",
+      "translationZh": "新措施旨在遏制投资下滑。"
+    },
+    {
+      "exampleId": "morph-example:e4c44eace1cd198a",
+      "sentence": "The minister met her foreign counterpart.",
+      "translationZh": "这位部长会见了与她职务相当的外国官员。"
+    },
+    {
+      "exampleId": "morph-example:a71fdc0e455c6d1f",
+      "sentence": "The new device is smaller than its mechanical counterpart.",
+      "translationZh": "这台新设备比同类机械设备更小。"
+    },
+    {
+      "exampleId": "morph-example:9e07c48434aa663c",
+      "sentence": "Higher wages may counterbalance the increase in living costs.",
+      "translationZh": "更高的工资或许能够抵消生活成本的上涨。"
+    },
+    {
+      "exampleId": "morph-example:1ab800efcbb8ffda",
+      "sentence": "The second weight will counterbalance the load.",
+      "translationZh": "第二个重物将起到配重作用，使载荷保持平衡。"
+    },
+    {
+      "exampleId": "morph-example:61dc41f7501f4454",
+      "sentence": "The reform aims to decentralise decision making.",
+      "translationZh": "这项改革旨在分散决策权。"
+    },
+    {
+      "exampleId": "morph-example:8e8c481a39712808",
+      "sentence": "Digital systems allowed the firm to decentralise its operations.",
+      "translationZh": "数字系统使这家公司能够分散其业务运营。"
+    },
+    {
+      "exampleId": "morph-example:c4f15b9b65dfa083",
+      "sentence": "Microorganisms decompose dead plant material.",
+      "translationZh": "微生物会分解死亡的植物物质。"
+    },
+    {
+      "exampleId": "morph-example:0d6c9cb0d5352686",
+      "sentence": "The model can decompose the data into separate components.",
+      "translationZh": "这个模型可以将数据分解为不同的组成部分。"
+    },
+    {
+      "exampleId": "morph-example:7e742582aa177d05",
+      "sentence": "Inflation can devalue household savings.",
+      "translationZh": "通货膨胀可能使家庭储蓄贬值。"
+    },
+    {
+      "exampleId": "morph-example:1ceeee631d283809",
+      "sentence": "Such comparisons may devalue the contribution of local workers.",
+      "translationZh": "这样的比较可能会贬低当地工人的贡献。"
+    },
+    {
+      "exampleId": "morph-example:3d6d29d3c592c26f",
+      "sentence": "Several researchers disagree about the cause of the decline.",
+      "translationZh": "几位研究人员对下降的原因意见不一。"
+    },
+    {
+      "exampleId": "morph-example:732ae260d15df03d",
+      "sentence": "I disagree with the decision to close the museum.",
+      "translationZh": "我不同意关闭博物馆的决定。"
+    },
+    {
+      "exampleId": "morph-example:605e41c9bc579a53",
+      "sentence": "Please disconnect the machine before repairing it.",
+      "translationZh": "维修机器之前，请先断开其电源连接。"
+    },
+    {
+      "exampleId": "morph-example:aeb35fabb8ec5d92",
+      "sentence": "The technician had to disconnect the damaged cable.",
+      "translationZh": "技术人员不得不断开那根损坏的电缆。"
+    },
+    {
+      "exampleId": "morph-example:3e7584b2e1d58ca7",
+      "sentence": "Rising sea levels may displace coastal communities.",
+      "translationZh": "海平面上升可能迫使沿海社区的居民迁离。"
+    },
+    {
+      "exampleId": "morph-example:da35722f237473ae",
+      "sentence": "Large construction projects can displace families from their homes.",
+      "translationZh": "大型建设项目可能迫使一些家庭离开家园。"
+    },
+    {
+      "exampleId": "morph-example:a5fb699850cbb84c",
+      "sentence": "The grant will enable further research.",
+      "translationZh": "这笔资助将使进一步的研究成为可能。"
+    },
+    {
+      "exampleId": "morph-example:a075a15accc8712c",
+      "sentence": "Clear labels enable users to find items quickly.",
+      "translationZh": "清晰的标签使用户能够迅速找到物品。"
+    },
+    {
+      "exampleId": "morph-example:6500b43313b587ad",
+      "sentence": "International exchanges can enrich students' experience.",
+      "translationZh": "国际交流能够丰富学生的经历。"
+    },
+    {
+      "exampleId": "morph-example:14165861cf951268",
+      "sentence": "Compost can enrich the soil.",
+      "translationZh": "堆肥能够增加土壤的肥力。"
+    },
+    {
+      "exampleId": "morph-example:b20123786c1b12fe",
+      "sentence": "The agency has the authority to enforce safety standards.",
+      "translationZh": "该机构有权执行安全标准。"
+    },
+    {
+      "exampleId": "morph-example:baa4cd03bd11e616",
+      "sentence": "It is difficult to enforce the ban without public support.",
+      "translationZh": "如果没有公众的支持，就很难落实这项禁令。"
+    },
+    {
+      "exampleId": "morph-example:2bd0dcbf01b65816",
+      "sentence": "Local farms export fruit to nearby countries.",
+      "translationZh": "当地农场向邻近国家出口水果。"
+    },
+    {
+      "exampleId": "morph-example:53bc1e6d748f3857",
+      "sentence": "The company hopes to export its new technology.",
+      "translationZh": "这家公司希望出口其新技术。"
+    },
+    {
+      "exampleId": "morph-example:fa57394e91ab76fd",
+      "sentence": "The explorer showed extraordinary courage.",
+      "translationZh": "这位探险家展现了非凡的勇气。"
+    },
+    {
+      "exampleId": "morph-example:2122fb3fc39bf2e9",
+      "sentence": "The telescope captured an extraordinary image of the sky.",
+      "translationZh": "望远镜拍摄到了一幅不同寻常的天空图像。"
+    },
+    {
+      "exampleId": "morph-example:9cdd6801db3eac06",
+      "sentence": "The school offers several extracurricular activities.",
+      "translationZh": "这所学校提供多种课外活动。"
+    },
+    {
+      "exampleId": "morph-example:3b619cbd48d402a7",
+      "sentence": "Extracurricular projects helped her develop leadership skills.",
+      "translationZh": "课外项目帮助她培养了领导能力。"
+    },
+    {
+      "exampleId": "morph-example:f1018a2b04e21a73",
+      "sentence": "The mission will search for signs of extraterrestrial life.",
+      "translationZh": "这次任务将寻找地外生命的迹象。"
+    },
+    {
+      "exampleId": "morph-example:6e9799202a38005b",
+      "sentence": "The researchers analysed a sample of extraterrestrial material.",
+      "translationZh": "研究人员分析了一份地外物质样本。"
+    },
+    {
+      "exampleId": "morph-example:450b4e4ebfd12ac2",
+      "sentence": "The weather forecast suggests heavy rain tomorrow.",
+      "translationZh": "天气预报显示，明天可能有大雨。"
+    },
+    {
+      "exampleId": "morph-example:91dbc945327d9143",
+      "sentence": "Their economic forecast includes a rise in employment.",
+      "translationZh": "他们的经济预测包含就业增长的预期。"
+    },
+    {
+      "exampleId": "morph-example:e6274d97b0c77262",
+      "sentence": "Few analysts could foresee the sudden change.",
+      "translationZh": "几乎没有分析人士能够预见这次突如其来的变化。"
+    },
+    {
+      "exampleId": "morph-example:98c365044ff1a09f",
+      "sentence": "The planners did not foresee the increase in demand.",
+      "translationZh": "规划人员未能预见需求的增长。"
+    },
+    {
+      "exampleId": "morph-example:840c6e3ca7b9d5f4",
+      "sentence": "The system can forewarn residents of severe flooding.",
+      "translationZh": "这套系统可以提前向居民发出严重洪水的预警。"
+    },
+    {
+      "exampleId": "morph-example:637e44bd17e61737",
+      "sentence": "Officials tried to forewarn travellers about the disruption.",
+      "translationZh": "官员们试图提前提醒旅行者注意行程可能受阻。"
+    },
+    {
+      "exampleId": "morph-example:28fd49772fbd0498",
+      "sentence": "The study examined patterns of hyperactive behaviour.",
+      "translationZh": "这项研究考察了过度活跃的行为模式。"
+    },
+    {
+      "exampleId": "morph-example:75592240db550cf4",
+      "sentence": "A hyperactive immune response can damage healthy tissue.",
+      "translationZh": "过度活跃的免疫反应可能损伤健康组织。"
+    },
+    {
+      "exampleId": "morph-example:69f9dbeb42ac08a9",
+      "sentence": "The programme offers screening for hypertension.",
+      "translationZh": "这项计划提供高血压筛查。"
+    },
+    {
+      "exampleId": "morph-example:797bcfbeb590c0ac",
+      "sentence": "Untreated hypertension increases the risk of heart disease.",
+      "translationZh": "未经治疗的高血压会增加患心脏病的风险。"
+    },
+    {
+      "exampleId": "morph-example:1fb36d0bd94ff196",
+      "sentence": "Some patients become hypersensitive to bright light.",
+      "translationZh": "有些患者会变得对强光异常敏感。"
+    },
+    {
+      "exampleId": "morph-example:bf5abdba12123f8b",
+      "sentence": "The instrument is hypersensitive to small changes in pressure.",
+      "translationZh": "这台仪器对微小的压力变化极为敏感。"
+    },
+    {
+      "exampleId": "morph-example:51661e2b58a83d8f",
+      "sentence": "The rescuers treated the hikers for hypothermia.",
+      "translationZh": "救援人员对这些徒步旅行者进行了低体温症治疗。"
+    },
+    {
+      "exampleId": "morph-example:8aec306c3e6084f7",
+      "sentence": "Wet clothing can increase the risk of hypothermia.",
+      "translationZh": "潮湿的衣物可能增加发生低体温症的风险。"
+    },
+    {
+      "exampleId": "morph-example:c55e19b1b412eba6",
+      "sentence": "The patient showed signs of hypoglycaemia.",
+      "translationZh": "这名患者出现了低血糖症的迹象。"
+    },
+    {
+      "exampleId": "morph-example:0b2c3cc71ac202f4",
+      "sentence": "The study monitored episodes of hypoglycaemia during treatment.",
+      "translationZh": "这项研究监测了治疗期间发生的低血糖发作。"
+    },
+    {
+      "exampleId": "morph-example:e0cd831137f7bf8b",
+      "sentence": "The nurse prepared a hypodermic needle.",
+      "translationZh": "护士准备好了一根皮下注射针头。"
+    },
+    {
+      "exampleId": "morph-example:68816de43a5719fb",
+      "sentence": "The diagram shows the position of a hypodermic injection.",
+      "translationZh": "这张图显示了皮下注射的位置。"
+    },
+    {
+      "exampleId": "morph-example:9b6cf99f2034e9b2",
+      "sentence": "The report contains several inaccurate figures.",
+      "translationZh": "报告中有几处不准确的数字。"
+    },
+    {
+      "exampleId": "morph-example:d30197c281cd6d47",
+      "sentence": "An inaccurate map can mislead field researchers.",
+      "translationZh": "一张不准确的地图可能误导野外研究人员。"
+    },
+    {
+      "exampleId": "morph-example:e49ff803bbc1201a",
+      "sentence": "The article investigates illegal trade in rare animals.",
+      "translationZh": "这篇文章调查珍稀动物的非法贸易。"
+    },
+    {
+      "exampleId": "morph-example:66a2290405aa1874",
+      "sentence": "Officials removed the illegal advertisements from the roadside.",
+      "translationZh": "官员们清除了路边的非法广告。"
+    },
+    {
+      "exampleId": "morph-example:5483b8e9c306daae",
+      "sentence": "It is impossible to predict the exact outcome.",
+      "translationZh": "不可能预测出确切的结果。"
+    },
+    {
+      "exampleId": "morph-example:175cb77dc3645d51",
+      "sentence": "Without further evidence, it is impossible to test the claim.",
+      "translationZh": "如果没有进一步的证据，就无法检验这一说法。"
+    },
+    {
+      "exampleId": "morph-example:a3b33c54fcda6bfe",
+      "sentence": "The project helps students interact with local residents.",
+      "translationZh": "这个项目帮助学生与当地居民交流。"
+    },
+    {
+      "exampleId": "morph-example:53eb5e9382c01fc8",
+      "sentence": "Children learn social skills when they interact with their peers.",
+      "translationZh": "孩子们在与同龄人交往时学习社交技能。"
+    },
+    {
+      "exampleId": "morph-example:06c9adb82d00ddfb",
+      "sentence": "The city hosts an international film festival.",
+      "translationZh": "这座城市举办一个国际电影节。"
+    },
+    {
+      "exampleId": "morph-example:1c52f3c804ba42ae",
+      "sentence": "International cooperation is essential for protecting migratory birds.",
+      "translationZh": "国际合作对于保护候鸟至关重要。"
+    },
+    {
+      "exampleId": "morph-example:ab7776dc61ddeb9d",
+      "sentence": "Economic and environmental systems are interdependent.",
+      "translationZh": "经济系统和环境系统相互依存。"
+    },
+    {
+      "exampleId": "morph-example:9033474a30adcdaf",
+      "sentence": "The project involves several interdependent stages.",
+      "translationZh": "这个项目涉及几个相互依存的阶段。"
+    },
+    {
+      "exampleId": "morph-example:4c79f84fd06b1e4b",
+      "sentence": "The experiment measured intracellular calcium levels.",
+      "translationZh": "这项实验测量了细胞内的钙水平。"
+    },
+    {
+      "exampleId": "morph-example:ecd985a4eaaeccb9",
+      "sentence": "The drug affects an intracellular signalling pathway.",
+      "translationZh": "这种药物会影响细胞内的一条信号传导通路。"
+    },
+    {
+      "exampleId": "morph-example:e771d250acbe99d2",
+      "sentence": "The patient received intravenous fluids.",
+      "translationZh": "这名患者接受了静脉补液。"
+    },
+    {
+      "exampleId": "morph-example:0115351d829b23d1",
+      "sentence": "The study compared oral and intravenous treatment.",
+      "translationZh": "这项研究比较了口服治疗与静脉给药治疗。"
+    },
+    {
+      "exampleId": "morph-example:778012a1ccb1e24d",
+      "sentence": "The university organises intramural sports competitions.",
+      "translationZh": "这所大学组织校内体育比赛。"
+    },
+    {
+      "exampleId": "morph-example:20ff987a6d8344c9",
+      "sentence": "Intramural funding supported the early stages of the project.",
+      "translationZh": "内部资助支持了项目的早期阶段。"
+    },
+    {
+      "exampleId": "morph-example:a7c7495e306562f8",
+      "sentence": "The report examines the macroeconomic effects of the reform.",
+      "translationZh": "这份报告考察了改革的宏观经济影响。"
+    },
+    {
+      "exampleId": "morph-example:41b4112b140f58ae",
+      "sentence": "Macroeconomic stability can encourage long-term investment.",
+      "translationZh": "宏观经济稳定能够鼓励长期投资。"
+    },
+    {
+      "exampleId": "morph-example:74c61717fb535c13",
+      "sentence": "The material showed no macroscopic signs of damage.",
+      "translationZh": "这种材料没有出现肉眼可见的损坏迹象。"
+    },
+    {
+      "exampleId": "morph-example:d14a5b5dacce36ef",
+      "sentence": "The model links microscopic processes with macroscopic behaviour.",
+      "translationZh": "这个模型将微观过程与宏观行为联系起来。"
+    },
+    {
+      "exampleId": "morph-example:322c831924bc3063",
+      "sentence": "The chapter examines the macrostructure of the text.",
+      "translationZh": "本章考察文本的整体结构。"
+    },
+    {
+      "exampleId": "morph-example:6b76d11016e6c745",
+      "sentence": "The researchers analysed the macrostructure of the urban network.",
+      "translationZh": "研究人员分析了城市网络的宏观结构。"
+    },
+    {
+      "exampleId": "morph-example:330eef1a70d6627c",
+      "sentence": "The cells were examined under a microscope.",
+      "translationZh": "这些细胞是在显微镜下观察的。"
+    },
+    {
+      "exampleId": "morph-example:fdc9509424290b75",
+      "sentence": "The laboratory purchased a more powerful microscope.",
+      "translationZh": "实验室购买了一台放大能力更强的显微镜。"
+    },
+    {
+      "exampleId": "morph-example:5f64472b5d06b298",
+      "sentence": "A microorganism in the soil helps break down waste.",
+      "translationZh": "土壤中的一种微生物有助于分解废物。"
+    },
+    {
+      "exampleId": "morph-example:f36ac6acf5f18ff3",
+      "sentence": "The team identified the microorganism responsible for the infection.",
+      "translationZh": "团队确定了导致这次感染的微生物。"
+    },
+    {
+      "exampleId": "morph-example:b1d0a954b24598fd",
+      "sentence": "The researchers detected microplastic in the water sample.",
+      "translationZh": "研究人员在水样中检测到了微塑料。"
+    },
+    {
+      "exampleId": "morph-example:0ab9ce06de3a3ba7",
+      "sentence": "The study tracked a microplastic particle through the food chain.",
+      "translationZh": "这项研究追踪了一个微塑料颗粒在食物链中的迁移过程。"
+    },
+    {
+      "exampleId": "morph-example:45a61435df8fef42",
+      "sentence": "A malfunction in the cooling system stopped production.",
+      "translationZh": "冷却系统的一处故障使生产停止了。"
+    },
+    {
+      "exampleId": "morph-example:049f505d1b1cb46a",
+      "sentence": "The engineers investigated the cause of the malfunction.",
+      "translationZh": "工程师们调查了这次故障的原因。"
+    },
+    {
+      "exampleId": "morph-example:b6993414a7801150",
+      "sentence": "The programme aims to reduce childhood malnutrition.",
+      "translationZh": "这项计划旨在减少儿童营养不良的情况。"
+    },
+    {
+      "exampleId": "morph-example:6c5f91d8994b0bd1",
+      "sentence": "The survey found evidence of malnutrition in the region.",
+      "translationZh": "这项调查发现了该地区存在营养不良的证据。"
+    },
+    {
+      "exampleId": "morph-example:1f452ff9eb4008d2",
+      "sentence": "The investigation uncovered evidence of financial malpractice.",
+      "translationZh": "调查发现了财务方面存在不当行为的证据。"
+    },
+    {
+      "exampleId": "morph-example:7205ac952d12cf4b",
+      "sentence": "The hospital reviewed its procedures after a malpractice claim.",
+      "translationZh": "医院在收到一项医疗过失索赔后审查了自身流程。"
+    },
+    {
+      "exampleId": "morph-example:576507aecffad439",
+      "sentence": "Readers may misinterpret the graph without a clear scale.",
+      "translationZh": "如果没有清晰的刻度，读者可能会错误解读这张图表。"
+    },
+    {
+      "exampleId": "morph-example:3d02182eec761e5a",
+      "sentence": "The team did not want to misinterpret a temporary fluctuation.",
+      "translationZh": "团队不希望对暂时的波动作出错误解释。"
+    },
+    {
+      "exampleId": "morph-example:478b6707be48e979",
+      "sentence": "It is easy to misunderstand the instructions.",
+      "translationZh": "这些说明很容易被误解。"
+    },
+    {
+      "exampleId": "morph-example:c496d02cafb56866",
+      "sentence": "Clear diagrams reduce the chance that readers will misunderstand the procedure.",
+      "translationZh": "清晰的示意图可以降低读者误解操作流程的可能性。"
+    },
+    {
+      "exampleId": "morph-example:20ef554f458e1f6c",
+      "sentence": "Selective statistics can mislead the public.",
+      "translationZh": "有选择地使用统计数据可能误导公众。"
+    },
+    {
+      "exampleId": "morph-example:e4079bbc76936b62",
+      "sentence": "The advertisement must not mislead consumers.",
+      "translationZh": "这则广告不得误导消费者。"
+    },
+    {
+      "exampleId": "morph-example:ff3bc9a510c4cd4d",
+      "sentence": "The company once held a monopoly on rail transport.",
+      "translationZh": "这家公司曾经垄断铁路运输。"
+    },
+    {
+      "exampleId": "morph-example:aa154c319417e07e",
+      "sentence": "The new law ended the state's monopoly in the sector.",
+      "translationZh": "新法律结束了国家在该行业的垄断。"
+    },
+    {
+      "exampleId": "morph-example:db807cb5cf995717",
+      "sentence": "The study compared bilingual and monolingual participants.",
+      "translationZh": "这项研究比较了使用两种语言和只使用一种语言的参与者。"
+    },
+    {
+      "exampleId": "morph-example:7150b8934e302bc1",
+      "sentence": "A monolingual dictionary explains words in the same language.",
+      "translationZh": "单语词典用与词条相同的语言来解释词义。"
+    },
+    {
+      "exampleId": "morph-example:a3fcaf14cce6e1ad",
+      "sentence": "A multinational company opened a regional office here.",
+      "translationZh": "一家跨国公司在这里设立了地区办事处。"
+    },
+    {
+      "exampleId": "morph-example:4417a681df1fcfce",
+      "sentence": "The project was carried out by a multinational research team.",
+      "translationZh": "该项目由一支跨国研究团队实施。"
+    },
+    {
+      "exampleId": "morph-example:5aa27ecd6ff8ffe1",
+      "sentence": "The museum developed a multimedia exhibition.",
+      "translationZh": "博物馆策划了一场多媒体展览。"
+    },
+    {
+      "exampleId": "morph-example:a5cfea14c1af25fb",
+      "sentence": "Students submitted a multimedia presentation.",
+      "translationZh": "学生们提交了一份多媒体演示作品。"
+    },
+    {
+      "exampleId": "morph-example:c94e3492aae4770d",
+      "sentence": "A multidisciplinary team investigated the problem.",
+      "translationZh": "一支多学科团队调查了这个问题。"
+    },
+    {
+      "exampleId": "morph-example:9aa7796f9ffff6af",
+      "sentence": "The course takes a multidisciplinary approach to public health.",
+      "translationZh": "这门课程采用多学科视角研究公共卫生。"
+    },
+    {
+      "exampleId": "morph-example:5e7b093bb0c71f91",
+      "sentence": "Facial expressions provide nonverbal information.",
+      "translationZh": "面部表情传递非言语信息。"
+    },
+    {
+      "exampleId": "morph-example:5b235f2241ae47ed",
+      "sentence": "The experiment measured nonverbal communication between participants.",
+      "translationZh": "这项实验测量了参与者之间的非言语交流。"
+    },
+    {
+      "exampleId": "morph-example:2d3178b722a2234d",
+      "sentence": "A nonprofit organisation runs the centre.",
+      "translationZh": "一家非营利组织运营着这个中心。"
+    },
+    {
+      "exampleId": "morph-example:81a874a748d621da",
+      "sentence": "The project received support from a nonprofit foundation.",
+      "translationZh": "该项目获得了一家非营利基金会的支持。"
+    },
+    {
+      "exampleId": "morph-example:ea8ddf31d4dab612",
+      "sentence": "Coal is a nonrenewable energy source.",
+      "translationZh": "煤是一种不可再生能源。"
+    },
+    {
+      "exampleId": "morph-example:90f376a7116b225a",
+      "sentence": "The policy aims to reduce dependence on nonrenewable resources.",
+      "translationZh": "这项政策旨在减少对不可再生资源的依赖。"
+    },
+    {
+      "exampleId": "morph-example:eb1f96dc9e240672",
+      "sentence": "Analysts may overestimate the speed of economic recovery.",
+      "translationZh": "分析人士可能会高估经济复苏的速度。"
+    },
+    {
+      "exampleId": "morph-example:aba3dfed80aca0e9",
+      "sentence": "Do not overestimate the precision of a small sample.",
+      "translationZh": "不要高估小样本的精确性。"
+    },
+    {
+      "exampleId": "morph-example:a0f5fd0f99004baf",
+      "sentence": "Large visitor numbers can overcrowd popular sites.",
+      "translationZh": "游客数量过多会使热门景点过度拥挤。"
+    },
+    {
+      "exampleId": "morph-example:f8d1a9f0c3e95fbd",
+      "sentence": "The organisers should not overcrowd the exhibition space.",
+      "translationZh": "组织者不应使展览空间过度拥挤。"
+    },
+    {
+      "exampleId": "morph-example:4f465bf0f53d1d12",
+      "sentence": "Employers should not overwork their staff.",
+      "translationZh": "雇主不应让员工过度劳累。"
+    },
+    {
+      "exampleId": "morph-example:17b683fbab8461c8",
+      "sentence": "Students who overwork may struggle to concentrate.",
+      "translationZh": "过度学习的学生可能难以集中注意力。"
+    },
+    {
+      "exampleId": "morph-example:3c115ab102dd195d",
+      "sentence": "Each polygon on the map represents a land parcel.",
+      "translationZh": "地图上的每个多边形代表一块地。"
+    },
+    {
+      "exampleId": "morph-example:b3da4443dde430eb",
+      "sentence": "The software calculates the area of the polygon.",
+      "translationZh": "该软件计算这个多边形的面积。"
+    },
+    {
+      "exampleId": "morph-example:79dee73f129d9b75",
+      "sentence": "The interpreter is an accomplished polyglot.",
+      "translationZh": "这位口译员是一位精通多种语言的人。"
+    },
+    {
+      "exampleId": "morph-example:d63e9b2aa5af1f8b",
+      "sentence": "A polyglot helped the team communicate with local residents.",
+      "translationZh": "一位通晓多种语言的人帮助团队与当地居民交流。"
+    },
+    {
+      "exampleId": "morph-example:6d1ea4bc5046cfa5",
+      "sentence": "The researchers developed a biodegradable polymer.",
+      "translationZh": "研究人员开发出了一种可生物降解的聚合物。"
+    },
+    {
+      "exampleId": "morph-example:71b86d55c81be190",
+      "sentence": "Heat can change the properties of the polymer.",
+      "translationZh": "热量可以改变这种聚合物的性质。"
+    },
+    {
+      "exampleId": "morph-example:16a71de4d9418b84",
+      "sentence": "A postgraduate helped supervise the laboratory session.",
+      "translationZh": "一名研究生协助指导了这次实验课。"
+    },
+    {
+      "exampleId": "morph-example:e3da9fc2c8dca459",
+      "sentence": "The scholarship supported a postgraduate studying coastal erosion.",
+      "translationZh": "这笔奖学金资助了一名研究海岸侵蚀的研究生。"
+    },
+    {
+      "exampleId": "morph-example:816c71161f07890b",
+      "sentence": "The city expanded rapidly during the postwar period.",
+      "translationZh": "这座城市在战后时期迅速扩张。"
+    },
+    {
+      "exampleId": "morph-example:b84aec3b7f8a2d31",
+      "sentence": "The book examines postwar changes in housing policy.",
+      "translationZh": "这本书研究了战后住房政策的变化。"
+    },
+    {
+      "exampleId": "morph-example:80d9f6b15f832287",
+      "sentence": "The region is adapting to a postindustrial economy.",
+      "translationZh": "该地区正在适应后工业化经济。"
+    },
+    {
+      "exampleId": "morph-example:2e332dd6261d47d0",
+      "sentence": "The study compares employment in several postindustrial cities.",
+      "translationZh": "这项研究比较了几座后工业化城市的就业情况。"
+    },
+    {
+      "exampleId": "morph-example:eec020ef6a7051a1",
+      "sentence": "The valley contains several prehistoric settlements.",
+      "translationZh": "这个山谷中有几处史前聚落。"
+    },
+    {
+      "exampleId": "morph-example:8976e419873e32c2",
+      "sentence": "Archaeologists discovered prehistoric tools near the river.",
+      "translationZh": "考古学家在河流附近发现了史前工具。"
+    },
+    {
+      "exampleId": "morph-example:5876c78783c7504f",
+      "sentence": "It would be premature to draw a firm conclusion.",
+      "translationZh": "现在就得出确定的结论还为时过早。"
+    },
+    {
+      "exampleId": "morph-example:ead03be4ad398202",
+      "sentence": "The equipment failed because of premature wear.",
+      "translationZh": "设备因过早磨损而发生故障。"
+    },
+    {
+      "exampleId": "morph-example:225bf7adb6dcde6c",
+      "sentence": "The report describes the aims of the pro-democracy movement.",
+      "translationZh": "这份报告介绍了支持民主的运动所追求的目标。"
+    },
+    {
+      "exampleId": "morph-example:b25a0d3cda9edd34",
+      "sentence": "A pro-democracy group called for fair elections.",
+      "translationZh": "一个支持民主的团体呼吁举行公正选举。"
+    },
+    {
+      "exampleId": "morph-example:d76e7017e01d287f",
+      "sentence": "The candidate adopted a pro-European position.",
+      "translationZh": "这位候选人采取了支持欧洲一体化的立场。"
+    },
+    {
+      "exampleId": "morph-example:d527fb628c7fc28e",
+      "sentence": "The article compares pro-European and nationalist arguments.",
+      "translationZh": "这篇文章比较了支持欧洲一体化的论点与民族主义论点。"
+    },
+    {
+      "exampleId": "morph-example:cd18eaa875c4833e",
+      "sentence": "The survey measured pro-environmental attitudes.",
+      "translationZh": "这项调查衡量了人们支持环境保护的态度。"
+    },
+    {
+      "exampleId": "morph-example:c978bf6183679826",
+      "sentence": "The campaign encouraged pro-environmental choices.",
+      "translationZh": "这场宣传活动鼓励人们作出有利于环境保护的选择。"
+    },
+    {
+      "exampleId": "morph-example:069d90bee8c032e7",
+      "sentence": "The team hopes to reconstruct the damaged bridge.",
+      "translationZh": "团队希望重建这座受损的桥梁。"
+    },
+    {
+      "exampleId": "morph-example:21994c6bf4c2a2d9",
+      "sentence": "Historians used old photographs to reconstruct the room.",
+      "translationZh": "历史学家利用老照片复原了这个房间。"
+    },
+    {
+      "exampleId": "morph-example:d21fd2c0f101ebf0",
+      "sentence": "The council agreed to reconsider the proposal.",
+      "translationZh": "委员会同意重新考虑这项提案。"
+    },
+    {
+      "exampleId": "morph-example:d73345fd0745d885",
+      "sentence": "New evidence forced the researchers to reconsider their conclusion.",
+      "translationZh": "新证据迫使研究人员重新考虑他们的结论。"
+    },
+    {
+      "exampleId": "morph-example:b56b427493b963a6",
+      "sentence": "The tax system can redistribute income.",
+      "translationZh": "税收制度可以重新分配收入。"
+    },
+    {
+      "exampleId": "morph-example:5e83412f5e1ebc32",
+      "sentence": "The programme will redistribute unused equipment to rural schools.",
+      "translationZh": "该计划将把闲置设备重新分配给乡村学校。"
+    },
+    {
+      "exampleId": "morph-example:0f0c9ecf31287542",
+      "sentence": "The students sat in a semicircle.",
+      "translationZh": "学生们围坐成半圆形。"
+    },
+    {
+      "exampleId": "morph-example:536678787bfac1f2",
+      "sentence": "A semicircle of trees surrounds the building.",
+      "translationZh": "一圈呈半圆形排列的树木环绕着这座建筑。"
+    },
+    {
+      "exampleId": "morph-example:d884be3d26c9a798",
+      "sentence": "The device uses a semiconductor to control current.",
+      "translationZh": "该装置利用半导体控制电流。"
+    },
+    {
+      "exampleId": "morph-example:a3148102851128f7",
+      "sentence": "A shortage of semiconductor components delayed production.",
+      "translationZh": "半导体元件短缺导致生产延误。"
+    },
+    {
+      "exampleId": "morph-example:7aebc95350dae451",
+      "sentence": "The organisation publishes a semiannual review.",
+      "translationZh": "该组织每半年出版一期评论刊物。"
+    },
+    {
+      "exampleId": "morph-example:2c92304d1b17f621",
+      "sentence": "The committee holds a semiannual meeting.",
+      "translationZh": "委员会每半年举行一次会议。"
+    },
+    {
+      "exampleId": "morph-example:0fb99878d1074cf8",
+      "sentence": "The experiment investigated subconscious responses to images.",
+      "translationZh": "这项实验研究了人们对图像的潜意识反应。"
+    },
+    {
+      "exampleId": "morph-example:31315a76c376c531",
+      "sentence": "Advertising may influence subconscious associations.",
+      "translationZh": "广告可能影响潜意识中的联想。"
+    },
+    {
+      "exampleId": "morph-example:0599bc3cbbae838f",
+      "sentence": "The researchers subdivide the sample by age.",
+      "translationZh": "研究人员按年龄进一步划分样本。"
+    },
+    {
+      "exampleId": "morph-example:55492688adf706df",
+      "sentence": "The plan would subdivide the site into smaller plots.",
+      "translationZh": "该计划将把这块场地进一步分成更小的地块。"
+    },
+    {
+      "exampleId": "morph-example:de74802bda62e3be",
+      "sentence": "The country emerged as a superpower after the war.",
+      "translationZh": "这个国家在战后崛起为超级大国。"
+    },
+    {
+      "exampleId": "morph-example:88a5a8108409e5db",
+      "sentence": "The chapter examines relations between a superpower and smaller states.",
+      "translationZh": "这一章研究了超级大国与较小国家之间的关系。"
+    },
+    {
+      "exampleId": "morph-example:514d473dbc322aa8",
+      "sentence": "The story attributes the event to supernatural forces.",
+      "translationZh": "这个故事将该事件归因于超自然力量。"
+    },
+    {
+      "exampleId": "morph-example:67981b6ecaf2e88b",
+      "sentence": "The survey asked participants about belief in supernatural explanations.",
+      "translationZh": "这项调查询问了参与者是否相信超自然的解释。"
+    },
+    {
+      "exampleId": "morph-example:70f9597486265ee3",
+      "sentence": "The rescue demanded an almost superhuman effort.",
+      "translationZh": "这次救援需要付出几乎超出常人能力的努力。"
+    },
+    {
+      "exampleId": "morph-example:d03803a21b3e1b19",
+      "sentence": "The character is portrayed as having superhuman strength.",
+      "translationZh": "这个角色被描绘成拥有超人的力量。"
+    },
+    {
+      "exampleId": "morph-example:26e75c702d13a94a",
+      "sentence": "Climate change requires transnational cooperation.",
+      "translationZh": "应对气候变化需要跨国合作。"
+    },
+    {
+      "exampleId": "morph-example:35d948f405bd6ff0",
+      "sentence": "The study examines the activities of transnational companies.",
+      "translationZh": "这项研究考察了跨国公司的活动。"
+    },
+    {
+      "exampleId": "morph-example:ceb4cefb81a7500f",
+      "sentence": "The policy places an unfair burden on small firms.",
+      "translationZh": "这项政策给小企业施加了不公平的负担。"
+    },
+    {
+      "exampleId": "morph-example:c6ee68b2c2221e38",
+      "sentence": "Workers complained about unfair treatment.",
+      "translationZh": "工人们抱怨自己受到了不公平的待遇。"
+    },
+    {
+      "exampleId": "morph-example:512cfe0397eab1ca",
+      "sentence": "The long-term effects remain uncertain.",
+      "translationZh": "长期影响仍不确定。"
+    },
+    {
+      "exampleId": "morph-example:36068db12f45f937",
+      "sentence": "Farmers face an uncertain future as rainfall declines.",
+      "translationZh": "随着降雨减少，农民面临着不确定的未来。"
+    },
+    {
+      "exampleId": "morph-example:7b3dcde645df9ec8",
+      "sentence": "Some disruption is unavoidable during construction.",
+      "translationZh": "施工期间出现一些干扰是不可避免的。"
+    },
+    {
+      "exampleId": "morph-example:c597ee076741e7c3",
+      "sentence": "The committee concluded that the delay was unavoidable.",
+      "translationZh": "委员会认定这次延误是不可避免的。"
+    },
+    {
+      "exampleId": "morph-example:7e5620cadc6d6659",
+      "sentence": "The model may underestimate future demand.",
+      "translationZh": "这个模型可能会低估未来的需求。"
+    },
+    {
+      "exampleId": "morph-example:e02fc622b522a3ac",
+      "sentence": "It is easy to underestimate the cost of maintenance.",
+      "translationZh": "人们很容易低估维护成本。"
+    },
+    {
+      "exampleId": "morph-example:ee26c0ea14b3a5c5",
+      "sentence": "The report describes an underfunded healthcare system.",
+      "translationZh": "这份报告描述了一个资金不足的医疗卫生体系。"
+    },
+    {
+      "exampleId": "morph-example:bab2d5f4b4e7427e",
+      "sentence": "An underfunded research programme may struggle to retain staff.",
+      "translationZh": "资金不足的研究项目可能难以留住员工。"
+    },
+    {
+      "exampleId": "morph-example:895ec560ecf4d538",
+      "sentence": "Rural communities are underrepresented in the survey.",
+      "translationZh": "这项调查中农村社区的代表比例偏低。"
+    },
+    {
+      "exampleId": "morph-example:47794396a5f0d6cc",
+      "sentence": "The programme supports groups that are underrepresented in higher education.",
+      "translationZh": "该计划支持那些在高等教育中所占比例偏低的群体。"
+    },
+    {
+      "exampleId": "morph-example:1300afdce9b0e96e",
+      "sentence": "The new station is accessible to wheelchair users.",
+      "translationZh": "这座新车站可供轮椅使用者通行。"
+    },
+    {
+      "exampleId": "morph-example:441d5b329132af63",
+      "sentence": "The archive is accessible through the university website.",
+      "translationZh": "人们可以通过大学网站查阅这些档案。"
+    },
+    {
+      "exampleId": "morph-example:9775439d8c14fdde",
+      "sentence": "The town developed a plan for sustainable transport.",
+      "translationZh": "这个城镇制定了一项可持续交通计划。"
+    },
+    {
+      "exampleId": "morph-example:335b460a0a073800",
+      "sentence": "The project seeks a sustainable source of income.",
+      "translationZh": "该项目寻求一种可持续的收入来源。"
+    },
+    {
+      "exampleId": "morph-example:929cec7a9bb0b5c3",
+      "sentence": "The reaction is reversible under these conditions.",
+      "translationZh": "在这些条件下，这一反应是可逆的。"
+    },
+    {
+      "exampleId": "morph-example:55e471408b3d73b7",
+      "sentence": "Some of the effects may be reversible with treatment.",
+      "translationZh": "其中一些影响可能通过治疗得到逆转。"
+    },
+    {
+      "exampleId": "morph-example:c7f123f1140c2022",
+      "sentence": "The team checked the accuracy of the measurements.",
+      "translationZh": "团队核查了测量结果的准确性。"
+    },
+    {
+      "exampleId": "morph-example:a3630fb1b18f13b2",
+      "sentence": "The new map offers greater accuracy than the earlier version.",
+      "translationZh": "新地图比先前的版本更加精确。"
+    },
+    {
+      "exampleId": "morph-example:b21af177fd45a391",
+      "sentence": "The study must protect the privacy of its participants.",
+      "translationZh": "这项研究必须保护参与者的隐私。"
+    },
+    {
+      "exampleId": "morph-example:9c18490230cd1b5a",
+      "sentence": "Residents value the privacy of their homes.",
+      "translationZh": "居民珍视自己家中的私密空间。"
+    },
+    {
+      "exampleId": "morph-example:0708d5827d2b9133",
+      "sentence": "The region faces a shortage of skilled workers.",
+      "translationZh": "该地区面临技术工人短缺的问题。"
+    },
+    {
+      "exampleId": "morph-example:457313a25b953d88",
+      "sentence": "A water shortage forced the factory to reduce production.",
+      "translationZh": "水资源短缺迫使工厂减少产量。"
+    },
+    {
+      "exampleId": "morph-example:ef0c48e2f2ca5f84",
+      "sentence": "The event received extensive media coverage.",
+      "translationZh": "这次活动得到了媒体的广泛报道。"
+    },
+    {
+      "exampleId": "morph-example:d599344314b9744f",
+      "sentence": "The newspaper expanded its coverage of local issues.",
+      "translationZh": "这家报纸扩大了对本地议题的报道范围。"
+    },
+    {
+      "exampleId": "morph-example:4f877ee7087c6f97",
+      "sentence": "The archive provides secure storage for old manuscripts.",
+      "translationZh": "档案馆为古老手稿提供安全的保管条件。"
+    },
+    {
+      "exampleId": "morph-example:26df1a7ea54ab3e4",
+      "sentence": "We need more storage for the laboratory equipment.",
+      "translationZh": "我们需要更多空间来存放实验室设备。"
+    },
+    {
+      "exampleId": "morph-example:5c4fc5c0583d0c8b",
+      "sentence": "The development requires an environmental assessment.",
+      "translationZh": "这个开发项目需要进行环境评估。"
+    },
+    {
+      "exampleId": "morph-example:308b47aa0cae74f8",
+      "sentence": "Students investigated local environmental problems.",
+      "translationZh": "学生们调查了当地的环境问题。"
+    },
+    {
+      "exampleId": "morph-example:40689ac93ac5e89c",
+      "sentence": "The festival celebrates the city's cultural diversity.",
+      "translationZh": "这个节日旨在颂扬这座城市的文化多样性。"
+    },
+    {
+      "exampleId": "morph-example:dd7a40971c319600",
+      "sentence": "Cultural traditions influence food choices.",
+      "translationZh": "文化传统会影响人们对食物的选择。"
+    },
+    {
+      "exampleId": "morph-example:14a70b4846daa729",
+      "sentence": "The refusal to release the data delayed the investigation.",
+      "translationZh": "拒绝公布数据的决定延误了调查。"
+    },
+    {
+      "exampleId": "morph-example:1643b5f0e7347202",
+      "sentence": "The company explained its refusal to accept the proposal.",
+      "translationZh": "公司解释了拒绝接受该提案的原因。"
+    },
+    {
+      "exampleId": "morph-example:6ec2cc8b0d065a70",
+      "sentence": "The proposal met with strong resistance from residents.",
+      "translationZh": "这项提案遭到了居民的强烈抵制。"
+    },
+    {
+      "exampleId": "morph-example:6f286f7d69560601",
+      "sentence": "The manager tried to understand the resistance to change.",
+      "translationZh": "经理试图了解人们抵制变革的原因。"
+    },
+    {
+      "exampleId": "morph-example:c01dcd325529c132",
+      "sentence": "The project reduced the village's dependence on imported fuel.",
+      "translationZh": "该项目降低了村庄对进口燃料的依赖。"
+    },
+    {
+      "exampleId": "morph-example:e67d66731f543f7d",
+      "sentence": "Financial dependence made it difficult for him to leave home.",
+      "translationZh": "经济上的依赖使他难以离家。"
+    },
+    {
+      "exampleId": "morph-example:b3ee0f4165c14c0d",
+      "sentence": "Practice helped build her confidence.",
+      "translationZh": "练习帮助她建立了自信。"
+    },
+    {
+      "exampleId": "morph-example:96007faca57dbf29",
+      "sentence": "The team approached the task with confidence.",
+      "translationZh": "团队满怀信心地着手完成这项任务。"
+    },
+    {
+      "exampleId": "morph-example:6196b049a0003e25",
+      "sentence": "Each participant received the same instructions.",
+      "translationZh": "每位参与者都收到了相同的说明。"
+    },
+    {
+      "exampleId": "morph-example:2049fa9c7cc0dafe",
+      "sentence": "One participant withdrew before the final interview.",
+      "translationZh": "一位参与者在最后一次访谈前退出了。"
+    },
+    {
+      "exampleId": "morph-example:f773290c3196e672",
+      "sentence": "The company hired a consultant to review its energy use.",
+      "translationZh": "公司聘请了一位顾问来评估其能源使用情况。"
+    },
+    {
+      "exampleId": "morph-example:c204c0b97758be7e",
+      "sentence": "A financial consultant explained the costs of the project.",
+      "translationZh": "一位财务顾问解释了该项目的各项成本。"
+    },
+    {
+      "exampleId": "morph-example:0e1e12de428c0d61",
+      "sentence": "Each resident received a consultation letter.",
+      "translationZh": "每位居民都收到了一封征求意见的信。"
+    },
+    {
+      "exampleId": "morph-example:adac756b5f3a30ea",
+      "sentence": "A local resident reported the damaged fence.",
+      "translationZh": "一位当地居民报告了围栏受损的情况。"
+    },
+    {
+      "exampleId": "morph-example:52b6bd81de0b7246",
+      "sentence": "The survey collected information about dietary habits.",
+      "translationZh": "这项调查收集了有关饮食习惯的信息。"
+    },
+    {
+      "exampleId": "morph-example:01f87933bfe95c42",
+      "sentence": "Dietary changes can affect the results of the study.",
+      "translationZh": "饮食变化可能影响研究结果。"
+    },
+    {
+      "exampleId": "morph-example:c05212f0b2d31aa4",
+      "sentence": "The invention introduced a revolutionary way of storing information.",
+      "translationZh": "这项发明带来了一种革命性的信息存储方式。"
+    },
+    {
+      "exampleId": "morph-example:9998265c8f5b0d22",
+      "sentence": "The new technique was considered revolutionary at the time.",
+      "translationZh": "这项新技术在当时被认为具有革命性。"
+    },
+    {
+      "exampleId": "morph-example:2b98a6e96aa83c20",
+      "sentence": "Press the green button to activate the alarm.",
+      "translationZh": "按下绿色按钮以启动警报器。"
+    },
+    {
+      "exampleId": "morph-example:5346e88cf9050e34",
+      "sentence": "The sensor will activate the lights when someone enters.",
+      "translationZh": "有人进入时，传感器会开启照明灯。"
+    },
+    {
+      "exampleId": "morph-example:74457e82f261327f",
+      "sentence": "Clear goals can motivate students to practise regularly.",
+      "translationZh": "明确的目标能够激励学生定期练习。"
+    },
+    {
+      "exampleId": "morph-example:6ee6702e487e7a8e",
+      "sentence": "The coach tried to motivate the team before the final.",
+      "translationZh": "教练试图在决赛前激励队员们。"
+    },
+    {
+      "exampleId": "morph-example:1282bfba161f0154",
+      "sentence": "Students have considerable freedom to choose topics.",
+      "translationZh": "学生在选择课题时有相当大的自由。"
+    },
+    {
+      "exampleId": "morph-example:92d7450f775bdef8",
+      "sentence": "The policy protects freedom of expression.",
+      "translationZh": "这项政策保障言论自由。"
+    },
+    {
+      "exampleId": "morph-example:105b5e436055083e",
+      "sentence": "Repetitive tasks can cause boredom.",
+      "translationZh": "重复性的任务可能让人感到无聊。"
+    },
+    {
+      "exampleId": "morph-example:abfef11ef7f4e873",
+      "sentence": "The programme offers activities to relieve boredom.",
+      "translationZh": "该计划提供各种活动来缓解无聊感。"
+    },
+    {
+      "exampleId": "morph-example:5fa8c68b2c8308a6",
+      "sentence": "The kingdom developed a network of coastal trading ports.",
+      "translationZh": "这个王国建立了一个沿海贸易港口网络。"
+    },
+    {
+      "exampleId": "morph-example:f94b0bd680c309ab",
+      "sentence": "The document describes the laws of the medieval kingdom.",
+      "translationZh": "这份文件介绍了这个中世纪王国的法律。"
+    },
+    {
+      "exampleId": "morph-example:500f1a7f4c93abfb",
+      "sentence": "Each employee received a new security pass.",
+      "translationZh": "每位员工都收到了一张新的通行证。"
+    },
+    {
+      "exampleId": "morph-example:b0f934a37f898049",
+      "sentence": "The company hired another employee to manage deliveries.",
+      "translationZh": "公司又雇用了一名员工来管理配送工作。"
+    },
+    {
+      "exampleId": "morph-example:763156c2583e2fa0",
+      "sentence": "The interview follows a refugee settling into a new community.",
+      "translationZh": "这段访谈跟踪记录了一位难民融入新社区的过程。"
+    },
+    {
+      "exampleId": "morph-example:9708dc09a49b884e",
+      "sentence": "A young refugee joined the school's language programme.",
+      "translationZh": "一位年轻难民参加了学校的语言课程。"
+    },
+    {
+      "exampleId": "morph-example:525f33c14d5928a2",
+      "sentence": "Each trainee works with an experienced engineer.",
+      "translationZh": "每位实习生都与一位经验丰富的工程师一起工作。"
+    },
+    {
+      "exampleId": "morph-example:13b21a523c2466d1",
+      "sentence": "The trainee completed a safety course before entering the laboratory.",
+      "translationZh": "这位实习生在进入实验室之前完成了一门安全课程。"
+    },
+    {
+      "exampleId": "morph-example:c29f430e1fc7fb36",
+      "sentence": "The mountaineer checked the weather before setting out.",
+      "translationZh": "这位登山者在出发前查看了天气。"
+    },
+    {
+      "exampleId": "morph-example:2ea2d6caf96887b3",
+      "sentence": "An experienced mountaineer guided the research team.",
+      "translationZh": "一位经验丰富的登山者为研究团队带路。"
+    },
+    {
+      "exampleId": "morph-example:226de0dfb2d17f72",
+      "sentence": "The auctioneer announced the opening price.",
+      "translationZh": "拍卖师宣布了起拍价。"
+    },
+    {
+      "exampleId": "morph-example:214ba44f787094c9",
+      "sentence": "The museum asked an auctioneer to value the collection.",
+      "translationZh": "博物馆请一位拍卖师为这批藏品估价。"
+    },
+    {
+      "exampleId": "morph-example:c24a9623619c1aee",
+      "sentence": "The law was intended to prevent a profiteer from exploiting the shortage.",
+      "translationZh": "这项法律旨在防止投机商利用物资短缺牟取暴利。"
+    },
+    {
+      "exampleId": "morph-example:8771a361e58702d4",
+      "sentence": "The investigation exposed a profiteer selling essential supplies at inflated prices.",
+      "translationZh": "调查揭露了一名以虚高价格出售必需物资的投机商。"
+    },
+    {
+      "exampleId": "morph-example:aa8fef08cd0a8c79",
+      "sentence": "The builders will strengthen the damaged wall.",
+      "translationZh": "建筑工人将加固这堵受损的墙。"
+    },
+    {
+      "exampleId": "morph-example:87d491dc2aa231f1",
+      "sentence": "Shared activities can strengthen relationships within the community.",
+      "translationZh": "共同参与活动可以加强社区成员之间的关系。"
+    },
+    {
+      "exampleId": "morph-example:853a970ab37c7ba1",
+      "sentence": "Studying abroad can broaden a student's outlook.",
+      "translationZh": "留学能够拓宽学生的视野。"
+    },
+    {
+      "exampleId": "morph-example:2be860276271fc7e",
+      "sentence": "The reform will broaden access to higher education.",
+      "translationZh": "这项改革将扩大人们接受高等教育的机会。"
+    },
+    {
+      "exampleId": "morph-example:5018ef20804cf0a2",
+      "sentence": "The findings deepen our understanding of the process.",
+      "translationZh": "这些发现加深了我们对这一过程的理解。"
+    },
+    {
+      "exampleId": "morph-example:c9a574c33a454fd0",
+      "sentence": "The dispute may deepen existing divisions.",
+      "translationZh": "这场争端可能加剧现有的分歧。"
+    },
+    {
+      "exampleId": "morph-example:48a962024abb3cac",
+      "sentence": "The researcher interviewed twenty residents.",
+      "translationZh": "研究人员访谈了二十位居民。"
+    },
+    {
+      "exampleId": "morph-example:fb7388c03162cf10",
+      "sentence": "A young researcher noticed the unusual pattern.",
+      "translationZh": "一位年轻研究人员注意到了这种不寻常的规律。"
+    },
+    {
+      "exampleId": "morph-example:e2a6fa9f19997902",
+      "sentence": "A translator checked the wording of the questionnaire.",
+      "translationZh": "一位译者核查了问卷的措辞。"
+    },
+    {
+      "exampleId": "morph-example:6ae7d1aaff3ea103",
+      "sentence": "The publisher hired a translator for the report.",
+      "translationZh": "出版商为这份报告聘请了一位译者。"
+    },
+    {
+      "exampleId": "morph-example:6187163d4921e862",
+      "sentence": "An investor provided funds for the expansion.",
+      "translationZh": "一位投资者为扩建提供了资金。"
+    },
+    {
+      "exampleId": "morph-example:7b758fe6eb05b7a0",
+      "sentence": "Every investor received the annual report.",
+      "translationZh": "每位投资者都收到了年度报告。"
+    },
+    {
+      "exampleId": "morph-example:b05375253b63bfe1",
+      "sentence": "The bakery supplies bread to nearby schools.",
+      "translationZh": "这家面包店向附近的学校供应面包。"
+    },
+    {
+      "exampleId": "morph-example:1df4fe51c76e471b",
+      "sentence": "A family opened a bakery in the old market.",
+      "translationZh": "一家人在老市场开了一家面包店。"
+    },
+    {
+      "exampleId": "morph-example:ee93880a0da7237a",
+      "sentence": "The factory replaced its outdated machinery.",
+      "translationZh": "工厂更换了过时的机器设备。"
+    },
+    {
+      "exampleId": "morph-example:73f0b24e2e669947",
+      "sentence": "Only trained staff may operate the machinery.",
+      "translationZh": "只有受过培训的员工才可以操作这些机器设备。"
+    },
+    {
+      "exampleId": "morph-example:1db75b94b57406be",
+      "sentence": "The exhibition examines the history of slavery.",
+      "translationZh": "这场展览探讨了奴隶制的历史。"
+    },
+    {
+      "exampleId": "morph-example:db50379338283847",
+      "sentence": "The campaign called for the abolition of slavery.",
+      "translationZh": "这场运动呼吁废除奴隶制。"
+    },
+    {
+      "exampleId": "morph-example:60562f8fb9b86f36",
+      "sentence": "The resourceful team repaired the equipment with local materials.",
+      "translationZh": "这个善于应变的团队利用当地材料修好了设备。"
+    },
+    {
+      "exampleId": "morph-example:ee004874e5beec17",
+      "sentence": "Employers value resourceful graduates who can solve unfamiliar problems.",
+      "translationZh": "雇主看重那些能灵活解决陌生问题的毕业生。"
+    },
+    {
+      "exampleId": "morph-example:a88d49f9fe05fb11",
+      "sentence": "The sample was large enough to allow a meaningful comparison.",
+      "translationZh": "样本足够大，可以进行有意义的比较。"
+    },
+    {
+      "exampleId": "morph-example:8376889e79745e9b",
+      "sentence": "Volunteers wanted to make a meaningful contribution to the community.",
+      "translationZh": "志愿者们希望为社区作出有意义的贡献。"
+    },
+    {
+      "exampleId": "morph-example:cd2ed4911f5d4cd9",
+      "sentence": "The article offers an insightful analysis of migration.",
+      "translationZh": "这篇文章对人口迁移作出了富有洞察力的分析。"
+    },
+    {
+      "exampleId": "morph-example:bb796451f3d59c97",
+      "sentence": "She asked an insightful question about the research methods.",
+      "translationZh": "她就研究方法提出了一个很有见地的问题。"
+    },
+    {
+      "exampleId": "morph-example:41e7a8d6e441f1e8",
+      "sentence": "The changes reduced the likelihood of an accident.",
+      "translationZh": "这些改变降低了事故发生的可能性。"
+    },
+    {
+      "exampleId": "morph-example:61e95cb7ddd11f53",
+      "sentence": "The forecast indicates a high likelihood of rain.",
+      "translationZh": "天气预报显示下雨的可能性很大。"
+    },
+    {
+      "exampleId": "morph-example:0e418a30a52c806b",
+      "sentence": "The study followed participants from childhood into adulthood.",
+      "translationZh": "这项研究从童年起一直跟踪参与者到成年。"
+    },
+    {
+      "exampleId": "morph-example:72f00b0d423e6801",
+      "sentence": "Financial independence is one important transition in adulthood.",
+      "translationZh": "经济独立是成年阶段的一项重要转变。"
+    },
+    {
+      "exampleId": "morph-example:cea670734f0c56d7",
+      "sentence": "The neighbourhood has good access to public transport.",
+      "translationZh": "这个街区的公共交通十分便利。"
+    },
+    {
+      "exampleId": "morph-example:5813eedfe26b2965",
+      "sentence": "Residents worked together to improve the neighbourhood.",
+      "translationZh": "居民们共同努力改善了这个街区。"
+    },
+    {
+      "exampleId": "morph-example:379a4927785f794a",
+      "sentence": "The report examines economic growth.",
+      "translationZh": "这份报告研究了经济增长问题。"
+    },
+    {
+      "exampleId": "morph-example:2f01fb734da77864",
+      "sentence": "Transport improvements can bring economic benefits.",
+      "translationZh": "改善交通能够带来经济效益。"
+    },
+    {
+      "exampleId": "morph-example:eb2f0a750886028e",
+      "sentence": "The new engine is more economical to operate.",
+      "translationZh": "这款新发动机的运行成本更低。"
+    },
+    {
+      "exampleId": "morph-example:a389b48fdd1ff42a",
+      "sentence": "Shared transport can be an economical choice for commuters.",
+      "translationZh": "对于通勤者来说，共享交通工具可以是一种经济实惠的选择。"
+    },
+    {
+      "exampleId": "morph-example:11a314fe7b52bc13",
+      "sentence": "The archive contains valuable historical records.",
+      "translationZh": "档案馆收藏着珍贵的历史记录。"
+    },
+    {
+      "exampleId": "morph-example:dee92dee7d1318ea",
+      "sentence": "The guide explained the building's historical importance.",
+      "translationZh": "导游解释了这座建筑的历史重要性。"
+    },
+    {
+      "exampleId": "morph-example:dbfec7723a707cc0",
+      "sentence": "The new form should simplify the application process.",
+      "translationZh": "新表格应该能简化申请流程。"
+    },
+    {
+      "exampleId": "morph-example:5ac99a24959e5f48",
+      "sentence": "Use a diagram to simplify the explanation.",
+      "translationZh": "用一张图来简化说明。"
+    },
+    {
+      "exampleId": "morph-example:5878d856f7578faa",
+      "sentence": "Could you clarify which documents we need to submit?",
+      "translationZh": "你能说明一下我们需要提交哪些文件吗？"
+    },
+    {
+      "exampleId": "morph-example:6c2827862f421d7e",
+      "sentence": "The final paragraph should clarify the link between the evidence and the conclusion.",
+      "translationZh": "最后一段应明确说明证据与结论之间的联系。"
+    },
+    {
+      "exampleId": "morph-example:22b530609c02e351",
+      "sentence": "The company must justify the increase in prices.",
+      "translationZh": "公司必须说明涨价的正当理由。"
+    },
+    {
+      "exampleId": "morph-example:b242cd125ab82e39",
+      "sentence": "The evidence does not justify such a strong conclusion.",
+      "translationZh": "这些证据不足以支持如此肯定的结论。"
+    },
+    {
+      "exampleId": "morph-example:3f55b670c9f3f76b",
+      "sentence": "The project depends on public funding.",
+      "translationZh": "该项目依赖公共资金支持。"
+    },
+    {
+      "exampleId": "morph-example:5f883cc7a4d1997b",
+      "sentence": "Additional funding was approved for the research centre.",
+      "translationZh": "研究中心获批了额外的资金。"
+    },
+    {
+      "exampleId": "morph-example:d7e9fa051ccb90ff",
+      "sentence": "The programme provides training for new teachers.",
+      "translationZh": "该计划为新教师提供培训。"
+    },
+    {
+      "exampleId": "morph-example:cef7c3129765b50d",
+      "sentence": "Staff need regular training in laboratory safety.",
+      "translationZh": "员工需要定期接受实验室安全培训。"
+    },
+    {
+      "exampleId": "morph-example:eeed440bec39c965",
+      "sentence": "Manufacturing remains an important source of employment.",
+      "translationZh": "制造业仍是一个重要的就业来源。"
+    },
+    {
+      "exampleId": "morph-example:b5e41c8ca3dd32e5",
+      "sentence": "The company invested in cleaner manufacturing.",
+      "translationZh": "公司投资于更加清洁的生产制造方式。"
+    },
+    {
+      "exampleId": "morph-example:c7116e9c8323434a",
+      "sentence": "The lecture examined how capitalism shaped industrial growth.",
+      "translationZh": "这场讲座研究了资本主义如何影响工业增长。"
+    },
+    {
+      "exampleId": "morph-example:76257f9de5b99246",
+      "sentence": "Students compared capitalism with other economic systems.",
+      "translationZh": "学生们将资本主义与其他经济制度进行了比较。"
+    },
+    {
+      "exampleId": "morph-example:9c4281a94024285c",
+      "sentence": "The proposal attracted considerable criticism.",
+      "translationZh": "这项提案引来了相当多的批评。"
+    },
+    {
+      "exampleId": "morph-example:47cc34d9a8dd8965",
+      "sentence": "She responded calmly to the criticism.",
+      "translationZh": "她平静地回应了这些批评。"
+    },
+    {
+      "exampleId": "morph-example:46c3fc8fb5b5cadb",
+      "sentence": "The locking mechanism prevents the door from opening accidentally.",
+      "translationZh": "锁定装置能够防止门意外打开。"
+    },
+    {
+      "exampleId": "morph-example:14a917f0868e5361",
+      "sentence": "Dust can damage the delicate mechanism inside the instrument.",
+      "translationZh": "灰尘会损坏仪器内部的精密机械装置。"
+    },
+    {
+      "exampleId": "morph-example:9d8c930f088bb18f",
+      "sentence": "An economist explained the likely effects of the tax.",
+      "translationZh": "一位经济学家解释了这项税收可能产生的影响。"
+    },
+    {
+      "exampleId": "morph-example:666e314ff376b9da",
+      "sentence": "The bank hired an economist to study regional employment.",
+      "translationZh": "银行聘请了一位经济学家研究该地区的就业情况。"
+    },
+    {
+      "exampleId": "morph-example:0864de12183fc82b",
+      "sentence": "A specialist inspected the damaged painting.",
+      "translationZh": "一位专家检查了这幅受损的画作。"
+    },
+    {
+      "exampleId": "morph-example:2da669586da711be",
+      "sentence": "The doctor referred her to a heart specialist.",
+      "translationZh": "医生将她转诊给了一位心脏专科医生。"
+    },
+    {
+      "exampleId": "morph-example:6bff198c6c45e380",
+      "sentence": "An environmentalist questioned the impact of the new road.",
+      "translationZh": "一位环保人士对新建道路的影响提出了质疑。"
+    },
+    {
+      "exampleId": "morph-example:9a7973383319964c",
+      "sentence": "The environmentalist worked with local farmers to protect the wetland.",
+      "translationZh": "这位环保人士与当地农民合作保护湿地。"
+    },
+    {
+      "exampleId": "morph-example:d893f57d321f7688",
+      "sentence": "The forest supports a remarkable diversity of plant life.",
+      "translationZh": "这片森林孕育着极其丰富多样的植物。"
+    },
+    {
+      "exampleId": "morph-example:dc592e863bec0b7b",
+      "sentence": "The festival celebrates the city's cultural diversity.",
+      "translationZh": "这个节日旨在颂扬这座城市的文化多样性。"
+    },
+    {
+      "exampleId": "morph-example:6627afcddb35c6ca",
+      "sentence": "The role requires maturity and responsibility.",
+      "translationZh": "这个职位要求成熟稳重并有责任心。"
+    },
+    {
+      "exampleId": "morph-example:bf56a477d0cb56ff",
+      "sentence": "Her sense of responsibility earned the team's trust.",
+      "translationZh": "她的责任感赢得了团队的信任。"
+    },
+    {
+      "exampleId": "morph-example:38cd0e4c21c75b16",
+      "sentence": "The campaign proved effective in reducing waste.",
+      "translationZh": "事实证明，这场宣传活动有效减少了浪费。"
+    },
+    {
+      "exampleId": "morph-example:c18dc2d77b5722e3",
+      "sentence": "An effective treatment must be both safe and affordable.",
+      "translationZh": "有效的治疗方法必须既安全又负担得起。"
+    },
+    {
+      "exampleId": "morph-example:c3a0fc36cffe244a",
+      "sentence": "The meeting was productive and ended with a clear plan.",
+      "translationZh": "这次会议富有成效，并在结束时形成了明确的计划。"
+    },
+    {
+      "exampleId": "morph-example:b2b038e77a1ab489",
+      "sentence": "A quiet workspace helps researchers remain productive.",
+      "translationZh": "安静的工作空间有助于研究人员保持工作效率。"
+    },
+    {
+      "exampleId": "morph-example:9eaa232bfe6e7073",
+      "sentence": "The animals show adaptive behaviour when food becomes scarce.",
+      "translationZh": "当食物变得稀缺时，这些动物会表现出适应性行为。"
+    },
+    {
+      "exampleId": "morph-example:50f3346902c504e1",
+      "sentence": "An adaptive system changes its settings as demand increases.",
+      "translationZh": "自适应系统会随着需求的增加而改变其设置。"
+    },
+    {
+      "exampleId": "morph-example:1f011c8a1981952e",
+      "sentence": "The programme aims to modernise the rail network.",
+      "translationZh": "该计划旨在使铁路网实现现代化。"
+    },
+    {
+      "exampleId": "morph-example:c4e4937ccd67ee15",
+      "sentence": "The factory needs to modernise its production equipment.",
+      "translationZh": "工厂需要对生产设备进行现代化升级。"
+    },
+    {
+      "exampleId": "morph-example:a01cf42047236a3f",
+      "sentence": "The researchers agreed to standardise their measurements.",
+      "translationZh": "研究人员同意统一测量标准。"
+    },
+    {
+      "exampleId": "morph-example:2a17980de614042e",
+      "sentence": "The new guidelines will standardise safety procedures.",
+      "translationZh": "新指南将使安全操作程序标准化。"
+    },
+    {
+      "exampleId": "morph-example:c7e3fa0b4f0e0bca",
+      "sentence": "The laboratory will specialise in water analysis.",
+      "translationZh": "这家实验室将专门从事水质分析。"
+    },
+    {
+      "exampleId": "morph-example:c275cd135dde7fc5",
+      "sentence": "Some graduates choose to specialise in environmental law.",
+      "translationZh": "一些毕业生选择专门研究环境法。"
+    },
+    {
+      "exampleId": "morph-example:846685939d119db2",
+      "sentence": "The region faced relentless pressure on its water supplies.",
+      "translationZh": "该地区的供水面临持续不减的压力。"
+    },
+    {
+      "exampleId": "morph-example:bab872b58054ce55",
+      "sentence": "The team maintained a relentless focus on safety.",
+      "translationZh": "团队始终毫不松懈地重视安全。"
+    },
+    {
+      "exampleId": "morph-example:829a433d50fb1c34",
+      "sentence": "The exhibition explores a timeless question about identity.",
+      "translationZh": "这场展览探讨了一个有关身份认同的永恒问题。"
+    },
+    {
+      "exampleId": "morph-example:b6c893813932040e",
+      "sentence": "The design has a simple and timeless appeal.",
+      "translationZh": "这一设计简洁而经久耐看。"
+    },
+    {
+      "exampleId": "morph-example:b3c8f4e29c773be5",
+      "sentence": "The service provides a seamless connection between rail and bus routes.",
+      "translationZh": "这项服务使铁路与公交线路顺畅衔接。"
+    },
+    {
+      "exampleId": "morph-example:a777eacbd337441b",
+      "sentence": "The team worked towards a seamless transition to the new system.",
+      "translationZh": "团队努力实现向新系统的平稳无缝过渡。"
+    },
+    {
+      "exampleId": "morph-example:6be9528d4bd45d95",
+      "sentence": "The chair took a businesslike approach to the meeting.",
+      "translationZh": "主持人以务实高效的方式组织会议。"
+    },
+    {
+      "exampleId": "morph-example:986b5bcc0619a4b9",
+      "sentence": "Her businesslike manner helped resolve the dispute quickly.",
+      "translationZh": "她干练的处事方式帮助迅速解决了这场争端。"
+    },
+    {
+      "exampleId": "morph-example:140220ccb7f73a2e",
+      "sentence": "The artist retained a childlike curiosity about nature.",
+      "translationZh": "这位艺术家一直保持着孩子般对自然的好奇心。"
+    },
+    {
+      "exampleId": "morph-example:da0d6555deb37add",
+      "sentence": "The poem expresses a childlike sense of wonder.",
+      "translationZh": "这首诗表达了一种孩子般天真的惊奇感。"
+    },
+    {
+      "exampleId": "morph-example:292684b37eeb64c6",
+      "sentence": "The museum displays a lifelike model of the animal.",
+      "translationZh": "博物馆展出了一个栩栩如生的动物模型。"
+    },
+    {
+      "exampleId": "morph-example:bc789364f8c6298b",
+      "sentence": "The simulation produces lifelike movements.",
+      "translationZh": "该模拟系统能够产生逼真的动作。"
+    },
+    {
+      "exampleId": "morph-example:f23da948ee183ab0",
+      "sentence": "The road was flooded; consequently, the buses took another route.",
+      "translationZh": "道路被洪水淹没，因此公交车改走了另一条路线。"
+    },
+    {
+      "exampleId": "morph-example:6a9e6d3990d3f1bb",
+      "sentence": "The sample was too small; consequently, the findings remained uncertain.",
+      "translationZh": "样本太小，因此研究结果仍不确定。"
+    },
+    {
+      "exampleId": "morph-example:ef57e223c7ed5101",
+      "sentence": "Public transport use increased substantially after the fare reduction.",
+      "translationZh": "票价降低后，公共交通的使用量大幅增加。"
+    },
+    {
+      "exampleId": "morph-example:45f403e66cfcd73c",
+      "sentence": "The revised plan is substantially different from the original.",
+      "translationZh": "修改后的计划与原计划有很大不同。"
+    },
+    {
+      "exampleId": "morph-example:9dfb7cfcf96b51eb",
+      "sentence": "Online courses are increasingly popular.",
+      "translationZh": "在线课程越来越受欢迎。"
+    },
+    {
+      "exampleId": "morph-example:a51f07197ae343cd",
+      "sentence": "The equipment became increasingly difficult to maintain.",
+      "translationZh": "这些设备变得越来越难以维护。"
+    },
+    {
+      "exampleId": "morph-example:aa025e0c0100fe69",
+      "sentence": "The project requires an environmental assessment.",
+      "translationZh": "该项目需要进行环境评估。"
+    },
+    {
+      "exampleId": "morph-example:80a6aee560e27505",
+      "sentence": "Her assessment was based on detailed observations.",
+      "translationZh": "她的评估以细致的观察为依据。"
+    },
+    {
+      "exampleId": "morph-example:9b123820333f3c8d",
+      "sentence": "The new equipment represents a substantial investment.",
+      "translationZh": "新设备意味着一笔可观的投资。"
+    },
+    {
+      "exampleId": "morph-example:53930c909efe0a8b",
+      "sentence": "She considered the apartment a long-term investment.",
+      "translationZh": "她把这套公寓视为一项长期投资。"
+    },
+    {
+      "exampleId": "morph-example:e6a801eac09e3044",
+      "sentence": "Her commitment to education remained strong throughout her career.",
+      "translationZh": "在整个职业生涯中，她始终坚定地投身教育事业。"
+    },
+    {
+      "exampleId": "morph-example:ce0b934a3c2097b0",
+      "sentence": "The project requires a long-term commitment from every partner.",
+      "translationZh": "这个项目要求每个合作伙伴长期投入。"
+    },
+    {
+      "exampleId": "morph-example:522bbc972ef398f6",
+      "sentence": "The campaign aims to increase awareness of water waste.",
+      "translationZh": "这场宣传活动旨在提高人们对浪费水资源问题的认识。"
+    },
+    {
+      "exampleId": "morph-example:fceff7f7a2063841",
+      "sentence": "He showed little awareness of the difficulties facing local farmers.",
+      "translationZh": "他对当地农民面临的困难几乎毫无了解。"
+    },
+    {
+      "exampleId": "morph-example:d2d0ba66054c4aa2",
+      "sentence": "The trial measured the effectiveness of the training.",
+      "translationZh": "这次试验衡量了培训的成效。"
+    },
+    {
+      "exampleId": "morph-example:568a2f34f68c7a50",
+      "sentence": "Regular maintenance improves the effectiveness of the ventilation system.",
+      "translationZh": "定期维护能够提高通风系统的效能。"
+    },
+    {
+      "exampleId": "morph-example:1700313af082ff37",
+      "sentence": "The survey measured willingness to pay for cleaner energy.",
+      "translationZh": "这项调查衡量了人们为更清洁的能源付费的意愿。"
+    },
+    {
+      "exampleId": "morph-example:c20ca909ca2d2c6d",
+      "sentence": "The agreement depends on a willingness to compromise.",
+      "translationZh": "这项协议有赖于各方愿意作出妥协。"
+    },
+    {
+      "exampleId": "morph-example:b0883deee79b17d2",
+      "sentence": "Workers receive special training before handling hazardous chemicals.",
+      "translationZh": "工人在接触危险化学品之前要接受专门培训。"
+    },
+    {
+      "exampleId": "morph-example:d32059b3361d95d4",
+      "sentence": "The storm created hazardous conditions on the coast.",
+      "translationZh": "暴风雨使沿海地区出现了危险状况。"
+    },
+    {
+      "exampleId": "morph-example:1697252758cbb76b",
+      "sentence": "The city announced an ambitious plan to reduce emissions.",
+      "translationZh": "该市宣布了一项雄心勃勃的减排计划。"
+    },
+    {
+      "exampleId": "morph-example:ef0e331776214e9f",
+      "sentence": "The project has ambitious goals but limited funding.",
+      "translationZh": "这个项目目标宏大，但资金有限。"
+    },
+    {
+      "exampleId": "morph-example:fa9978fd207e0029",
+      "sentence": "She received a prestigious award for her research.",
+      "translationZh": "她因自己的研究获得了一项享有盛誉的奖项。"
+    },
+    {
+      "exampleId": "morph-example:b471215d4b8311d2",
+      "sentence": "The university attracted funding from a prestigious foundation.",
+      "translationZh": "这所大学吸引到了一家知名基金会的资助。"
+    },
+    {
+      "exampleId": "morph-example:69da1d59ebf73c75",
+      "sentence": "She won a scholarship to study engineering.",
+      "translationZh": "她获得了一笔用于攻读工程学的奖学金。"
+    },
+    {
+      "exampleId": "morph-example:14a1c28d2e585ec2",
+      "sentence": "The scholarship covers tuition and living costs.",
+      "translationZh": "这笔奖学金涵盖学费和生活费。"
+    },
+    {
+      "exampleId": "morph-example:0d43d94244adebc9",
+      "sentence": "The course introduces students to entrepreneurship.",
+      "translationZh": "这门课程向学生介绍创业活动。"
+    },
+    {
+      "exampleId": "morph-example:b0dafa44e6ea4c20",
+      "sentence": "Local entrepreneurship can create new employment opportunities.",
+      "translationZh": "本地创业能够创造新的就业机会。"
+    },
+    {
+      "exampleId": "morph-example:6cf92faa83f24f92",
+      "sentence": "The university formed a partnership with the local museum.",
+      "translationZh": "这所大学与当地博物馆建立了合作关系。"
+    },
+    {
+      "exampleId": "morph-example:42fe604ebff21c8e",
+      "sentence": "Their business partnership began with a small design project.",
+      "translationZh": "他们的商业合作始于一个小型设计项目。"
+    },
+    {
+      "exampleId": "morph-example:909d23eee98d7324",
+      "sentence": "The device developed a troublesome fault.",
+      "translationZh": "这个装置出现了一个棘手的故障。"
+    },
+    {
+      "exampleId": "morph-example:94736b692d66400f",
+      "sentence": "The report identifies a troublesome gap in the evidence.",
+      "translationZh": "这份报告指出了证据中一处令人困扰的缺漏。"
+    },
+    {
+      "exampleId": "morph-example:f45927b82238cbe9",
+      "sentence": "Small firms described the paperwork as burdensome.",
+      "translationZh": "小企业表示，这些文书工作让它们负担沉重。"
+    },
+    {
+      "exampleId": "morph-example:9379fce63e0fb630",
+      "sentence": "The new fees may be burdensome for low-income households.",
+      "translationZh": "新增的费用可能会给低收入家庭带来沉重负担。"
+    },
+    {
+      "exampleId": "morph-example:cbc6c3135dde3fdd",
+      "sentence": "The school provides children with wholesome meals made from fresh ingredients.",
+      "translationZh": "学校为孩子们提供用新鲜食材制作的健康餐食。"
+    },
+    {
+      "exampleId": "morph-example:5225fa692d883867",
+      "sentence": "Families need access to affordable, wholesome food.",
+      "translationZh": "各个家庭都需要能够获得价格实惠、有益健康的食物。"
+    },
+    {
+      "exampleId": "morph-example:88b02f21d34bb7f2",
+      "sentence": "The driver moved the truck backward towards the loading bay.",
+      "translationZh": "司机将卡车倒向装卸区。"
+    },
+    {
+      "exampleId": "morph-example:b07d97f8194870c3",
+      "sentence": "He took a step backward to see the whole painting.",
+      "translationZh": "他向后退了一步，以便看清整幅画。"
+    },
+    {
+      "exampleId": "morph-example:670d32d84111a8d1",
+      "sentence": "Heat flows outward from the warm centre of the Earth.",
+      "translationZh": "热量从地球温度较高的中心向外流动。"
+    },
+    {
+      "exampleId": "morph-example:c53b00dede0b31aa",
+      "sentence": "The doors open outward to allow a rapid evacuation.",
+      "translationZh": "这些门向外开启，以便人们迅速疏散。"
+    },
+    {
+      "exampleId": "morph-example:d66cd0310a659640",
+      "sentence": "The crew sailed homeward after completing the survey.",
+      "translationZh": "船员们完成调查后乘船返航。"
+    },
+    {
+      "exampleId": "morph-example:1f45758dfd90d7cc",
+      "sentence": "The hikers turned homeward before the weather worsened.",
+      "translationZh": "徒步旅行者在天气恶化前踏上了归途。"
+    },
+    {
+      "exampleId": "morph-example:15ca4a0f6d559171",
+      "sentence": "The first experiment failed, and the second did likewise.",
+      "translationZh": "第一次实验失败了，第二次也同样失败了。"
+    },
+    {
+      "exampleId": "morph-example:9142d8fffc732761",
+      "sentence": "The north coast is dry; the inland region is likewise short of water.",
+      "translationZh": "北部海岸气候干燥，内陆地区也同样缺水。"
+    },
+    {
+      "exampleId": "morph-example:4572a073500c0131",
+      "sentence": "Leave now; otherwise, you may miss the train.",
+      "translationZh": "现在就出发吧，否则你可能赶不上火车。"
+    },
+    {
+      "exampleId": "morph-example:7b906e45eba74f67",
+      "sentence": "Label each sample carefully, otherwise confusion may result.",
+      "translationZh": "仔细给每个样本贴上标签，否则可能发生混淆。"
+    },
+    {
+      "exampleId": "morph-example:447897ed845248ba",
+      "sentence": "Turn the dial clockwise to increase the pressure.",
+      "translationZh": "顺时针转动旋钮以增大压力。"
+    },
+    {
+      "exampleId": "morph-example:b4f013f8efaa11c3",
+      "sentence": "The current moves clockwise around the basin.",
+      "translationZh": "水流绕着这个盆地呈顺时针方向流动。"
+    },
+    {
+      "exampleId": "morph-example:3134ef6c9bb1e8de",
+      "sentence": "The investment was too risky for the small company.",
+      "translationZh": "对这家小公司来说，这项投资的风险太高。"
+    },
+    {
+      "exampleId": "morph-example:9363b709cd83cb52",
+      "sentence": "It is risky to draw conclusions from so little evidence.",
+      "translationZh": "仅凭这么少的证据就下结论是有风险的。"
+    },
+    {
+      "exampleId": "morph-example:acde11431fa7795f",
+      "sentence": "The application requires a lengthy review process.",
+      "translationZh": "这项申请需要经过漫长的审核流程。"
+    },
+    {
+      "exampleId": "morph-example:2a99c5a05b6db20f",
+      "sentence": "The committee produced a lengthy report.",
+      "translationZh": "委员会撰写了一份篇幅很长的报告。"
+    },
+    {
+      "exampleId": "morph-example:eba280d2065a337d",
+      "sentence": "A wealthy donor helped fund the new library.",
+      "translationZh": "一位富有的捐赠者出资帮助兴建了新图书馆。"
+    },
+    {
+      "exampleId": "morph-example:1a8872da92dff5d5",
+      "sentence": "The survey compared housing conditions in poor and wealthy districts.",
+      "translationZh": "这项调查比较了贫困地区和富裕地区的住房条件。"
+    },
+    {
+      "exampleId": "morph-example:8a934f9515bea411",
+      "sentence": "The clinic provides a booklet explaining the procedure.",
+      "translationZh": "诊所提供了一本介绍该操作流程的小册子。"
+    },
+    {
+      "exampleId": "morph-example:8e75956ad7255710",
+      "sentence": "A booklet describes the history of the site.",
+      "translationZh": "一本小册子介绍了这个遗址的历史。"
+    },
+    {
+      "exampleId": "morph-example:54d297a6a2710f5a",
+      "sentence": "The leaflet explains how to apply for the grant.",
+      "translationZh": "这张宣传页说明了如何申请这笔补助金。"
+    },
+    {
+      "exampleId": "morph-example:d92519081f65f350",
+      "sentence": "Volunteers distributed a leaflet about recycling.",
+      "translationZh": "志愿者们分发了有关回收利用的宣传页。"
+    },
+    {
+      "exampleId": "morph-example:c76f88f8ce77133c",
+      "sentence": "A droplet of water formed on the surface.",
+      "translationZh": "表面上形成了一小滴水。"
+    },
+    {
+      "exampleId": "morph-example:2ec98ea77a0d8d2b",
+      "sentence": "The instrument measures the size of each droplet.",
+      "translationZh": "这台仪器测量每个小滴的大小。"
+    },
+    {
+      "exampleId": "morph-example:ac8a8827f8f29092",
+      "sentence": "The samples were taken to the laboratory for analysis.",
+      "translationZh": "这些样本被送往实验室进行分析。"
+    },
+    {
+      "exampleId": "morph-example:49382d8bb3301621",
+      "sentence": "A new laboratory will support research into renewable energy.",
+      "translationZh": "一间新实验室将为可再生能源研究提供支持。"
+    },
+    {
+      "exampleId": "morph-example:99ca479809910c2f",
+      "sentence": "The observatory monitors changes in the night sky.",
+      "translationZh": "这座天文台监测夜空中的变化。"
+    },
+    {
+      "exampleId": "morph-example:6723707f2eed8c2d",
+      "sentence": "Scientists installed a new telescope at the observatory.",
+      "translationZh": "科学家在天文台安装了一台新的望远镜。"
+    },
+    {
+      "exampleId": "morph-example:6be3221001970124",
+      "sentence": "The university converted the old building into a dormitory.",
+      "translationZh": "这所大学将旧楼改建成了宿舍。"
+    },
+    {
+      "exampleId": "morph-example:a436ab54ae231ce4",
+      "sentence": "Each dormitory has a shared study area.",
+      "translationZh": "每栋宿舍楼都有一个共用学习区。"
+    },
+    {
+      "exampleId": "morph-example:974cb6c455dfb7b4",
+      "sentence": "Early exposure to music can encourage an interest in rhythm.",
+      "translationZh": "早期接触音乐能够培养对节奏的兴趣。"
+    },
+    {
+      "exampleId": "morph-example:5023e1053b6e07c8",
+      "sentence": "The equipment suffered damage after prolonged exposure to rain.",
+      "translationZh": "这些设备因长时间淋雨而受损。"
+    },
+    {
+      "exampleId": "morph-example:bb10cb2b3c63ef89",
+      "sentence": "The closure of the library left students without a quiet place to study.",
+      "translationZh": "图书馆关闭后，学生们失去了安静的学习场所。"
+    },
+    {
+      "exampleId": "morph-example:732387c1b6296102",
+      "sentence": "Heavy snowfall forced the temporary closure of the mountain road.",
+      "translationZh": "大雪迫使这条山路暂时关闭。"
+    },
+    {
+      "exampleId": "morph-example:b78d6f847052ab72",
+      "sentence": "The delay affected the departure of several trains.",
+      "translationZh": "这次延误影响了几列火车的发车。"
+    },
+    {
+      "exampleId": "morph-example:1cd717c9d4d1a9a0",
+      "sentence": "The team prepared the equipment before departure.",
+      "translationZh": "团队在出发前准备好了设备。"
+    },
+    {
+      "exampleId": "morph-example:bf66e80edd295f1e",
+      "sentence": "The hospital plans a major expansion.",
+      "translationZh": "医院计划进行大规模扩建。"
+    },
+    {
+      "exampleId": "morph-example:bcc1d4d90bf3878d",
+      "sentence": "The report examines the rapid expansion of online retail.",
+      "translationZh": "这份报告研究了网络零售的快速扩张。"
+    },
+    {
+      "exampleId": "morph-example:fb2aa7d4df8c6ffa",
+      "sentence": "Thick fur is an adaptation to life in a cold climate.",
+      "translationZh": "厚实的皮毛是适应寒冷气候生活的一种特征。"
+    },
+    {
+      "exampleId": "morph-example:5052ec14d2fbc658",
+      "sentence": "The study investigates adaptation to drought in wild plants.",
+      "translationZh": "这项研究探讨了野生植物对干旱的适应。"
+    },
+    {
+      "exampleId": "morph-example:03a59bc998a21288",
+      "sentence": "The evidence supports a different interpretation.",
+      "translationZh": "这些证据支持另一种解释。"
+    },
+    {
+      "exampleId": "morph-example:9759b02ad0934293",
+      "sentence": "Her interpretation of the poem surprised the class.",
+      "translationZh": "她对这首诗的解读让全班同学感到惊讶。"
+    },
+    {
+      "exampleId": "morph-example:2461d52c86e241e0",
+      "sentence": "She studies the ecology of freshwater lakes.",
+      "translationZh": "她研究淡水湖泊生态学。"
+    },
+    {
+      "exampleId": "morph-example:e0eb517a25fd1fb1",
+      "sentence": "The course introduces students to forest ecology.",
+      "translationZh": "这门课程向学生介绍森林生态学。"
+    },
+    {
+      "exampleId": "morph-example:30ef783424cc530d",
+      "sentence": "She studied sociology before becoming a policy researcher.",
+      "translationZh": "她在成为政策研究人员之前学习过社会学。"
+    },
+    {
+      "exampleId": "morph-example:bb21db1fc073478f",
+      "sentence": "The course links sociology with environmental studies.",
+      "translationZh": "这门课程将社会学与环境研究联系起来。"
+    }
+  ]
+}

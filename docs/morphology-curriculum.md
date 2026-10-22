@@ -1,6 +1,6 @@
 # 词根词缀系统课程：内容、核对与许可
 
-课程文件为 `src/data/morphology-curriculum.json`，内容版本 2。首批包含 160 课：80 个词根主题、40 个前缀主题、40 个后缀主题，482 个关联词义位，合计 463 个不同的“词＋词性＋具体义项”，每个词义有两条不同语境例句。跨课复用同义项时沿用相同词义与例句 ID，因此总句位为 964，不等于 964 条互不重复的句子。
+课程文件为 `src/data/morphology-curriculum.json`，内容版本 3。首批包含 160 课：80 个词根主题、40 个前缀主题、40 个后缀主题，482 个关联词义位，合计 463 个不同的“词＋词性＋具体义项”，每个词义有两条不同语境例句。跨课复用同义项时沿用相同词义与例句 ID，因此总句位为 964，按稳定 ID 去重为 926 条例句（925 个不同英文句子）。
 
 这是 IELTS Studio 编写的构词学习课程，不是官方雅思考纲，也不声称课程词汇会在特定考试中出现。课程独立于词汇 FSRS；仅在学习者逐词明确选择加入后，才由应用处理词汇待学关联。
 
@@ -31,6 +31,10 @@
 - 构词部件卡不把任意剩余字母编造成有含义的词根；历史词干与现代派生在关系标签和解释中区分。
 
 ## 内容许可
+
+版本 3 的完整中文例句译文为 IELTS Studio contributors 原创，采用本节相同 CC BY-SA 4.0 许可。离线作者资料表 `scripts/morphology-translations.json` 绑定例句稳定 ID、完整英文及完整译文。发布前逐句编写并交叉复核了全部 926 条；构建器拒绝缺失、重复 ID、英文错配和多余条目，不再用短词义填充例句。机械校验不能保证翻译质量，后续编辑仍需语义复核。
+
+教学标题展示「英文词 · 中文词义」，教学例句与已核对解析展示整句译文。单词 `meaningZh` 始终为短词义；版本 3 的例句 `meaningZh` 为整句译文。新练习和加入词汇学习的提示只取单词短词义，完整译文不会进入核对前题面。版本 1/2 的冻结题面仍按原例句提示校验，缺译文时明确提示，不借用新版资料补写旧历史。备份仍为 v6；已有会话不自动重写，遇版本冲突应先保留输入，再结束旧轮并重新载入。
 
 `src/data/morphology-curriculum.json`、本课程原创讲解和例句、`scripts/morphology-authored-words.tsv`、教学说明、构词干扰项、词源 manifest 摘录及其改编内容统一按 **[Creative Commons Attribution–ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/)** 分发。署名为 **IELTS Studio contributors, 2026; adapted with attribution to Wiktionary contributors and the New General Service List Project**。允许在遵守署名、许可链接、标明修改及相同方式共享等条件下复制和改编；许可不表示上述机构认可本应用。
 

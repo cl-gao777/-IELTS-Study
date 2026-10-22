@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "reviewedAt": "2026-10-22",
   "lessons": 160,
   "byKind": {
@@ -10,6 +10,7 @@
   "wordSlots": 482,
   "uniqueWordSenses": 463,
   "contextSlots": 964,
+  "uniqueTranslatedExamples": 926,
   "distinctSentences": 925,
   "levels": {
     "B2": 94,
