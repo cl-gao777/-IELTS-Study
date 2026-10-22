@@ -7,7 +7,7 @@ import { getDatabase } from "./db";
 import { assertDataEpoch, getDataEpoch } from "./data-integrity";
 import { studyDate } from "./preferences";
 import { morphologyLessonSchema, morphologySessionInputSchema, morphologyAttemptInputSchema, morphologyStudyInputSchema,
-  normaliseMorphologyAnswer, morphologyContextPrompt, type MorphologyLesson, type MorphologySession, type MorphologySessionState, type MorphologyQuestion,
+  normaliseMorphologyAnswer, morphologyContextPrompt, morphologyContextCue, type MorphologyLesson, type MorphologySession, type MorphologySessionState, type MorphologyQuestion,
   type MorphologyProgress, type MorphologyHistory, type MorphologyAnswerResult, type MorphologyWorkspace, type MorphologyCoursesResponse, type MorphologyStatistics } from "@/lib/morphology";
 
 export class MorphologyConflict extends Error { readonly status = 409; readonly code = "MORPHOLOGY_CONFLICT"; }
@@ -105,7 +105,7 @@ function buildQuestions(lesson:MorphologyLesson,database:Database.Database,run:n
   const meanings=lesson.meaningDistractors??[...new Set(other.map(l=>l.meaningZh))].slice(0,3);
   const questions:MorphologyQuestion[]=[{id:lesson.id+":meaning",kind:"meaning",prompt:`本课中 ${lesson.form} 表达的核心含义是什么？`,options:shuffled([lesson.meaningZh,...meanings]),acceptedAnswers:[lesson.meaningZh],hint:lesson.overviewZh,explanation:lesson.overviewZh,sentence:"",wordId:null},
     {id:lesson.id+":structure",kind:"structure",prompt:lesson.structureQuestion.prompt,options:shuffled(lesson.structureQuestion.options),acceptedAnswers:[lesson.structureQuestion.answer],hint:lesson.spellingZh,explanation:lesson.structureQuestion.explanation,sentence:"",wordId:null}];
-  for(const word of lesson.words){const example=word.examples[run%word.examples.length],prompt=morphologyContextPrompt(example);
+  for(const word of lesson.words){const example=word.examples[run%word.examples.length],prompt=morphologyContextPrompt(example,morphologyContextCue(lesson,word,example));
     if(!prompt.slice(0,prompt.indexOf("\n")).includes("______"))throw new Error("语境题无法安全遮蔽目标词。");
     questions.push({id:lesson.id+":context:"+word.id,kind:"context",prompt,options:[],acceptedAnswers:example.acceptedAnswers,hint:word.segments.map(s=>s.surface+"（"+s.meaningZh+"）").join(" + "),explanation:word.explanationZh,sentence:example.sentence,wordId:word.id});}
   return questions;

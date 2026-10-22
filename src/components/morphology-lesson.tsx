@@ -14,13 +14,13 @@ export function MorphologySources({ lesson, sourceIds }: { lesson: MorphologyLes
   return <details className={styles.sourceDetails}><summary>资料来源与许可</summary><ol>{sources.map(source => <li key={source.id}><a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a><br />{source.license} · 核对日期 {source.reviewedAt}<br />{source.note}</li>)}</ol><p>讲解和学习例句均供构词学习使用，不是雅思原题；具体词义应结合语境理解。</p></details>;
 }
 
-export function MorphologyWordDetails({ word, lesson, onSpeak, disabled = false }: { word: MorphologyWord; lesson: MorphologyLesson; onSpeak: (text: string) => void; disabled?: boolean }) {
+export function MorphologyWordDetails({ word, lesson, onSpeak, disabled = false, showMeaning = true }: { word: MorphologyWord; lesson: MorphologyLesson; onSpeak: (text: string) => void; disabled?: boolean; showMeaning?: boolean }) {
   return <>
     <div className={styles.wordMeta}><span className={ui.pill}>{word.partOfSpeech}</span><span className={ui.pill}>{relationLabels[word.relation]}</span>{word.level ? <span className={ui.pill}>{word.level}</span> : <span className={styles.small}>等级未标注</span>}{word.illustrative && <span className={styles.small}>构词示例</span>}</div>
-    <p><strong>{word.meaningZh}</strong><br />{word.definitionEn}</p>
+    <p>{showMeaning && <><strong>{word.meaningZh}</strong><br /></>}{word.definitionEn}</p>
     <div className={styles.segments} aria-label={`${word.term} 构词部件`}>{word.segments.map((segment, index) => <div key={index} className={styles.segment}><strong>{segment.surface}</strong><small>{segment.meaningZh}</small></div>)}</div>
     <p>{word.explanationZh}</p>
-    {word.examples.map(example => <blockquote className={styles.example} key={example.id}><div><p>{example.sentence}</p><p className={styles.translation}>{example.meaningZh}</p></div><button className={ui.buttonGhost} type="button" disabled={disabled} onClick={() => onSpeak(example.sentence)} aria-label={`播放 ${word.term} 例句`}>播放例句</button></blockquote>)}
+    {word.examples.map(example => <blockquote className={styles.example} key={example.id}><div><p>{example.sentence}</p><p className={styles.translation}>{lesson.version >= 3 ? example.meaningZh : "该版本未提供整句译文。"}</p></div><button className={ui.buttonGhost} type="button" disabled={disabled} onClick={() => onSpeak(example.sentence)} aria-label={`播放 ${word.term} 例句`}>播放例句</button></blockquote>)}
     {word.levelSource && <p className={styles.small}>等级依据：{word.levelSource}</p>}
     <MorphologySources lesson={lesson} sourceIds={word.sourceIds} />
   </>;
@@ -50,8 +50,8 @@ export function MorphologyLessonContent({ lesson, dataEpoch, disabled, onStale }
     {lesson.variants.length > 0 && <p className={styles.small}>常见形式：{lesson.variants.join(" / ")}</p>}
     <p>{lesson.overviewZh}</p><div className={styles.rule}><h3>组合与拼写规律</h3><p>{lesson.spellingZh}</p></div><div className={styles.rule}><h3>使用边界</h3><p>{lesson.limitsZh}</p></div>
     {audio.error && <p className={ui.error} role="alert">{audio.error}</p>}
-    <section className={styles.words} aria-label="关联词群">{lesson.words.map(word => <article key={word.id} className={styles.word}><div className={styles.heading}><h3>{word.term}</h3><div className={styles.actions}><button className={ui.buttonGhost} type="button" onClick={() => audio.play(word.term)} disabled={disabled}>单词发音</button>{!word.illustrative && <button className={ui.buttonSecondary} type="button" disabled={disabled || Boolean(enrolling) || Boolean(enrolled[word.id])} onClick={() => void enroll(word)}>{enrolling === word.id ? "正在保存…" : enrolled[word.id] === "paused" ? "原词已暂停" : enrolled[word.id] ? "已保存选择" : "加入词汇学习"}</button>}</div></div>
-      <MorphologyWordDetails word={word} lesson={lesson} disabled={disabled} onSpeak={text => audio.play(text)} />
+    <section className={styles.words} aria-label="关联词群">{lesson.words.map(word => <article key={word.id} className={styles.word}><div className={styles.heading}><h3>{word.term} <span className={styles.wordMeaning}>· {word.meaningZh}</span></h3><div className={styles.actions}><button className={ui.buttonGhost} type="button" onClick={() => audio.play(word.term)} disabled={disabled}>单词发音</button>{!word.illustrative && <button className={ui.buttonSecondary} type="button" disabled={disabled || Boolean(enrolling) || Boolean(enrolled[word.id])} onClick={() => void enroll(word)}>{enrolling === word.id ? "正在保存…" : enrolled[word.id] === "paused" ? "原词已暂停" : enrolled[word.id] ? "已保存选择" : "加入词汇学习"}</button>}</div></div>
+      <MorphologyWordDetails word={word} lesson={lesson} disabled={disabled} showMeaning={false} onSpeak={text => audio.play(text)} />
       {word.illustrative && <p className={styles.small}>此词仅用于说明构词，不作为新增学习词推荐。</p>}
       {messages[word.id] && <p role="status" className={ui.notice}>{messages[word.id]}{enrolled[word.id] === "paused" && <> <Link href="/vocabulary">前往词库恢复学习</Link></>}</p>}
     </article>)}</section>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { MorphologyPractice } from "./morphology-practice";
+import { MorphologyPractice, MorphologyResults } from "./morphology-practice";
+import { MorphologyLessonContent } from "./morphology-lesson";
 import { MorphologyClient, type MorphologyClientSnapshot } from "@/lib/morphology-client";
 
 function state(revealed = false, hintUsed = false): MorphologyClientSnapshot {
@@ -27,5 +28,26 @@ describe("morphology answer boundaries", () => {
   it("shows the submitted answer, full sentence and explanations only after a recorded result", () => {
     const html = renderToStaticMarkup(<MorphologyPractice client={new MorphologyClient()} state={state(true)} />);
     expect(html).toContain("portable"); expect(html).toContain("SECRET BREAKDOWN"); expect(html).toContain("你的回答"); expect(html).toContain("wrong"); expect(html).not.toContain("SECRET COURSE MEANING");
+  });
+  it("shows v3 translations after checking, but never mounts them in the question", () => {
+    const before = state(), after = state(true);
+    for (const snapshot of [before, after]) {
+      const lesson = snapshot.workspace!.session!.state.lesson; lesson.version = 3;
+      Object.assign(lesson.words[0].examples[0], { meaningZh: "这台便携式设备很有用。", acceptedAnswers: ["portable"] });
+    }
+    expect(renderToStaticMarkup(<MorphologyPractice client={new MorphologyClient()} state={before} />)).not.toContain("这台便携式设备很有用。");
+    const revealed = renderToStaticMarkup(<MorphologyPractice client={new MorphologyClient()} state={after} />);
+    expect(revealed.slice(0, revealed.indexOf("查看 portable"))).toContain("这台便携式设备很有用。");
+    expect(renderToStaticMarkup(<MorphologyResults session={after.workspace!.session!} busy={false} onRetry={() => {}} />)).toContain("这台便携式设备很有用。");
+  });
+  it("labels old history without inventing a sentence translation", () => {
+    const html = renderToStaticMarkup(<MorphologyPractice client={new MorphologyClient()} state={state(true)} />);
+    expect(html).toContain("该版本未提供整句译文。"); expect(html).not.toContain("此装置可携带");
+  });
+  it("puts the word meaning beside its heading and removes the repeated standalone gloss", () => {
+    const lesson = state().workspace!.session!.state.lesson; lesson.version = 3; lesson.variants = [];
+    const html = renderToStaticMarkup(<MorphologyLessonContent lesson={lesson} dataEpoch="epoch" disabled={false} onStale={() => {}} />);
+    expect(html).toMatch(/<h3>portable .*· 便携的<\/span><\/h3>/);
+    expect(html).not.toContain("<strong>便携的</strong>");
   });
 });

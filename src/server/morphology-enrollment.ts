@@ -9,6 +9,7 @@ import { ensureVocabularyTables, saveVocabularyEntry } from "./vocabulary";
 import { getVocabularyStudy, registerVocabularyCourse } from "./vocabulary-courses";
 import { isVocabularyTermPaused, readVocabularyTargetState } from "./vocabulary-targets";
 import { normaliseVocabularyAnswer, vocabularyInputSchema } from "@/lib/vocabulary";
+import { morphologyContextCue } from "@/lib/morphology";
 import type { VocabularyCatalogEntry, VocabularyExercise } from "@/lib/vocabulary-course";
 
 export const MORPHOLOGY_SELECTED_COURSE = "morphology-selected";
@@ -59,7 +60,7 @@ export function enrollMorphologyWord(raw: unknown, database: Database.Database =
         if (start < 0) throw new Error("课程例句目标词形无效。");
         return { id: `morphology:${example.id}`, version: lesson.version, status: "published", sentence: example.sentence,
           targetStart: start, targetEnd: start + example.targetSurface.length, targetSurface: example.sentence.slice(start, start + example.targetSurface.length),
-          acceptedAnswers: example.acceptedAnswers, meaningZh: example.meaningZh,
+          acceptedAnswers: example.acceptedAnswers, meaningZh: morphologyContextCue(lesson, word, example),
           source: "IELTS Studio 词根词缀课程原创语境例句", targetId };
       });
       const person = saveVocabularyEntry(vocabularyInputSchema.parse({

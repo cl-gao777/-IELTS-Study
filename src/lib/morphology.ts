@@ -33,11 +33,23 @@ export type MorphologyLesson = z.infer<typeof morphologyLessonSchema>;
 export type MorphologyWord = z.infer<typeof morphologyWordSchema>;
 export type MorphologySource = z.infer<typeof morphologySourceSchema>;
 export function normaliseMorphologyAnswer(value: string) { return value.trim().toLocaleLowerCase("en").replace(/[’‘]/g, "'").replace(/\s+/g, " "); }
-export function morphologyContextPrompt(example: z.infer<typeof morphologyExampleSchema>) {
+/** v1/v2 froze the cue on the example; v3 reserves that field for a full translation. */
+export function morphologyContextCue(lesson: Pick<MorphologyLesson, "version">, word: MorphologyWord, example: z.infer<typeof morphologyExampleSchema>) {
+  return lesson.version >= 3 ? word.meaningZh : example.meaningZh;
+}
+export function morphologyContextPrompt(example: z.infer<typeof morphologyExampleSchema>, cue = example.meaningZh) {
   const alternatives=[...new Set([example.targetSurface,...example.acceptedAnswers])].sort((a,b)=>b.length-a.length)
     .map(answer=>normaliseMorphologyAnswer(answer).replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/\s+/g,"\\s+").replace(/'/g,"['’‘]"));
   const expression=new RegExp(`(?<![A-Za-z])(?:${alternatives.join("|")})(?![A-Za-z])`,"gi");
-  return example.sentence.replace(expression,"______")+"\n"+example.meaningZh.replace(expression,"______");
+  return example.sentence.replace(expression,"______")+"\n"+cue.replace(expression,"______");
+}
+
+/** Only the frozen v3 lesson can identify a full translation; never borrow current content for old history. */
+export function morphologySentenceTranslation(lesson: MorphologyLesson, question: MorphologyQuestion) {
+  if (lesson.version < 3 || question.kind !== "context") return null;
+  const word = lesson.words.find(word => word.id === question.wordId);
+  return word?.examples.find(example => example.sentence === question.sentence
+    && JSON.stringify(example.acceptedAnswers) === JSON.stringify(question.acceptedAnswers))?.meaningZh ?? null;
 }
 
 export interface MorphologyQuestion {

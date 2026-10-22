@@ -77,6 +77,14 @@ describe("independent morphology study loop",()=>{
     const s=action(start(),"practice");expect(()=>submitMorphologyAttempt(answer(s,""),db)).toThrow("输入答案");
     const done=submitMorphologyAttempt(answer(s,"",true),db).session!;expect(done.state.results[0]).toMatchObject({correct:false,gaveUp:true,firstAttempt:true});
   });
+  it("uses the word cue rather than the complete v3 sentence translation",()=>{
+    const changed=structuredClone(lesson);changed.version=3;
+    changed.words[0].examples[0].meaningZh="我们每天运输货物。";
+    registerMorphologyLessons([changed],db);
+    const s=updateMorphologySession({action:"start",dataEpoch:getDataEpoch(db),operationId:randomUUID(),lessonId:changed.id,lessonVersion:3},db,now).session!;
+    expect(s.state.questions[2].prompt).toBe("We ______ goods every day.\n运输");
+    expect(s.state.lesson.words[0].examples[0].meaningZh).toBe("我们每天运输货物。");
+  });
   it("finishes a complete run, rotates sentences on retry and does not inflate first samples",()=>{
     let s=action(start(),"practice");const firstSentence=s.state.questions[2].sentence;
     while(s.status==="active"){const q=s.state.questions[s.state.questionIndex];s=submitMorphologyAttempt(answer(s,q.acceptedAnswers[0]),db,now).session!;s=action(s,"next");}

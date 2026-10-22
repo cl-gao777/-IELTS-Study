@@ -2,7 +2,7 @@ import { isDeepStrictEqual } from "node:util";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { morphologyLessonSchema, morphologySessionStateSchema, morphologyAnswerResultSchema, morphologyHistorySchema,
-  normaliseMorphologyAnswer, morphologyContextPrompt, type MorphologySessionState, type MorphologyAnswerResult } from "@/lib/morphology";
+  normaliseMorphologyAnswer, morphologyContextPrompt, morphologyContextCue, type MorphologySessionState, type MorphologyAnswerResult } from "@/lib/morphology";
 
 type Row = Record<string, string | number | null>;
 type Data = Record<string, Row[]>;
@@ -46,7 +46,7 @@ function validateFrozenQuestions(state: MorphologySessionState) {
       const example = word!.examples.find(example => example.sentence === question.sentence && isDeepStrictEqual(example.acceptedAnswers, question.acceptedAnswers));
       requireValid(example, "词根语境题不对应已冻结的例句与词形。");
       same(question.explanation, word!.explanationZh);
-      same(question.prompt, morphologyContextPrompt(example!));
+      same(question.prompt, morphologyContextPrompt(example!, morphologyContextCue(lesson, word!, example!)));
       same(question.hint, word!.segments.map(segment => segment.surface + "（" + segment.meaningZh + "）").join(" + "));
     }
   }

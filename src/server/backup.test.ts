@@ -174,8 +174,12 @@ afterEach(() => {
 });
 
 describe("morphology version 6 backup", () => {
-  function prepareCourseHistory() {
-    const db = holder.database!, clock = new Date("2026-10-22T08:00:00Z"), lesson = curriculum.lessons[0];
+  function prepareCourseHistory(legacyVersion?: number) {
+    const db = holder.database!, clock = new Date("2026-10-22T08:00:00Z"), lesson = structuredClone(curriculum.lessons[0]);
+    if (legacyVersion) {
+      lesson.version = legacyVersion;
+      for (const word of lesson.words) for (const example of word.examples) example.meaningZh = "旧版独立提示，保持原样";
+    }
     registerMorphologyLessons([lesson], db);
     const epoch = getDataEpoch(db);
     let session = updateMorphologySession({ action: "start", dataEpoch: epoch, operationId: randomUUID(), lessonId: lesson.id, lessonVersion: lesson.version }, db, clock).session!;
@@ -215,6 +219,20 @@ describe("morphology version 6 backup", () => {
     expect(() => updateMorphologySession({ action: "save", dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision, input: "旧页面" }, holder.database!)).toThrow("数据已恢复");
     expect(restored.data.vocabulary_scheduler_state).toEqual(snapshot.data.vocabulary_scheduler_state);
     expect(restored.data.vocabulary_reviews).toEqual(snapshot.data.vocabulary_reviews);
+  });
+  it.each([1, 2])("preserves original v%s prompts and snapshots inside v6 backups", version => {
+    prepareCourseHistory(version);
+    const snapshot = createBackup();
+    const lesson = JSON.parse(String(snapshot.data.morphology_lessons[0].data_json));
+    registerMorphologyLessons([{ ...lesson, version: 3, words: lesson.words.map((word: typeof lesson.words[number]) => ({ ...word, examples: word.examples.map((example: typeof word.examples[number]) => ({ ...example, meaningZh: "新版完整译文，不回填历史。" })) })) }], holder.database!);
+    const upgraded = createBackup(); expect(validateBackup(upgraded).version).toBe(6);
+    expect(upgraded.data.morphology_sessions).toEqual(snapshot.data.morphology_sessions);
+    restoreBackup(upgraded);
+    const restored = createBackup();
+    const frozen = JSON.parse(String(restored.data.morphology_sessions[0].state_json));
+    expect(frozen.lesson.version).toBe(version);
+    expect(frozen.questions[2].prompt).toContain("旧版独立提示，保持原样");
+    expect(JSON.stringify(frozen)).not.toContain("新版完整译文");
   });
   it("rejects forged course grades, changed frozen answers, repeated first samples and missing time ledger", () => {
     prepareCourseHistory(); const snapshot = createBackup();

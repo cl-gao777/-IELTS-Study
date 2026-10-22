@@ -33,6 +33,7 @@
 .word { padding-top:24px; border-top:1px solid var(--line); }
 .heading { justify-content:space-between; align-items:flex-start; }
 .heading h3 { margin:0; font-size:24px; overflow-wrap:anywhere; }
+.wordMeaning { font-size:18px; font-weight:500; color:var(--ink); }
 .wordMeta { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:8px 0; }
 .segments { display:flex; align-items:stretch; flex-wrap:wrap; gap:8px; margin:18px 0; }
 .segment { padding:10px 14px; border:1px solid var(--line); background:var(--page); border-radius:8px; }
@@ -40,7 +41,7 @@
 .segment small { color:var(--muted); font-size:13px; }
 .example { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:8px; border-left:3px solid var(--line); margin:16px 0; padding:4px 0 4px 16px; }
 .example p { margin:0; }
-.example .translation { color:var(--muted); font-size:14px; }
+.translation { color:var(--muted); font-size:16px; line-height:1.9; }
 .sourceDetails { margin-top:24px; border-top:1px solid var(--line); padding-top:16px; font-size:13px; line-height:1.8; }
 .sourceDetails summary { min-height:44px; cursor:pointer; color:var(--ink); }
 .sourceDetails a { color:var(--leaf); overflow-wrap:anywhere; }

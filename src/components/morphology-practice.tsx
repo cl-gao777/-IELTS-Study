@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { MorphologyClientSnapshot } from "@/lib/morphology-client";
 import { MorphologyClient } from "@/lib/morphology-client";
 import type { MorphologySession } from "@/lib/morphology";
+import { morphologySentenceTranslation } from "@/lib/morphology";
 import { useVocabularyCardAudio } from "./vocabulary-card-audio";
 import { MorphologySources, MorphologyWordDetails } from "./morphology-lesson";
 import { morphologyTitle } from "./morphology-catalogue";
@@ -30,7 +31,7 @@ export function MorphologyPractice({ client, state }: { client: MorphologyClient
     </form>
     {session.state.hintUsed && !result && <aside className={styles.hint} aria-label="构词提示"><strong>提示</strong><p>{question.hint}</p><span className={styles.small}>本题已标记为有提示练习，不计入首次独立准确率。</span></aside>}
     {result && <div className={styles.feedback} aria-live="polite"><h3 className={result.correct ? styles.correct : styles.incorrect}>{result.gaveUp ? "这次没有想起" : result.correct ? "回答正确" : "一起核对这个用法"}</h3><p>你的回答：<strong>{result.answer || "（未填写）"}</strong>{result.hintUsed ? " · 使用提示" : " · 未使用提示"}</p><p>本题答案：<strong>{result.acceptedAnswers.join(" / ")}</strong></p><p>{result.explanation}</p>
-      {result.sentence && <blockquote className={styles.fullSentence}>{result.sentence}<br /><button type="button" className={ui.buttonGhost} onClick={() => audio.play(result.sentence)} disabled={locked}>播放完整例句</button></blockquote>}
+      {result.sentence && <blockquote className={styles.fullSentence}>{result.sentence}<p className={styles.translation}>{morphologySentenceTranslation(session.state.lesson, question) ?? "该版本未提供整句译文。"}</p><button type="button" className={ui.buttonGhost} onClick={() => audio.play(result.sentence)} disabled={locked}>播放完整例句</button></blockquote>}
       {audio.error && <p role="alert" className={ui.error}>{audio.error}</p>}
       {word && <details className={styles.sourceDetails}><summary>查看 {word.term} 的完整构词资料</summary><MorphologyWordDetails word={word} lesson={session.state.lesson} disabled={locked} onSpeak={text => audio.play(text)} /></details>}
       <MorphologySources lesson={session.state.lesson} sourceIds={word?.sourceIds} />
@@ -45,6 +46,6 @@ export function MorphologyResults({ session, busy, onRetry }: { session: Morphol
   return <section className={ui.panel} aria-label="词根课程练习结果"><p className={ui.eyebrow}>本课练习已完成</p><h2>{morphologyTitle(session.state.lesson.form, session.state.lesson.titleZh)}</h2><p className={styles.small}>完成表示你做完了本轮题目，不代表已掌握。随时可以重练，不会产生到期任务或单词评分。</p>
     <dl className={styles.overview}><div><dt>本轮独立正确</dt><dd>{independent.filter(result => result.correct).length} / {independent.length}</dd></div><div><dt>有提示正确</dt><dd>{hinted.filter(result => result.correct).length} / {hinted.length}</dd></div><div><dt>首次独立样本</dt><dd>{first.filter(result => result.correct).length} / {first.length}</dd></div></dl>
     <div className={styles.actions}><button type="button" className={ui.button} disabled={busy} onClick={() => onRetry("whole")}>重练整课</button><button type="button" className={ui.buttonSecondary} disabled={busy || !weak.length} onClick={() => onRetry("weak")}>重练答错及提示题（{weak.length}）</button></div>
-    <ol className={styles.runResults}>{results.map((result, index) => <li key={result.questionId}><details><summary><span className={result.correct ? styles.correct : styles.incorrect}>第 {index + 1} 题 · {result.correct ? "正确" : "未答对"}</span>{result.hintUsed ? " · 有提示" : " · 独立"}{!result.firstAttempt && " · 重练样本"}</summary><p>原回答：{result.answer || "（未填写）"}</p><p>本题答案：{result.acceptedAnswers.join(" / ")}</p><p>{result.explanation}</p>{result.sentence && <blockquote className={styles.fullSentence}>{result.sentence}</blockquote>}</details></li>)}</ol>
+    <ol className={styles.runResults}>{results.map((result, index) => { const question = session.state.questions.find(question => question.id === result.questionId); return <li key={result.questionId}><details><summary><span className={result.correct ? styles.correct : styles.incorrect}>第 {index + 1} 题 · {result.correct ? "正确" : "未答对"}</span>{result.hintUsed ? " · 有提示" : " · 独立"}{!result.firstAttempt && " · 重练样本"}</summary><p>原回答：{result.answer || "（未填写）"}</p><p>本题答案：{result.acceptedAnswers.join(" / ")}</p><p>{result.explanation}</p>{result.sentence && <blockquote className={styles.fullSentence}>{result.sentence}<p className={styles.translation}>{question && morphologySentenceTranslation(session.state.lesson, question) || "该版本未提供整句译文。"}</p></blockquote>}</details></li>; })}</ol>
   </section>;
 }

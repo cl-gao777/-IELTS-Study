@@ -60,6 +60,15 @@ describe("explicit morphology sense enrollment", () => {
     expect(result.wordId).toBe(w.id); expect(personalRows()).toEqual(before);
     expect(selectVocabularyTargetCard(session(), now, db)).toMatchObject({ wordId: w.id, purpose: "learn-target" });
   });
+  it("enrolls v3 context exercises with short word cues rather than full translations", () => {
+    lesson.version = Math.max(3, lesson.version + 1);
+    lesson.words[0].examples[0].meaningZh = "整句译文不得进入词汇核对前题面。";
+    registerMorphologyLessons([lesson], db);
+    enrollMorphologyWord(request(), db);
+    const card = selectVocabularyTargetCard(session(), now, db)!;
+    expect(card.target?.meaningZh).toBe(lesson.words[0].meaningZh);
+    expect(JSON.stringify(card)).not.toContain("整句译文不得进入");
+  });
   it("deduplicates the same sense across lessons without changing its first selected content", () => {
     const first = enrollMorphologyWord(request(), db), other = { ...lesson, id: "other-unit", rank: 200 };
     registerMorphologyLessons([other], db);
