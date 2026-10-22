@@ -9,6 +9,7 @@ import { getVocabularyStudy, isVocabularyExerciseCurrent, listVocabularyCatalogE
 import { vocabularyRecallCue } from "@/lib/vocabulary-practice";
 import { isVocabularyCatalogEntryLearnable } from "@/lib/vocabulary-course";
 import { selectVocabularyTargetCard, vocabularyQueuePreview } from "./vocabulary-target-selection";
+import { morphologySelectedTargetRanks } from "./vocabulary-selected-targets";
 import { listVocabularyTargetStates, listVocabularyTermDispositions, getVocabularyTargetCounts, isVocabularyTargetCardCurrent, isVocabularyTermPaused, readVocabularyTargetDefinitions, vocabularyTargetEligible } from "./vocabulary-targets";
 
 export type VocabularySessionOperation =
@@ -87,10 +88,23 @@ export function changeVocabularySession(input: VocabularySessionOperation, now =
         return getVocabularySession();
       }
       const isNew = (word: ReturnType<typeof listVocabularyEntries>[number]) => !word.learningStartedAt && !word.hasReviewHistory && word.repetitions <= 0;
-      const words = listVocabularyEntries().filter((word) => !session.state.skippedIds.includes(word.id) && !isVocabularyTermPaused(word.term, database));
+      const definitions = readVocabularyTargetDefinitions(database).filter(({ entry, target }) => vocabularyTargetEligible(entry, target, advanced.focus ?? "general", database));
+      const held = new Set(listVocabularyTargetStates(database).filter(state => state.wordId && !state.paused && [1, 2].includes(state.step)
+        && definitions.some(({ target }) => target.id === state.targetId)
+        && (session.state.mode !== "context" || state.dueAt && Date.parse(state.dueAt) > now.getTime())).map(state => state.wordId));
+      const words = listVocabularyEntries().filter((word) => !held.has(word.id) && !session.state.skippedIds.includes(word.id) && !isVocabularyTermPaused(word.term, database));
       let word = words.filter((item) => !isNew(item) && Date.parse(item.dueAt) <= now.getTime())
         .sort((a, b) => Date.parse(a.dueAt) - Date.parse(b.dueAt) || a.id.localeCompare(b.id))[0];
       const settings = getVocabularyStudy(now, database);
+      // A hand-selected sense can be learned alongside a legacy non-target course.
+      // When none remains, continue the original course rather than replacing it.
+      if (!word && settings.activeCourseId && morphologySelectedTargetRanks(database).size) {
+        const selected = selectVocabularyTargetCard(session, now, database);
+        if (selected) {
+          writeVocabularySession(database, { ...session, state: { ...session.state, current: selected } }, now);
+          return getVocabularySession();
+        }
+      }
       const catalogWords = new Set((database.prepare("SELECT word_id FROM vocabulary_catalog_links WHERE detached=0").all() as { word_id: string }[]).map((link) => link.word_id));
       if (!word && settings.activeCourseId) word = words.filter((item) => isNew(item) && !catalogWords.has(item.id) && Boolean(vocabularyRecallCue(item).title))
         .sort((a, b) => Date.parse(a.dueAt) - Date.parse(b.dueAt) || a.id.localeCompare(b.id))[0];

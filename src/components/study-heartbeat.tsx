@@ -5,7 +5,7 @@ export function StudyHeartbeat(){
  const pathname=usePathname();
  useEffect(()=>{
    // Vocabulary owns a persistent pause control and idempotent foreground timer.
-   if(pathname.startsWith('/vocabulary'))return;
+   if(pathname.startsWith('/vocabulary') || pathname.startsWith('/morphology'))return;
    const area=document.querySelector('[data-study-area]')?.getAttribute('data-study-area') || (pathname.includes('reading')?'Reading':pathname.includes('listening')?'Listening':pathname.startsWith('/vocabulary')?'Vocabulary':pathname.startsWith('/writing')?'Writing':null);
    if(!area)return;
    const id=crypto.randomUUID();let active=Date.now();let last=Date.now();

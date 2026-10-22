@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "npm test && npm run typecheck && npm run lint && npm run build"
+    "validate:morphology": "node --experimental-strip-types scripts/morphology-validate.mjs",
+    "check": "npm test && npm run typecheck && npm run lint && npm run validate:morphology && npm run build"
   },
   "dependencies": {
     "@fontsource-variable/source-sans-3": "5.3.1",

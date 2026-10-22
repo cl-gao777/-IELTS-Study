@@ -19,6 +19,11 @@ import { canRecoverVocabularyDraft, type VocabularyRecovery } from "../lib/vocab
 import { V3_VOCABULARY_TABLES } from "./backup-vocabulary-courses";
 import { V4_VOCABULARY_TABLES } from "./backup-vocabulary-targets";
 import { V5_DURABILITY_TABLES } from "./backup-durability";
+import { V6_MORPHOLOGY_TABLES } from "./backup-morphology";
+import curriculum from "@/data/morphology-curriculum.json";
+import { registerMorphologyLessons, updateMorphologySession, submitMorphologyAttempt, recordMorphologyStudy, getMorphologyWorkspace } from "./morphology";
+import { enrollMorphologyWord } from "./morphology-enrollment";
+import { randomUUID } from "node:crypto";
 import { getDataEpoch, assertDataEpoch } from "./data-integrity";
 import { beginSubmission, submissionHash } from "./submissions";
 import { initialMockState } from "../lib/mock-exam";
@@ -168,12 +173,69 @@ afterEach(() => {
   rmSync(directory, { recursive: true, force: true });
 });
 
+describe("morphology version 6 backup", () => {
+  function prepareCourseHistory() {
+    const db = holder.database!, clock = new Date("2026-10-22T08:00:00Z"), lesson = curriculum.lessons[0];
+    registerMorphologyLessons([lesson], db);
+    const epoch = getDataEpoch(db);
+    let session = updateMorphologySession({ action: "start", dataEpoch: epoch, operationId: randomUUID(), lessonId: lesson.id, lessonVersion: lesson.version }, db, clock).session!;
+    session = updateMorphologySession({ action: "practice", dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision }, db, clock).session!;
+    session = updateMorphologySession({ action: "hint", dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision }, db, clock).session!;
+    while (session.status === "active") {
+      const question = session.state.questions[session.state.questionIndex];
+      session = submitMorphologyAttempt({ dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision, operationId: randomUUID(), questionId: question.id,
+        lessonVersion: lesson.version, answer: question.acceptedAnswers[0], gaveUp: false }, db, clock).session!;
+      session = updateMorphologySession({ action: "next", dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision }, db, clock).session!;
+    }
+    session = updateMorphologySession({ action: "start", dataEpoch: epoch, operationId: randomUUID(), lessonId: lesson.id, lessonVersion: lesson.version, retry: "whole" }, db, clock).session!;
+    session = updateMorphologySession({ action: "practice", dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision }, db, clock).session!;
+    session = updateMorphologySession({ action: "save", dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision, input: "未提交回答" }, db, clock).session!;
+    recordMorphologyStudy({ dataEpoch: epoch, sessionId: session.id, segmentId: randomUUID(), studyDate: "2026-10-22", seconds: 5 }, db, clock);
+    enrollMorphologyWord({ dataEpoch: epoch, operationId: randomUUID(), lessonId: lesson.id, lessonVersion: lesson.version, wordId: lesson.words.find(word => !word.illustrative)!.id }, db);
+    return { session, epoch };
+  }
+  it("upgrades complete v5 by adding empty morphology tables without manufacturing learning", () => {
+    const current = createBackup(), legacy = { ...structuredClone(current), version: 5 };
+    for (const table of V6_MORPHOLOGY_TABLES) delete legacy.data[table];
+    const frozen = JSON.stringify(legacy), upgraded = validateBackup(legacy);
+    expect(upgraded.version).toBe(6); expect(JSON.stringify(legacy)).toBe(frozen);
+    for (const table of V6_MORPHOLOGY_TABLES) expect(upgraded.data[table]).toEqual([]);
+    for (const table of Object.keys(legacy.data)) expect(upgraded.data[table]).toEqual(legacy.data[table]);
+    expect(() => validateBackup({ ...legacy, version: 6 })).toThrow("缺少数据表");
+  });
+  it("round-trips all course data, preserves frozen inputs, and freezes pre-restore writers", () => {
+    const { session, epoch } = prepareCourseHistory();
+    const snapshot = createBackup(); expect(V6_MORPHOLOGY_TABLES.every(table => snapshot.data[table].length > 0)).toBe(true);
+    expect(validateBackup(snapshot).version).toBe(6);
+    restoreBackup(snapshot);
+    const restored = createBackup(); expect(validateBackup(restored).version).toBe(6);
+    for (const table of V6_MORPHOLOGY_TABLES.filter(table => table !== "morphology_sessions")) expect(restored.data[table]).toEqual(snapshot.data[table]);
+    const state = getMorphologyWorkspace(holder.database!).session!;
+    expect(state).toMatchObject({ id: session.id, revision: session.revision + 2, state: { input: "未提交回答", paused: true } });
+    expect(() => updateMorphologySession({ action: "save", dataEpoch: epoch, sessionId: session.id, expectedRevision: session.revision, input: "旧页面" }, holder.database!)).toThrow("数据已恢复");
+    expect(restored.data.vocabulary_scheduler_state).toEqual(snapshot.data.vocabulary_scheduler_state);
+    expect(restored.data.vocabulary_reviews).toEqual(snapshot.data.vocabulary_reviews);
+  });
+  it("rejects forged course grades, changed frozen answers, repeated first samples and missing time ledger", () => {
+    prepareCourseHistory(); const snapshot = createBackup();
+    const grade = structuredClone(snapshot), run = JSON.parse(String(grade.data.morphology_runs[0].result_json));
+    run.correct = 999; grade.data.morphology_runs[0].result_json = JSON.stringify(run); expect(() => validateBackup(grade)).toThrow();
+    const question = structuredClone(snapshot), state = JSON.parse(String(question.data.morphology_sessions[0].state_json));
+    state.questions[0].acceptedAnswers = ["伪造答案"]; question.data.morphology_sessions[0].state_json = JSON.stringify(state); expect(() => validateBackup(question)).toThrow();
+    const time = structuredClone(snapshot); time.data.study_sessions = time.data.study_sessions.filter(row => row.area !== "Morphology"); expect(() => validateBackup(time)).toThrow();
+    const old = { ...structuredClone(snapshot), version: 5 }; expect(() => validateBackup(old)).toThrow("旧版备份");
+    const prompt = structuredClone(snapshot), frozen = JSON.parse(String(prompt.data.morphology_sessions[0].state_json));
+    frozen.questions[2].prompt = "A different question with the answer already visible."; prompt.data.morphology_sessions[0].state_json = JSON.stringify(frozen); expect(() => validateBackup(prompt)).toThrow();
+    const original = createBackup(); expect(() => restoreBackup(grade)).toThrow(); const after = createBackup(); expect(after.data).toEqual(original.data); expect(after.files).toEqual(original.files);
+  });
+});
+
 describe("complete local backup and restore", () => {
   it("strictly upgrades v4 without manufacturing run or submission identities", () => {
     const current = createBackup(), legacy = { ...structuredClone(current), version: 4 };
     for (const table of V5_DURABILITY_TABLES) delete legacy.data[table];
     const frozen = JSON.stringify(legacy), upgraded = validateBackup(legacy);
-    expect(upgraded.version).toBe(5); expect(JSON.stringify(legacy)).toBe(frozen);
+    expect(upgraded.version).toBe(6); expect(JSON.stringify(legacy)).toBe(frozen);
     expect(upgraded.data.app_data_state).toHaveLength(1);
     for (const table of V5_DURABILITY_TABLES.filter((table) => table !== "app_data_state")) expect(upgraded.data[table]).toEqual([]);
     for (const table of Object.keys(legacy.data)) expect(upgraded.data[table]).toEqual(legacy.data[table]);
@@ -195,7 +257,7 @@ describe("complete local backup and restore", () => {
     const state = { ...initialMockState(), paused: false, listeningAnswers: { q1: "sample" }, durations: { listening: 5, reading: 0, writing: 0 } };
     insert("mock_exam_sessions", { id: mockId, data_epoch: epoch, revision: 7, state_json: JSON.stringify(state), snapshot_json: JSON.stringify({ listeningSet: set, readingSet: { ...set, id: "sample-reading", kind: "reading", transcript: "", passage: "Sample" }, writingPrompt: "Discuss a topic." }), submission_id: mockSubmissionId, started_at: now, updated_at: now, status: "active", writer_id: writerId, lease_until: now, result_json: null });
     beginSubmission({ submissionId: mockSubmissionId, kind: "mock", scopeId: mockId, dataEpoch: epoch, payload: { essay: "Pending essay" } }, db);
-    const backup = createBackup(); expect(validateBackup(backup).version).toBe(5);
+    const backup = createBackup(); expect(validateBackup(backup).version).toBe(6);
     expect(V5_DURABILITY_TABLES.every((table) => backup.data[table].length > 0)).toBe(true);
     db.prepare("UPDATE practice_workspace_versions SET revision=10").run();
     db.prepare("UPDATE writing_draft_revisions SET revision=11").run();
@@ -209,7 +271,7 @@ describe("complete local backup and restore", () => {
     expect(restored.data.submission_receipts.find((row) => row.id === mockSubmissionId)).toMatchObject({ status: "failed", lease_id: null, owner_pid: null });
     expect(restored.data.submission_receipts.find((row) => row.id === receiptId)).toMatchObject({ status: "completed", result_json: '{"attempt":{"id":1}}', data_epoch: getDataEpoch(db) });
     for (const table of ["vocabulary_study_time_segments", "practice_attempts", "vocabulary_reviews", "vocabulary_scheduler_state"]) expect(restored.data[table]).toEqual(backup.data[table]);
-    expect(validateBackup(restored).version).toBe(5);
+    expect(validateBackup(restored).version).toBe(6);
     const beforeFailure = getDataEpoch(db), bad = structuredClone(restored); bad.data.submission_receipts[0].request_hash = "invalid";
     expect(() => restoreBackup(bad)).toThrow("提交审计"); expect(getDataEpoch(db)).toBe(beforeFailure);
   });
@@ -223,7 +285,7 @@ describe("complete local backup and restore", () => {
     for (const row of legacy.data.vocabulary_study_preferences) for (const column of ["focus", "next_level", "policy_version", "private_catalog_key"]) delete row[column];
     for (const row of legacy.data.vocabulary_catalog_entries) { const value = JSON.parse(String(row.data_json)); delete value.targets; row.data_json = JSON.stringify(value); }
     const frozen = JSON.stringify(legacy), migrated = validateBackup(legacy);
-    expect(migrated.version).toBe(5); expect(JSON.stringify(legacy)).toBe(frozen);
+    expect(migrated.version).toBe(6); expect(JSON.stringify(legacy)).toBe(frozen);
     for (const table of V4_VOCABULARY_TABLES) expect(migrated.data[table]).toEqual([]);
     expect(migrated.data.vocabulary_study_preferences).toEqual(current.data.vocabulary_study_preferences);
     expect(migrated.data.vocabulary_catalog_entries).toEqual(current.data.vocabulary_catalog_entries);
@@ -235,7 +297,7 @@ describe("complete local backup and restore", () => {
   });
   it("round-trips v4 target introduction, persistent pauses and exact active minute card without rewriting old schedules", () => {
     const fixture = addAdvancedFixtures(), backup = createBackup();
-    expect(validateBackup(backup).version).toBe(5);
+    expect(validateBackup(backup).version).toBe(6);
     expect(V4_VOCABULARY_TABLES.every((table) => backup.data[table].length > 0)).toBe(true);
     holder.database!.prepare("UPDATE vocabulary_study_preferences SET restore_version=18").run();
     holder.database!.prepare("UPDATE vocabulary_sessions SET revision=12").run();
@@ -308,7 +370,7 @@ describe("complete local backup and restore", () => {
     delete legacy.supplementalReviewed; delete legacy.current.supplemental; delete legacy.current.canSupplement;
     const raw = JSON.stringify(legacy);
     insert("vocabulary_sessions", { id: sessionId, revision: 1, status: "active", state_json: raw, started_at: now, updated_at: now });
-    const exported = createBackup(); expect(validateBackup(exported).version).toBe(5);
+    const exported = createBackup(); expect(validateBackup(exported).version).toBe(6);
     expect(JSON.parse(String(exported.data.vocabulary_sessions[0].state_json))).toEqual(state);
     expect(holder.database!.prepare("SELECT state_json FROM vocabulary_sessions WHERE id=?").get(sessionId)).toEqual({ state_json: raw });
   });
@@ -322,7 +384,7 @@ describe("complete local backup and restore", () => {
     delete state.supplementalReviewed; delete state.current.supplemental; delete state.current.canSupplement;
     legacy.data.vocabulary_sessions[0].state_json = JSON.stringify(state);
     const raw = JSON.stringify(legacy), migrated = validateBackup(legacy);
-    expect(JSON.stringify(legacy)).toBe(raw); expect(migrated.version).toBe(5);
+    expect(JSON.stringify(legacy)).toBe(raw); expect(migrated.version).toBe(6);
     expect(JSON.parse(String(migrated.data.vocabulary_sessions[0].state_json))).toMatchObject({ courseId: null, supplementalReviewed: 0, current: { exercise: null, requestedRating: null, ratingSource: "automatic", supplemental: false, canSupplement: false } });
     expect(migrated.data.vocabulary_review_context).toEqual([]);
     expect(migrated.data.vocabulary_supplemental_attempts).toEqual([]);
@@ -374,7 +436,7 @@ describe("complete local backup and restore", () => {
       current: { ...sessionState(word.id, "revealed").current, wordVersion: word.reviewVersion, exercise, answer: exercise.targetSurface.slice(0, -1), confirmedTypo: true, supplemental: true, canSupplement: false, requestedRating: "good" } };
     database.prepare("UPDATE vocabulary_sessions SET state_json=? WHERE id=?").run(JSON.stringify(state), sessionId);
     database.prepare("UPDATE vocabulary_words SET term='changed-after-auxiliary'").run();
-    const snapshot = createBackup(); expect(validateBackup(snapshot).version).toBe(5);
+    const snapshot = createBackup(); expect(validateBackup(snapshot).version).toBe(6);
     restoreBackup(snapshot); const restored = createBackup();
     for (const table of ["vocabulary_words", "vocabulary_learning_state", "vocabulary_reviews", "vocabulary_review_details", "vocabulary_scheduler_state", "vocabulary_supplemental_attempts"]) expect(restored.data[table]).toEqual(snapshot.data[table]);
     expect(readVocabularySession(database)).toMatchObject({ id: sessionId, revision: 3, status: "active", state });
@@ -425,7 +487,7 @@ describe("complete local backup and restore", () => {
     insert("vocabulary_sessions", { id: sessionId, revision: 1, status: "active", state_json: JSON.stringify(state), started_at: now, updated_at: now });
     const result = reviewVocabularyEntry(word.id, { rating: "good", mode: "context", userAnswer: exercise!.targetSurface, durationSeconds: 9, expectedVersion: word.reviewVersion, sessionId, expectedSessionRevision: 1, submissionId, confirmedTypo: false, gaveUp: false }, new Date(Date.parse(now) + 86400000));
     expect(result!.review).toMatchObject({ correct: true, courseId: "general", exercise });
-    const backup = createBackup(); expect(validateBackup(backup).version).toBe(5);
+    const backup = createBackup(); expect(validateBackup(backup).version).toBe(6);
     restoreBackup(backup);
     const restored = createBackup();
     for (const table of ["vocabulary_words", "vocabulary_reviews", "vocabulary_review_details", "vocabulary_review_audit", "vocabulary_review_context", "vocabulary_scheduler_state"]) expect(restored.data[table]).toEqual(backup.data[table]);
@@ -449,7 +511,7 @@ describe("complete local backup and restore", () => {
     database.prepare("UPDATE vocabulary_catalog_entries SET data_json=? WHERE id=?").run(JSON.stringify(entry), entry.id);
     const word = listVocabularyEntries()[0]; addSession(word.id);
     addSupplementalFixture(word.id, { ...entry.exercises[0], entryId: entry.id, courseId: entry.courseIds[0] });
-    const good = createBackup(); expect(validateBackup(good).version).toBe(5);
+    const good = createBackup(); expect(validateBackup(good).version).toBe(6);
     for (const [key, value] of [["materialId", "999"], ["fileSha256", "a".repeat(64)], ["passageId", "missing"], ["pdfPage", 1], ["endPdfPage", 4]] as const) {
       const bad = structuredClone(good), row = bad.data.vocabulary_catalog_entries.find((item) => item.id === entry.id)!;
       const changed = JSON.parse(String(row.data_json)); changed.exercises[0].sourceReference[key] = value; row.data_json = JSON.stringify(changed);
@@ -465,7 +527,7 @@ describe("complete local backup and restore", () => {
     const saved = checkpointVocabularyAssessment(active.id, active.revision, { answers: Object.fromEntries(active.questions.map((question) => [question.id, ""])), currentIndex: 30 }, database);
     submitVocabularyAssessment(active.id, saved.revision, database);
     createVocabularyImportPreview("pending.txt", [["pending"]], database);
-    const good = createBackup(); expect(validateBackup(good).version).toBe(5);
+    const good = createBackup(); expect(validateBackup(good).version).toBe(6);
     const badResult = structuredClone(good), result = JSON.parse(String(badResult.data.vocabulary_assessments[0].result_json));
     result.correct = 30; badResult.data.vocabulary_assessments[0].result_json = JSON.stringify(result);
     expect(() => validateBackup(badResult)).toThrow("测评结果");
@@ -543,11 +605,11 @@ describe("complete local backup and restore", () => {
     for (const table of V5_DURABILITY_TABLES) delete legacy.data[table];
     for (const table of ["vocabulary_learning_state", "vocabulary_sessions", "vocabulary_review_audit", ...V3_VOCABULARY_TABLES, ...V4_VOCABULARY_TABLES]) delete legacy.data[table];
     const frozenInput = JSON.stringify(legacy);
-    expect(validateBackup(legacy).version).toBe(5);
+    expect(validateBackup(legacy).version).toBe(6);
     expect(JSON.stringify(legacy)).toBe(frozenInput);
     restoreBackup(legacy);
     const restored = createBackup();
-    expect(restored.version).toBe(5);
+    expect(restored.version).toBe(6);
     for (const table of ["vocabulary_words", "vocabulary_reviews", "vocabulary_review_details", "vocabulary_scheduler_state"]) expect(restored.data[table]).toEqual(original.data[table]);
     expect(restored.data.vocabulary_learning_state[0].learning_started_at).toBe(now);
     expect(restored.data.vocabulary_review_audit).toEqual([]);
@@ -688,7 +750,7 @@ describe("complete local backup and restore", () => {
     const backup = createBackup();
     const tables = holder.database!.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[];
     expect(Object.keys(backup.data).sort()).toEqual(tables.map((table) => table.name));
-    expect(Object.entries(backup.data).filter(([table]) => !["vocabulary_sessions", "vocabulary_review_audit", ...V3_VOCABULARY_TABLES, ...V4_VOCABULARY_TABLES, ...V5_DURABILITY_TABLES].includes(table)).every(([, rows]) => rows.length > 0)).toBe(true);
+    expect(Object.entries(backup.data).filter(([table]) => !["vocabulary_sessions", "vocabulary_review_audit", ...V3_VOCABULARY_TABLES, ...V4_VOCABULARY_TABLES, ...V5_DURABILITY_TABLES, ...V6_MORPHOLOGY_TABLES].includes(table)).every(([, rows]) => rows.length > 0)).toBe(true);
     expect(backup.data.source_materials[0].file_path).toBe("upload:1");
     expect(JSON.stringify(backup)).not.toContain("test-secret-must-not-be-exported");
     holder.database!.prepare("UPDATE vocabulary_words SET meaning_zh = 'Changed after backup'").run();

@@ -2,7 +2,11 @@
 
 - Status: Accepted
 - Date: 2026-10-04
-- Updated: 2026-10-13
+- Updated: 2026-10-22
+
+## Version 6 morphology additions
+
+Version 6 adds independent morphology content, progress, frozen sessions, immutable answers/results, operation receipts, cumulative time segments and explicit vocabulary selections. Complete known v1–v5 backups receive empty morphology tables; v6 requires all nine. Restore validates frozen questions and grades, first-attempt identity, time ledger correspondence and selected-sense provenance, then advances session revisions and pauses recovered sessions. It does not recalculate vocabulary FSRS or invent old morphology activity. See [ADR 0008](0008-independent-morphology-course.md).
 
 ## Version 5 durability additions
 

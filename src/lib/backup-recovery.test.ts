@@ -11,7 +11,7 @@ describe("backup restore browser invalidation", () => {
     const channels: string[] = [];
     vi.stubGlobal("BroadcastChannel", class { constructor(name: string) { channels.push(name); } postMessage = postMessage; close = close; });
     notifyBackupRestored();
-    expect(removeItem.mock.calls).toEqual([["ielts-studio-writing-recovery"], ["ielts-studio-vocabulary-recovery"], ["ielts-studio-vocabulary-assessment"], ["ielts-studio-vocabulary-study"]]);
+    expect(removeItem.mock.calls).toEqual([["ielts-studio-writing-recovery"], ["ielts-studio-vocabulary-recovery"], ["ielts-studio-vocabulary-assessment"], ["ielts-studio-vocabulary-study"], ["ielts-studio-morphology-recovery"]]);
     expect(dispatchEvent.mock.calls[0][0].type).toBe(BACKUP_RESTORED_EVENT);
     expect(channels).toEqual([BACKUP_RESTORE_CHANNEL]);
     expect(postMessage).toHaveBeenCalledWith({ type: BACKUP_RESTORED_EVENT });
@@ -24,5 +24,11 @@ describe("backup restore browser invalidation", () => {
     vi.stubGlobal("BroadcastChannel", undefined);
     expect(() => notifyBackupRestored()).not.toThrow();
     expect(dispatchEvent).toHaveBeenCalledOnce();
+  });
+  it("clears every morphology time packet while preserving unrelated storage", () => {
+    const values = new Map([["ielts-studio-morphology-time:segment:a", "old"], ["ielts-studio-morphology-time:segment:b", "old"], ["theme", "dark"]]);
+    vi.stubGlobal("localStorage", { get length() { return values.size; }, key(index: number) { return [...values.keys()][index] ?? null; }, removeItem(key: string) { values.delete(key); } });
+    vi.stubGlobal("window", { dispatchEvent() {} }); vi.stubGlobal("BroadcastChannel", undefined);
+    notifyBackupRestored(); expect([...values]).toEqual([["theme", "dark"]]);
   });
 });

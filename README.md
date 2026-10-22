@@ -11,8 +11,9 @@ A local-first IELTS workspace. Clone it, run it on your computer, and keep your 
 - **词汇**：离线语境填空，认词、回忆、听写专项，共享 FSRS 调度；核对前隐藏答案，恢复原题面和输入。
 - **课程**：NGSL 1.2 基础词 2,809 个、NAWL 1.2 学术词 957 个，共 3,766 个词条和 7,532 道原创语境题；支持 TXT、CSV、Excel 导入。
 - **进阶用法**：支持 B2/C1 义项、熟词新用法、暂停与分钟级巩固；需自行导入相应学习资料。
+- **词根词缀**：160 课（80 词根、40 前缀、40 后缀），词群教学、选择与语境练习，保存中断位置、提示和首次作答；自行重练，不安排 FSRS。关联词仅在明确选择加入后进入词汇学习。
 - **写作与模考**：作文自动保存、计时、历史版本；可选 AI 反馈明确标为估计分数。
-- **记录与备份**：学习统计、错题、SQLite 持久保存，以及含附件的 v4 JSON 备份和恢复。
+- **记录与备份**：学习统计、错题、SQLite 持久保存，以及含附件、词根课程与会话的 v6 JSON 备份和恢复。
 
 ## 快速开始：Windows
 
@@ -59,7 +60,7 @@ npm start
 - `data/ai-provider.secret.json`：可选 AI 配置。
 - `data/backups/`：恢复前安全快照。
 
-Settings 可导出/恢复完整 JSON 备份。SQLite 快照不含附件和密钥；完整迁移请使用 JSON，或停服后备份整个数据目录。v4 支持本项目已知完整 v1/v2/v3 备份的升级，不能将上游不完整导出视为完整备份。
+Settings 可导出/恢复完整 JSON 备份。SQLite 快照不含附件和密钥；完整迁移请使用 JSON，或停服后备份整个数据目录。v6 支持本项目已知完整 v1–v5 备份的升级，不能将上游不完整导出视为完整备份。旧备份不补造词根学习记录，恢复后旧页面失效，未提交回答可保留为独立副本。
 
 升级前先备份，停止应用，再 `git pull`；保留 `data/` 和 `.env.local`，运行 `start.bat` 或重新 `npm ci && npm run build && npm start`。不要使用 `git clean -xfd`，它会删除 Git 忽略的个人资料。
 
@@ -75,5 +76,7 @@ npm run check
 ## 许可与来源
 
 程序使用 [MIT License](LICENSE)，保留上游作者和本项目维护者署名。NGSL/NAWL 词表、释义和本项目课包改编另按 **CC BY-SA 4.0** 分发，完整作者、下载来源、版本和 SHA-256 见 [词库许可说明](src/data/VOCABULARY-LICENSE.md) 及 [来源清单](src/data/vocabulary-source-manifest.json)。私人资料不因程序开源而获得再分发许可。
+
+词根词缀课程、来源摘录及改编另按 **CC BY-SA 4.0** 分发，逐项保留 Wiktionary 修订署名与公开词汇资料来源，见 [课程内容与许可](docs/morphology-curriculum.md)。仅有可核依据时标注 B2/C1，未标等级不等于基础词。
 
 本项目不是 IELTS 官方产品，词库不称为官方固定考纲；没有复制 Lingvist 课程内容。AI 反馈不代表正式 IELTS 成绩。

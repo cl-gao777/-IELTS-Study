@@ -1,0 +1,192 @@
+{
+  "id": "morph-root-spec-spect",
+  "version": 1,
+  "status": "published",
+  "kind": "root",
+  "rank": 1,
+  "form": "spec- / spect-",
+  "titleZh": "从看见到观察与观点",
+  "meaningZh": "看；观察",
+  "variants": [
+    "spec-",
+    "spect-"
+  ],
+  "overviewZh": "这组词追溯到拉丁语中表示看的词干。词根帮助建立词群联系，但借入英语后的词义不能只靠字面相加推导。",
+  "spellingZh": "spec-与spect-是这一拉丁词族在不同构词历史中留下的形式。以下切分用于说明词源，不表示spect可以自由拼接任何前缀。",
+  "limitsZh": "respect在本课学习尊重这一现代义；perspective学习看待问题的角度。两者都已超出单纯视觉动作，不应逐字翻译。",
+  "sources": [
+    {
+      "id": "wikt:inspect",
+      "title": "Wiktionary contributors · inspect · English Etymology",
+      "url": "https://en.wiktionary.org/wiki/inspect#Etymology",
+      "reviewedAt": "2026-10-22",
+      "license": "CC BY-SA 4.0",
+      "note": "原文说明Latin inspectum/inspicere以及in+specere关系；中文讲解和练习为改编/原创。"
+    },
+    {
+      "id": "wikt:respect",
+      "title": "Wiktionary contributors · respect · English Etymology",
+      "url": "https://en.wiktionary.org/wiki/respect#Etymology",
+      "reviewedAt": "2026-10-22",
+      "license": "CC BY-SA 4.0",
+      "note": "核对拉丁语respectus/respicere词源；现代义不等于机械的再次看。"
+    },
+    {
+      "id": "wikt:perspective",
+      "title": "Wiktionary contributors · perspective · English Etymology",
+      "url": "https://en.wiktionary.org/wiki/perspective#Etymology",
+      "reviewedAt": "2026-10-22",
+      "license": "CC BY-SA 4.0",
+      "note": "核对perspectivus/perspectus/perspicere与per+specere关系。"
+    }
+  ],
+  "words": [
+    {
+      "id": "morph-word:inspect:verb:检查；仔细查看",
+      "term": "inspect",
+      "partOfSpeech": "verb",
+      "meaningZh": "检查；仔细查看",
+      "definitionEn": "to examine something carefully to check its condition",
+      "level": null,
+      "relation": "etymology",
+      "segments": [
+        {
+          "surface": "in-",
+          "meaningZh": "向内"
+        },
+        {
+          "surface": "spect",
+          "meaningZh": "看"
+        }
+      ],
+      "explanationZh": "inspect的词源联系是向内看；现代用法指仔细检查设备、建筑或其他对象。",
+      "examples": [
+        {
+          "id": "morph-example:inspect:1",
+          "sentence": "Engineers inspect the bridge for cracks every spring.",
+          "targetSurface": "inspect",
+          "acceptedAnswers": [
+            "inspect"
+          ],
+          "meaningZh": "检查；仔细查看"
+        },
+        {
+          "id": "morph-example:inspect:2",
+          "sentence": "The researchers inspect each sample before recording its weight.",
+          "targetSurface": "inspect",
+          "acceptedAnswers": [
+            "inspect"
+          ],
+          "meaningZh": "检查；仔细查看"
+        }
+      ],
+      "sourceIds": [
+        "wikt:inspect"
+      ],
+      "illustrative": false
+    },
+    {
+      "id": "morph-word:respect:verb:尊重；重视",
+      "term": "respect",
+      "partOfSpeech": "verb",
+      "meaningZh": "尊重；重视",
+      "definitionEn": "to treat someone or something as worthy of consideration",
+      "level": null,
+      "relation": "etymology",
+      "segments": [
+        {
+          "surface": "re-",
+          "meaningZh": "回；再次"
+        },
+        {
+          "surface": "spect",
+          "meaningZh": "看"
+        }
+      ],
+      "explanationZh": "respect追溯到回头看或顾及的词源，现代义是尊重；不能把它当作再次观看这一动作。",
+      "examples": [
+        {
+          "id": "morph-example:respect:1",
+          "sentence": "Researchers must respect the privacy of everyone in the study.",
+          "targetSurface": "respect",
+          "acceptedAnswers": [
+            "respect"
+          ],
+          "meaningZh": "尊重；重视"
+        },
+        {
+          "id": "morph-example:respect:2",
+          "sentence": "The new policy should respect the needs of local communities.",
+          "targetSurface": "respect",
+          "acceptedAnswers": [
+            "respect"
+          ],
+          "meaningZh": "尊重；重视"
+        }
+      ],
+      "sourceIds": [
+        "wikt:respect"
+      ],
+      "illustrative": false
+    },
+    {
+      "id": "morph-word:perspective:noun:看法；观察问题的角度",
+      "term": "perspective",
+      "partOfSpeech": "noun",
+      "meaningZh": "看法；观察问题的角度",
+      "definitionEn": "a particular way of considering a situation",
+      "level": null,
+      "relation": "etymology",
+      "segments": [
+        {
+          "surface": "per-",
+          "meaningZh": "透过"
+        },
+        {
+          "surface": "spect",
+          "meaningZh": "看"
+        },
+        {
+          "surface": "-ive",
+          "meaningZh": "历史构词形式"
+        }
+      ],
+      "explanationZh": "perspective从视觉和透视相关词发展出观点、角度的现代义。这里的-ive不是把名词自动变成形容词的通用规则。",
+      "examples": [
+        {
+          "id": "morph-example:perspective:1",
+          "sentence": "The report examines the proposal from an environmental perspective.",
+          "targetSurface": "perspective",
+          "acceptedAnswers": [
+            "perspective"
+          ],
+          "meaningZh": "看法；观察问题的角度"
+        },
+        {
+          "id": "morph-example:perspective:2",
+          "sentence": "Working abroad gave her a different perspective on education.",
+          "targetSurface": "perspective",
+          "acceptedAnswers": [
+            "perspective"
+          ],
+          "meaningZh": "看法；观察问题的角度"
+        }
+      ],
+      "sourceIds": [
+        "wikt:perspective"
+      ],
+      "illustrative": false
+    }
+  ],
+  "structureQuestion": {
+    "prompt": "本课中的inspect与spect-的词源联系，哪项说明最准确？",
+    "options": [
+      "in-与看的词干相连；现代义为仔细检查",
+      "inspect表示再次观看，所以一定含re-",
+      "只要出现字母spec，单词就表示尊重",
+      "spect是完整英语动词，可以随意加前缀"
+    ],
+    "answer": "in-与看的词干相连；现代义为仔细检查",
+    "explanation": "词源可辅助理解inspect的仔细查看；respect和perspective则已有各自的现代词义，不能机械替换。"
+  }
+}

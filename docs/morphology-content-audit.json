@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "reviewedAt": "2026-10-22",
+  "lessons": 160,
+  "byKind": {
+    "root": 80,
+    "prefix": 40,
+    "suffix": 40
+  },
+  "wordSlots": 482,
+  "uniqueWordSenses": 463,
+  "contextSlots": 964,
+  "distinctSentences": 925,
+  "levels": {
+    "B2": 94,
+    "C1": 39,
+    "unknown": 330
+  },
+  "illustrative": 56,
+  "uniqueSourceRevisions": 502,
+  "authoredWords": 259,
+  "publicCatalogWords": 205,
+  "validationErrors": [],
+  "exceptions": [
+    "reg-/rect- merged as Latin regō/rēctus; replaced duplicate root slot with rupt-.",
+    "livelihood excluded from regular -hood examples; adulthood used.",
+    "-cy/-acy, -ous/-ious, -ory/-tory/-atory and -ion/-tion/-sion/-ation variants grouped.",
+    "pro-environmental is productive pro- + environmental; actual two component entries cited, no claim of an existing whole-word entry.",
+    "hypoglycaemia and modernise cite canonical spelling entries; -ing nouns cite nominal definitions, bases and actual -ing entry.",
+    "Each sense has two aligned sentences; mixed-sense catalog entries were replaced with original editorial overrides."
+  ],
+  "contentLicense": "CC BY-SA 4.0; application code licence remains separate."
+}

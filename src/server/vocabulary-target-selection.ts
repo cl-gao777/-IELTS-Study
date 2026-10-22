@@ -1,6 +1,7 @@
 import "server-only";
 import type Database from "better-sqlite3";
 import type { VocabularyCardDraft, VocabularySession } from "@/lib/vocabulary-session";
+import { morphologySelectedTargetRanks } from "./vocabulary-selected-targets";
 import { normaliseVocabularyAnswer, type VocabularyEntry } from "@/lib/vocabulary";
 import { getVocabularyStudy, materializeVocabularyCatalogEntry, vocabularyExerciseForWord, supplementalVocabularyExerciseForWord } from "./vocabulary-courses";
 import { listVocabularyEntries } from "./vocabulary";
@@ -57,10 +58,14 @@ export function selectVocabularyTargetCard(session: VocabularySession, now: Date
     }
   }
   if (!settings.activeCourseId) return null;
-  const candidates = definitions.filter(({ entry, target }) => target.memberships.some((member) => member.courseId === settings.activeCourseId && member.rank >= settings.startRank)
+  const selected = morphologySelectedTargetRanks(database);
+  const rank = (target: typeof definitions[number]["target"]) => selected.get(target.id)
+    ?? target.memberships.find(member => member.courseId === settings.activeCourseId)?.rank ?? Number.MAX_SAFE_INTEGER;
+  const candidates = definitions.filter(({ entry, target }) => (selected.has(target.id) || target.memberships.some((member) => member.courseId === settings.activeCourseId && member.rank >= settings.startRank))
     && !readVocabularyTargetState(target.id, normaliseVocabularyAnswer(entry.term), database).introducedAt)
     .sort((a, b) => Number(a.target.level !== settings.nextLevel) - Number(b.target.level !== settings.nextLevel)
-      || a.target.memberships.find((member) => member.courseId === settings.activeCourseId)!.rank - b.target.memberships.find((member) => member.courseId === settings.activeCourseId)!.rank || a.target.id.localeCompare(b.target.id));
+      || Number(!selected.has(a.target.id)) - Number(!selected.has(b.target.id))
+      || rank(a.target) - rank(b.target) || a.target.id.localeCompare(b.target.id));
   for (const definition of candidates) {
     let word = words.find((item) => normaliseVocabularyAnswer(item.term) === normaliseVocabularyAnswer(definition.entry.term));
     // Hold a genuinely pending first recall, but a withdrawn or paused meaning

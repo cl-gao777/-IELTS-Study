@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {useEffect, useRef, useState} from 'react';
-import {BookOpen, CalendarDays, ChartNoAxesCombined, ChevronRight, CircleCheck, FolderOpen, Headphones, Languages, Menu, MessageCircle, Moon, NotebookPen, Settings, ShieldCheck, Sun, Timer, X} from 'lucide-react';
+import {BookOpen, CalendarDays, ChartNoAxesCombined, ChevronRight, CircleCheck, FolderOpen, GitBranch, Headphones, Languages, Menu, MessageCircle, Moon, NotebookPen, Settings, ShieldCheck, Sun, Timer, X} from 'lucide-react';
 import {product} from '@/lib/product';
 import {VocabularyCapture} from './vocabulary-capture';
 import {StudyHeartbeat} from './study-heartbeat';
@@ -15,6 +15,7 @@ const groups = [
     {href:'/practice/reading',name:'阅读练习',english:'Reading',icon:BookOpen},
     {href:'/practice/listening',name:'听力练习',english:'Listening',icon:Headphones},
     {href:'/vocabulary',name:'词汇学习',english:'Vocabulary',icon:Languages},
+    {href:'/morphology',name:'词根词缀',english:'Word formation',icon:GitBranch},
     {href:'/writing',name:'写作练习',english:'Writing',icon:NotebookPen},
   ]},
   {label:'复盘与资料',items:[
@@ -64,7 +65,7 @@ export function AppShell({children,theme:initial}:{children:React.ReactNode,them
         {groups.map(group=><div className={styles.navSection} key={group.label}>
           <p>{group.label}</p>{group.items.map(({href,name,english,icon:Icon})=>{
             const current=pathname===href || (href!=='/' && pathname.startsWith(href+'/'));
-            return <Link className={`${styles.navItem} ${current?styles.current:''}`} href={href} key={href} aria-current={current?'page':undefined} onClick={()=>{if(closeOnNavigate) dialog.current?.close();}}>
+            return <Link className={`${styles.navItem} ${current?styles.current:''}`} href={href} key={href} aria-label={`${name} ${english}`} aria-current={current?'page':undefined} onClick={()=>{if(closeOnNavigate) dialog.current?.close();}}>
               <Icon size={19} strokeWidth={1.7} aria-hidden="true"/>
               <span className={styles.navLabel}><strong>{name}</strong><small>{english}</small></span>
               {current && <ChevronRight size={15} className={styles.currentArrow} aria-hidden="true"/>}

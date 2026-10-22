@@ -71,7 +71,7 @@ async function main() {
     assert.equal(response.status, status, `${route}: expected ${status}, got ${response.status} ${await response.text()}`);
   }
   await launch(port);
-  for (const route of ['/', '/vocabulary', '/practice/reading', '/practice/listening', '/writing', '/analytics', '/settings']) {
+  for (const route of ['/', '/vocabulary', '/morphology', '/practice/reading', '/practice/listening', '/writing', '/analytics', '/settings']) {
     const response = await fetch(base + route, { signal: AbortSignal.timeout(60000) });
     assert(response.ok, `${route}: ${response.status}`);
     assert((await response.text()).includes('<html'), `${route}: expected rendered HTML`);
@@ -139,14 +139,36 @@ async function main() {
   await checkpoint({ ...exam.state, stage: 'reading' });
   await checkpoint({ ...exam.state, readingAnswers: { [exam.readingSet.questions[0].id]: 'Original wrong answer' }, positions: { 'reading:source': 120 }, zooms: { reading: 125 } });
   await checkpoint({ ...exam.state, stage: 'writing', essay: writingRequest.essay }, true);
+  const morphology = await json('/api/morphology/courses');
+  assert.equal(morphology.courses.length, 160);
+  for (const [kind, count] of [['root', 80], ['prefix', 40], ['suffix', 40]]) assert.equal(morphology.courses.filter(course => course.kind === kind).length, count);
+  const lesson = (await json('/api/morphology/courses?lessonId=' + encodeURIComponent(morphology.courses[0].id))).lesson;
+  let morphologyRound = (await json('/api/morphology/session', put({ action: 'start', dataEpoch: epoch, operationId: randomUUID(), lessonId: lesson.id, lessonVersion: lesson.version }))).session;
+  morphologyRound = (await json('/api/morphology/session', put({ action: 'practice', dataEpoch: epoch, sessionId: morphologyRound.id, expectedRevision: morphologyRound.revision }))).session;
+  const rootQuestion = morphologyRound.state.questions[0];
+  assert.equal(rootQuestion.options.length, 4);
+  const rootAnswer = { dataEpoch: epoch, sessionId: morphologyRound.id, expectedRevision: morphologyRound.revision, operationId: randomUUID(), questionId: rootQuestion.id, lessonVersion: lesson.version, answer: rootQuestion.acceptedAnswers[0], gaveUp: false };
+  morphologyRound = (await json('/api/morphology/attempts', post(rootAnswer))).session;
+  assert.deepEqual((await json('/api/morphology/attempts', post(rootAnswer))).session, morphologyRound);
+  await rejects('/api/morphology/attempts', { ...rootAnswer, answer: 'Changed original answer' }, 409, 'POST');
+  morphologyRound = (await json('/api/morphology/session', put({ action: 'next', dataEpoch: epoch, sessionId: morphologyRound.id, expectedRevision: morphologyRound.revision }))).session;
+  morphologyRound = (await json('/api/morphology/session', put({ action: 'save', dataEpoch: epoch, sessionId: morphologyRound.id, expectedRevision: morphologyRound.revision, input: 'Frozen unsubmitted input' }))).session;
+  morphologyRound = (await json('/api/morphology/session', put({ action: 'pause', dataEpoch: epoch, sessionId: morphologyRound.id, expectedRevision: morphologyRound.revision }))).session;
+  const rootClock = { dataEpoch: epoch, sessionId: morphologyRound.id, segmentId: randomUUID(), seconds: 5, studyDate: new Intl.DateTimeFormat('en-CA', { timeZone: process.env.APP_TIME_ZONE || 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()) };
+  await json('/api/morphology/study', post(rootClock));
+  assert.equal((await json('/api/morphology/study', post(rootClock))).totalSeconds, 5);
+  assert.equal((await json('/api/vocabulary/study')).todaySeconds, timeAfter.todaySeconds, 'Morphology must not advance the vocabulary time goal.');
   const backup = await json('/api/backup');
-  assert.equal(backup.version, 5);
+  assert.equal(backup.version, 6);
   assert.equal(backup.files.length, 1);
+  assert.equal(backup.data.morphology_attempts.length, 1);
+  assert.equal(backup.data.vocabulary_reviews.length, 0, 'Morphology answers must not produce a vocabulary grade.');
   await stop();
   await launch(port);
   const recovered = await json('/api/vocabulary/session');
   assert.equal(recovered.session.id, round.session.id);
   assert.deepEqual(recovered.session.state.current, cue, 'Restart must preserve the exact issued card.');
+  assert.deepEqual((await json('/api/morphology/session')).session, morphologyRound, 'Restart must preserve root questions, order, answers and paused input.');
   const recoveredBackup = await json('/api/backup');
   assert.equal(recoveredBackup.files[0].sha256, backup.files[0].sha256);
   const resumed = (await json('/api/mock-exam/session')).session;
@@ -173,14 +195,21 @@ async function main() {
   await rejects('/api/writing/evaluate', { ...writingRequest, expectedRevision: writing.revision }, 409, 'POST');
   await rejects('/api/mock-exam/session', { action: 'claim', id: exam.id, dataEpoch: epoch, writerId: writer }, 409);
   await rejects('/api/mock-exam', mockRequest, 409, 'POST');
+  await rejects('/api/morphology/attempts', rootAnswer, 409, 'POST');
+  await rejects('/api/morphology/session', { action: 'save', dataEpoch: epoch, sessionId: morphologyRound.id, expectedRevision: morphologyRound.revision, input: 'Stale overwrite' }, 409);
   const restored = await json('/api/backup');
   assert.deepEqual(restored.data.practice_attempts, backup.data.practice_attempts);
   assert.equal(restored.data.mock_exam_sessions[0].writer_id, null);
   assert.equal(JSON.parse(restored.data.mock_exam_sessions[0].state_json).paused, true);
+  const restoredRoot = (await json('/api/morphology/session')).session;
+  assert.equal(restoredRoot.state.input, 'Frozen unsubmitted input');
+  assert.equal(restoredRoot.state.paused, true);
+  assert(restoredRoot.revision > morphologyRound.revision);
+  assert.deepEqual(restored.data.morphology_attempts, backup.data.morphology_attempts);
   const invalidBackup = structuredClone(restored); invalidBackup.files[0].sha256 = '0'.repeat(64);
   await rejects('/api/backup', { confirm: 'RESTORE', backup: invalidBackup }, 400, 'POST');
   assert.equal((await json('/api/data-state')).dataEpoch, newEpoch);
-  console.log(JSON.stringify({ passed: true, pages: 7, publicWords: 3766, contexts: 7532, backupVersion: 5, pdfImport: true, cardRestoredAfterRestart: true,
+  console.log(JSON.stringify({ passed: true, pages: 8, publicWords: 3766, contexts: 7532, morphologyLessons: 160, morphologyRestored: true, backupVersion: 6, pdfImport: true, cardRestoredAfterRestart: true,
     examRestoredAfterRestart: true, idempotentSubmissions: true, oldRoundRetry: true, oldPagesBlocked: true, duplicateTimeSeconds: 5, unavailableAIUnassessed: true }));
   succeeded = true;
 }
