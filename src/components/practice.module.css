@@ -1,4 +1,4 @@
-.workspace { --workspace-header-offset: var(--app-header-height, 64px); min-width: 0; }
+.workspace { width: 100%; --workspace-header-offset: var(--app-header-height, 64px); min-width: 0; }
 .workspace:fullscreen { --workspace-header-offset: 0px; background: var(--page); padding: 24px; overflow: auto; width: 100%; }
 .examHeader { align-items: center; margin-bottom: 20px; }
 .timer { min-width: 140px; padding: 16px; background: var(--forest); color: var(--on-accent); border-radius: var(--radius-control); text-align: center; }
