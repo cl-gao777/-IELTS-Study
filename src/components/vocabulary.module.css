@@ -1,6 +1,6 @@
 .reviewWorkspace { width: min(100%, 960px); margin: 0 auto; }
 .reviewToolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin-bottom: 20px; }
-.focusPanel { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); align-items: center; gap: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 8px; }
+.focusPanel { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); align-items: center; gap: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: var(--radius-control); }
 .focusPanel p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.8; }
 .saveState { margin-left: auto; align-self: center; font-size: 13px; color: var(--muted); }
 .reviewToolbar > .progressStrip { grid-column: 1 / -1; }
@@ -8,28 +8,28 @@
 .progressStrip div { display: grid; align-items: baseline; gap: 8px; }
 .progressStrip dt { color: var(--muted); }
 .progressStrip dd { font-size: 16px; margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
-.pendingActions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; }
+.pendingActions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-control); }
 .pendingActions p { margin: 0; font-size: 13px; }
-.retainedAnswer { padding: 16px; margin: 16px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--cream); font-size: 13px; overflow-wrap: anywhere; }
+.retainedAnswer { padding: 16px; margin: 16px 0; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--cream); font-size: 13px; overflow-wrap: anywhere; }
 .retainedAnswer p { margin: 0 0 10px; }
 .retainedAnswer summary { cursor: pointer; margin-bottom: 12px; }
 .retainedAnswer textarea { resize: vertical; }
-.typoConfirmation { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; line-height: 1.7; }
+.typoConfirmation { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; min-height: 44px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-control); font-size: 14px; line-height: 1.7; }
 .typoConfirmation input { margin-top: 4px; flex-shrink: 0; }
-.learningBadge { display: inline-flex; padding: 6px 12px; border-radius: 8px; color: var(--forest); background: var(--leaf-soft); font-size: 13px; font-weight: 600; }
-.supplementalBadge { align-self: flex-start; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--forest); background: var(--leaf-soft); font-size: 13px; line-height: 1.7; }
+.learningBadge { display: inline-flex; padding: 6px 12px; border-radius: var(--radius-control); color: var(--forest); background: var(--leaf-soft); font-size: 13px; font-weight: 600; }
+.supplementalBadge { align-self: flex-start; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--forest); background: var(--leaf-soft); font-size: 13px; line-height: 1.7; }
 .viewTabs { width: min(100%, 960px); margin-left: auto; margin-right: auto; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0; margin-bottom: 20px; }
-.viewTabs button { min-height: 44px; font-size: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 18px; color: var(--ink); background: var(--cream); cursor: pointer; }
+.viewTabs button { min-height: 44px; font-size: 14px; border: 1px solid var(--line); border-radius: var(--radius-control); padding: 10px 18px; color: var(--ink); background: var(--cream); cursor: pointer; }
 .viewTabs button[aria-pressed="true"] { border-color: var(--forest); background: var(--forest); color: var(--on-accent); }
 .viewTabs button:disabled, .modes button:disabled { opacity: .5; cursor: default; }
 .modes { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
-.modes button { min-height: 44px; font-size: 14px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); cursor: pointer; }
-.modes .activeMode { border-color: var(--forest); color: var(--forest); font-weight: 700; }
-.card { padding: 28px; display: flex; align-items: center; flex-direction: column; gap: 18px; min-height: 460px; }
+.modes button { min-height: 44px; font-size: 14px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); color: var(--ink); cursor: pointer; }
+.modes .activeMode { border-color: var(--forest); color: var(--on-accent); background: var(--forest); font-weight: 600; }
+.card { padding: 32px; font-size: 16px; display: flex; align-items: center; flex-direction: column; gap: 18px; min-height: 460px; }
 .cardHeader { line-height: 1.7; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 13px; color: var(--muted); }
 .cardHeaderActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .targetList { display: grid; gap: 18px; }
-.targetItem { padding: 18px; border: 1px solid var(--line); border-radius: 8px; overflow-wrap: anywhere; }
+.targetItem { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-control); overflow-wrap: anywhere; }
 .targetItem p { font-size: 16px; line-height: 1.8; }
 .targetItem .courseActions { margin-top: 16px; }
 .targetHeading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 12px; }
@@ -39,14 +39,14 @@
 .front { width: 100%; text-align: center; padding: 36px 12px 12px; }
 .front h2 { line-height: 1.5; font-family: inherit; font-size: 32px; margin-bottom: 20px; overflow-wrap: anywhere; }
 .front span { color: var(--muted); }
-.front blockquote, .back blockquote { border-radius: 0 8px 8px 0; margin: 16px 0; padding: 16px; border-left: 3px solid var(--forest); background: var(--page); color: var(--ink); text-align: left; line-height: 1.8; overflow-wrap: anywhere; }
+.front blockquote, .back blockquote { font-size: 18px; border-radius: 0 var(--radius-control) var(--radius-control) 0; margin: 16px 0; padding: 16px; border-left: 3px solid var(--forest); background: var(--page); color: var(--ink); text-align: left; line-height: 1.8; overflow-wrap: anywhere; }
 .back { width: 100%; border-top: 1px solid var(--line); padding-top: 16px; }
 .back h2 { margin: 0 0 12px; }
 .back blockquote button { margin-left: 10px; }
 .answer { font-size: 16px; width: min(100%, 560px); display: grid; gap: 8px; font-size: 16px; }
 .cardActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
 .ratings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 18px; }
-.ratings button { min-height: 64px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 12px 6px; cursor: pointer; font-size: 13px; }
+.ratings button { min-height: 64px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: var(--radius-control); padding: 12px 6px; cursor: pointer; font-size: 13px; }
 .ratings strong, .ratings span, .ratings small { display: block; }
 .ratings span { font-size: 13px; margin: 6px 0 10px; }
 .ratings small { font-variant-numeric: tabular-nums; font-size: 13px; }
@@ -60,7 +60,7 @@
 .details dt { color: var(--muted); }
 .details dd { margin: 0; overflow-wrap: anywhere; }
 .wordList { display: grid; gap: 6px; }
-.wordList button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 12px; background: transparent; border: 1px solid transparent; border-radius: 8px; text-align: left; color: var(--ink); cursor: pointer; }
+.wordList button { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 12px; background: transparent; border: 1px solid transparent; border-radius: var(--radius-control); text-align: left; color: var(--ink); cursor: pointer; }
 .wordList .selected { border-color: var(--forest); background: var(--page); }
 .wordList strong, .wordList small { display: block; overflow-wrap: anywhere; }
 .wordList strong { font-size: 16px; margin-bottom: 4px; }
@@ -71,12 +71,12 @@
 .editor { margin: 18px 0; }
 .editorFields { min-width: 0; padding: 0; margin: 0; border: 0; }
 .memoryPlan { border-top: 1px solid var(--line); padding: 18px 0; margin-top: 20px; font-size: 13px; color: var(--muted); line-height: 1.8; }
-.memoryPlan summary { cursor: pointer; color: var(--ink); }
+.memoryPlan summary { min-height: 44px; cursor: pointer; color: var(--ink); }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
-.capture { position: fixed; bottom: 26px; right: 28px; z-index: 80; width: min(360px, calc(100vw - 32px)); padding: 18px; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 32px #0002; background: var(--surface); color: var(--ink); }
+.capture { position: fixed; bottom: 26px; right: 28px; z-index: 80; width: min(360px, calc(100vw - 32px)); padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: 0 8px 32px #0002; background: var(--surface); color: var(--ink); }
 .captureHeader { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
 .captureHeader strong { overflow-wrap: anywhere; }
-.captureHeader button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 20px; }
+.captureHeader button { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 20px; }
 .capture p { font-size: 13px; color: var(--muted); }
 .capture label { display: grid; gap: 5px; margin: 10px 0; font-size: 13px; }
 .captureActions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -84,32 +84,32 @@
 .contextMeaning { display: flex; justify-content: center; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; margin: 20px 0 0; }
 .contextMeaning span { color: var(--muted); font-size: 13px; }
 .contextMeaning strong { color: var(--ink); font-size: 18px; }
-.continueRow { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin: 24px 0 18px; padding: 18px; background: var(--page); border: 1px solid var(--line); border-radius: 8px; }
+.continueRow { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin: 24px 0 18px; padding: 18px; background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-control); }
 .continueRow p { margin: 0; }
 .continueRow p strong { color: var(--ink); }
 .continueRow p small { display: block; margin-top: 5px; font-size: 13px; }
 .continueActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .continueActions > button { min-width: 120px; min-height: 44px; }
 .difficulty, .wordDetails, .specialModes { font-size: 13px; color: var(--muted); }
-.difficulty summary, .wordDetails summary, .specialModes summary { cursor: pointer; color: var(--ink); padding: 8px 0; }
+.difficulty summary, .wordDetails summary, .specialModes summary { min-height: 44px; cursor: pointer; color: var(--ink); padding: 8px 0; }
 .wordDetails { margin-top: 14px; }
 .specialModes .modes { margin-top: 10px; }
-.studyGoal { display: flex; justify-content: space-between; gap: 20px; padding: 20px 22px; margin-bottom: 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--cream); }
+.studyGoal { box-shadow: var(--shadow-card); display: flex; justify-content: space-between; gap: 20px; padding: 20px 22px; margin-bottom: 20px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--cream); }
 .studyGoal > div:first-child { flex: 1; min-width: 0; max-width: 460px; }
 .studyGoal p { margin: 0 0 10px; font-size: 13px; }
 .studyGoal strong { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.studyGoal progress { width: 100%; height: 7px; display: block; appearance: none; border: 0; border-radius: 4px; overflow: hidden; background: var(--line); accent-color: var(--leaf); }
+.studyGoal progress { width: 100%; height: 7px; display: block; appearance: none; border: 0; border-radius: var(--radius-control); overflow: hidden; background: var(--line); accent-color: var(--leaf); }
 .studyGoal progress::-webkit-progress-bar { background: var(--line); }
 .studyGoal progress::-webkit-progress-value { background: var(--leaf); }
 .studyGoal progress::-moz-progress-bar { background: var(--leaf); }
 .studyGoal small { display: block; color: var(--muted); font-size: 13px; margin-top: 8px; line-height: 1.7; }
 .goalActions { display: flex; align-content: start; flex-wrap: wrap; align-items: start; justify-content: flex-end; gap: 8px; max-width: 280px; }
 .goalActions details { width: 100%; font-size: 13px; text-align: right; color: var(--muted); }
-.goalActions summary { cursor: pointer; padding: 8px 0; }
+.goalActions summary { min-height: 44px; cursor: pointer; padding: 8px 0; }
 .goalActions form { display: grid; grid-template-columns: minmax(90px, 1fr) auto; align-items: end; gap: 8px; padding-top: 8px; text-align: left; }
 .managementActions, .courseActions { display: flex; gap: 10px; flex-wrap: wrap; }
 .courseGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
-.courseCard { border-radius: 12px; display: flex; flex-direction: column; gap: 18px; padding: 22px; border: 1px solid var(--line); background: var(--cream); min-width: 0; }
+.courseCard { box-shadow: var(--shadow-card); border-radius: var(--radius-panel); display: flex; flex-direction: column; gap: 18px; padding: 22px; border: 1px solid var(--line); background: var(--cream); min-width: 0; }
 .courseCard h3 { font-size: 18px; font-weight: 600; margin: 8px 0; overflow-wrap: anywhere; }
 .courseCard p { margin: 0; font-size: 16px; overflow-wrap: anywhere; }
 .activeCourse { border-color: var(--forest); box-shadow: inset 3px 0 0 var(--forest); }
@@ -119,7 +119,7 @@
 .courseTools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .pagination { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .searchRow { display: grid; grid-template-columns: minmax(0, 1fr) 160px; gap: 12px; margin-bottom: 18px; }
-.courseEditor { margin: 20px 0; padding: 18px; background: var(--page); border: 1px solid var(--line); border-radius: 8px; }
+.courseEditor { margin: 20px 0; padding: 18px; background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-control); }
 .exerciseEditor { display: grid; gap: 12px; margin-bottom: 20px; }
 .exerciseEditor textarea { resize: vertical; line-height: 1.8; }
 .importForm, .importConfirm { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: end; }
@@ -135,7 +135,7 @@
 .assessmentPanel { max-width: 960px; margin: 0 auto; width: 100%; }
 .assessmentProgress { display: flex; justify-content: space-between; gap: 12px; margin: 20px 0 16px; font-size: 13px; color: var(--muted); }
 .questionNav { display: flex; flex-wrap: wrap; gap: 6px; }
-.questionNav button { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--cream); font-size: 13px; }
+.questionNav button { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); background: var(--cream); font-size: 13px; }
 .questionNav button[data-answered="true"] { background: var(--leaf-soft); color: var(--leaf); }
 .questionNav button[aria-current="step"] { border-color: var(--forest); background: var(--forest); color: var(--on-accent); }
 .assessmentQuestion { display: grid; justify-items: center; gap: 16px; margin: 28px 0; }
@@ -149,20 +149,20 @@
 .assessmentFeedback p { margin: 5px 0; }
 .assessmentFeedback small { color: var(--muted); }
 .bandResults { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
-.bandResults > div { border: 1px solid var(--line); padding: 14px; border-radius: 8px; }
+.bandResults > div { border: 1px solid var(--line); padding: 14px; border-radius: var(--radius-control); }
 .bandResults dt { color: var(--muted); font-size: 13px; }
 .bandResults dd { margin: 8px 0 0; font-size: 20px; font-variant-numeric: tabular-nums; }
-@media (max-width: 900px) { .studyGoal { padding: 18px; } .goalActions { max-width: 240px; } .courseCard { border-radius: 12px; padding: 18px; } }
+@media (max-width: 900px) { .studyGoal { padding: 18px; } .goalActions { max-width: 240px; } .courseCard { border-radius: var(--radius-panel); padding: 18px; } }
 @media (max-width: 768px) { .courseGrid, .courseTools { grid-template-columns: minmax(0, 1fr); } .studyGoal { flex-wrap: wrap; } .goalActions { max-width: none; width: 100%; justify-content: flex-start; } .goalActions details { width: auto; flex: 1; text-align: right; } .bandResults { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .card { padding: 20px 16px; } .progressStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; } .fields, .importForm, .importConfirm, .searchRow { grid-template-columns: minmax(0, 1fr); } .ratings { grid-template-columns: repeat(2, 1fr); } .front { padding: 24px 0 8px; } .front h2 { line-height: 1.5; font-size: 26px; } .saveState { margin-left: 0; width: 100%; } .cardHeader { line-height: 1.7; flex-wrap: wrap; } .card { min-height: 420px; } .continueRow { flex-wrap: wrap; padding: 14px; } .continueActions, .continueActions > button { width: 100%; } .wordList button { align-items: flex-start; flex-wrap: wrap; } .scheduled, .due { flex-shrink: 1; } .goalActions details { flex-basis: 100%; text-align: left; } .questionNav button { width: 44px; height: 44px; } .courseActions > button, .cardActions > button, .managementActions > button { min-height: 44px; } .viewTabs button { min-height: 44px; font-size: 14px; min-height: 44px; padding: 10px 16px; } .contextSentence { font-size: 18px; } .courseEditor { padding: 12px; } }
 @media (max-width: 600px) { .focusPanel { grid-template-columns: minmax(0, 1fr); } .cardHeaderActions { justify-content: flex-start; } .targetItem { padding: 12px; } }
 
-.studySettings { margin-bottom: 16px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--cream); font-size: 14px; color: var(--muted); }
-.studySettings summary { min-height: 28px; color: var(--ink); line-height: 1.8; }
+.studySettings { margin-bottom: 16px; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--cream); font-size: 14px; color: var(--muted); }
+.studySettings summary { min-height: 44px; color: var(--ink); line-height: 1.8; }
 .studySettings .focusPanel { margin: 16px 0 0; padding: 16px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; }
 @media(max-width:600px) { .studySettings summary { min-height:44px; } .captureHeader button { min-width:44px; min-height:44px; } }
 
 .extraStats { color: var(--muted); font-size: 13px; }
 .extraStats summary { min-height: 44px; padding: 8px 0; }
-.extraStats .progressStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--cream); }
+.extraStats .progressStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--cream); }
 @media(max-width:600px) { .reviewToolbar { grid-template-columns: minmax(0, 1fr); } }

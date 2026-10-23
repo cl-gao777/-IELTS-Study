@@ -1,14 +1,14 @@
 .reviewGrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, .4fr); align-items: start; gap: 24px; }
 .reviewGrid > * { min-width: 0; }
 .reviewList { display: grid; gap: 16px; }
-.reviewList article { padding: 24px; background: var(--cream); border: 1px solid var(--line); border-radius: 12px; }
+.reviewList article { padding: 24px; background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-panel); box-shadow: var(--shadow-card); }
 .reviewList header { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: start; gap: 16px; }
-.reviewList header > span { width: 40px; height: 40px; display: grid; place-items: center; color: var(--on-accent); background: var(--forest); border-radius: 8px; font-family: var(--font-sans); font-size: 14px; font-weight: 600; }
+.reviewList header > span { width: 40px; height: 40px; display: grid; place-items: center; color: var(--muted); background: var(--surface-input); border-radius: var(--radius-control); font-family: var(--font-sans); font-size: 14px; font-weight: 600; }
 .reviewList small, .reviewList strong { display: block; }
 .reviewList header small { margin-bottom: 8px; color: var(--warning); font-size: 13px; font-weight: 600; line-height: 1.5; }
 .reviewList header strong { font-size: 17px; font-weight: 600; line-height: 1.7; overflow-wrap: anywhere; }
-.reviewAnswer { margin: 20px 0; padding: 16px 20px; background: var(--page); border-left: 3px solid var(--leaf); border-radius: 4px 8px 8px 4px; }
-.reviewAnswer small { color: var(--leaf); font-size: 13px; font-weight: 600; }
+.reviewAnswer { margin: 20px 0; padding: 16px 20px; background: var(--page); border-radius: var(--radius-control); }
+.reviewAnswer small { color: var(--ink); font-size: 13px; font-weight: 600; }
 .reviewAnswer p { margin: 8px 0 0; color: var(--ink); font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; }
 .reviewList footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 20px; }
 .reviewList footer > * { min-height: 44px; }

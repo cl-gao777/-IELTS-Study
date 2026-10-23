@@ -8,11 +8,11 @@
 .materialList strong { font-size: 16px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
 .materialList small { margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
 .materialList i { color: var(--muted); font-size: 13px; font-style: normal; }
-.materialList pre { max-height: 360px; overflow: auto; margin: 16px 0; padding: 16px; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 8px; font-family: var(--font-mono); font-size: 13px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
-.materialList a { color: var(--leaf); font-size: 14px; font-weight: 600; }
+.materialList pre { max-height: 360px; overflow: auto; margin: 16px 0; padding: 16px; color: var(--ink); background: var(--surface-input); border: 1px solid var(--line); border-radius: var(--radius-control); font-family: var(--font-mono); font-size: 13px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+.materialList a { color: var(--ink); font-size: 14px; font-weight: 600; }
 .materialList button { margin-top: 12px; }
 .materialList audio { width: 100%; margin: 4px 0 16px; }
-.previewImage { max-width: 100%; max-height: 360px; display: block; margin: 4px 0 16px; border: 1px solid var(--line); border-radius: 8px; object-fit: contain; }
+.previewImage { max-width: 100%; max-height: 360px; display: block; margin: 4px 0 16px; border: 1px solid var(--line); border-radius: var(--radius-control); object-fit: contain; }
 .filters { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 8px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
 .filters input { flex: 1 1 220px; min-width: 0; }
 .filters select { flex: 1 1 120px; min-width: 0; }
@@ -22,7 +22,7 @@
 .materialCard p { margin: 12px 0 16px; color: var(--muted); font-size: 15px; line-height: 1.75; overflow-wrap: anywhere; }
 .materialCard a { min-height: 44px; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.questionEditor { display: grid; gap: 16px; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 20px; background: var(--page); }
+.questionEditor { display: grid; gap: 16px; min-width: 0; border: 1px solid var(--line); border-radius: var(--radius-control); padding: 20px; background: var(--surface-input); }
 .questionEditor textarea { min-height: 88px; }
 .audio { width: 100%; }
 .plainText { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.85; font-family: var(--font-serif); font-size: 17px; }

@@ -1,36 +1,36 @@
 .coachLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, .36fr); align-items: start; gap: 24px; }
 .coachLayout > * { min-width: 0; }
-.chatPanel { min-height: min(720px, calc(100dvh - 200px)); display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: 0; overflow: hidden; }
+.chatPanel { box-shadow: var(--shadow-card); min-height: min(720px, calc(100dvh - 200px)); display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: 0; overflow: hidden; }
 .chatTimeline { max-height: 620px; min-height: 320px; overflow-y: auto; display: grid; align-content: start; gap: 20px; padding: 28px; background: var(--cream); scrollbar-gutter: stable; }
 .welcomeMessage { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: start; gap: 16px; max-width: 560px; margin: 40px auto; }
-.welcomeMessage > span { width: 44px; height: 44px; display: grid; place-items: center; color: var(--on-accent); background: var(--forest); border-radius: 12px; font-family: var(--font-sans); font-size: 20px; font-weight: 600; }
+.welcomeMessage > span { width: 44px; height: 44px; display: grid; place-items: center; color: var(--on-accent); background: var(--forest); border-radius: var(--radius-panel); font-family: var(--font-sans); font-size: 20px; font-weight: 600; }
 .welcomeMessage strong { font-size: 16px; font-weight: 600; }
 .welcomeMessage p { margin: 8px 0 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
-.message { width: fit-content; max-width: min(88%, 760px); min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 12px; overflow-wrap: anywhere; }
+.message { width: fit-content; max-width: min(88%, 760px); min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-panel); overflow-wrap: anywhere; }
 .message header { display: flex; align-items: baseline; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; margin-bottom: 12px; color: var(--muted); font-size: 13px; font-weight: 600; }
 .message header small { color: inherit; font-size: 13px; font-weight: 400; }
 .message p { margin: 6px 0; color: var(--ink); font-size: 16px; line-height: 1.8; white-space: pre-wrap; }
-.userMessage { justify-self: end; background: var(--leaf-soft); border-color: transparent; border-radius: 12px 12px 4px 12px; }
-.userMessage header { color: var(--leaf); }
-.assistantMessage { justify-self: start; background: var(--page); border-radius: 12px 12px 12px 4px; }
-.correction { margin-bottom: 16px; padding: 12px 16px; color: var(--ink); background: var(--warning-soft); border-left: 3px solid var(--warning); border-radius: 4px 8px 8px 4px; font-size: 15px; line-height: 1.75; }
+.userMessage { justify-self: end; background: var(--leaf-soft); border-color: transparent; border-radius: var(--radius-panel); }
+.userMessage header { color: var(--ink); }
+.assistantMessage { justify-self: start; background: var(--surface-input); border-radius: var(--radius-panel); }
+.correction { margin-bottom: 16px; padding: 12px 16px; color: var(--ink); background: var(--warning-soft); border-left: 3px solid var(--warning); border-radius: var(--radius-control); font-size: 15px; line-height: 1.75; }
 .correction b { display: block; margin-bottom: 4px; color: var(--warning); font-size: 13px; font-weight: 600; }
 .typing { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-.typing i { width: 5px; height: 5px; background: var(--leaf); border-radius: 50%; animation: pulse 1s infinite alternate; }
+.typing i { width: 5px; height: 5px; background: var(--ink); border-radius: 50%; animation: pulse 1s infinite alternate; }
 .typing i:nth-child(2) { animation-delay: 150ms; }
 .typing i:nth-child(3) { animation-delay: 300ms; }
 @keyframes pulse { to { opacity: .25; } }
 .chatForm { display: grid; gap: 12px; padding: 20px; background: var(--cream); border-top: 1px solid var(--line); }
-.chatForm textarea { width: 100%; min-height: 112px; resize: vertical; padding: 12px 16px; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 8px; font-size: 16px; line-height: 1.75; }
+.chatForm textarea { width: 100%; min-height: 112px; resize: vertical; padding: 12px 16px; color: var(--ink); background: var(--surface-input); border: 1px solid var(--line); border-radius: var(--radius-control); font-size: 16px; line-height: 1.75; }
 .chatForm textarea::placeholder { color: var(--muted); }
 .chatForm > div:last-child { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
 .chatForm small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
-.chatForm button { min-height: 44px; padding: 10px 20px; color: var(--on-accent); background: var(--forest); border: 1px solid transparent; border-radius: 8px; font-size: 15px; font-weight: 600; line-height: 1.5; cursor: pointer; transition: background-color 140ms ease; }
+.chatForm button { min-height: 44px; padding: 10px 20px; color: var(--on-accent); background: var(--forest); border: 1px solid transparent; border-radius: var(--radius-control); font-size: 15px; font-weight: 600; line-height: 1.5; cursor: pointer; transition: background-color 140ms ease; }
 .chatForm button:hover:not(:disabled) { background: var(--forest-strong); }
 .chatForm button:disabled { opacity: .55; cursor: not-allowed; }
 .promptList { display: grid; gap: 12px; }
-.promptList button { min-height: 44px; padding: 12px 16px; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 8px; font-size: 14px; line-height: 1.7; text-align: left; overflow-wrap: anywhere; cursor: pointer; transition: border-color 140ms ease, background-color 140ms ease; }
-.promptList button:hover { color: var(--leaf); background: var(--leaf-soft); border-color: var(--leaf); }
+.promptList button { min-height: 44px; padding: 12px 16px; color: var(--ink); background: var(--surface-input); border: 1px solid var(--line); border-radius: var(--radius-control); font-size: 14px; line-height: 1.7; text-align: left; overflow-wrap: anywhere; cursor: pointer; transition: border-color 140ms ease, background-color 140ms ease; }
+.promptList button:hover { color: var(--ink); background: var(--leaf-soft); border-color: var(--ink); }
 @media (max-width: 1100px) {
   .coachLayout { grid-template-columns: minmax(0, 1fr); }
   .chatPanel { min-height: 560px; }
@@ -41,7 +41,7 @@
   .chatTimeline { padding: 16px; gap: 16px; min-height: 280px; max-height: 55dvh; }
   .chatPanel { min-height: 0; }
   .welcomeMessage { grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin: 24px auto; }
-  .welcomeMessage > span { width: 36px; height: 36px; font-size: 18px; border-radius: 8px; }
+  .welcomeMessage > span { width: 36px; height: 36px; font-size: 18px; border-radius: var(--radius-control); }
   .message { max-width: 100%; padding: 16px; }
   .chatForm { padding: 16px; }
   .chatForm textarea { padding: 12px; }

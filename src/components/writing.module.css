@@ -3,7 +3,7 @@
   padding: 12px 16px;
   color: var(--on-accent);
   background: var(--forest);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   font-family: var(--font-mono);
   font-size: 18px;
   font-variant-numeric: tabular-nums;
@@ -15,7 +15,7 @@
 .toolbar label, .settingsRow label, .importLabel, .imageImport label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
 .toolbar select, .settingsRow select, .settingsRow input, .importLabel select {
   width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px;
-  border: 1px solid var(--line); border-radius: 8px; background: var(--cream); color: var(--ink); font-size: 16px;
+  border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-input); color: var(--ink); font-size: 16px;
 }
 .writingGrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(300px, .85fr); gap: 24px; align-items: start; }
 .editorPanel { display: grid; gap: 20px; min-width: 0; }
@@ -30,9 +30,9 @@
 .imageImport label { min-width: 0; max-width: 100%; }
 .imageImport input { width: 100%; min-width: 0; max-width: 100%; font-size: 13px; }
 .promptFigure { margin: 0; min-width: 0; }
-.promptFigure img { max-width: 100%; max-height: 420px; object-fit: contain; display: block; border: 1px solid var(--line); border-radius: 8px; background: white; }
+.promptFigure img { max-width: 100%; max-height: 420px; object-fit: contain; display: block; border: 1px solid var(--line); border-radius: var(--radius-control); background: white; }
 .promptFigure figcaption { margin-top: 8px; font-size: 13px; color: var(--muted); line-height: 1.6; overflow-wrap: anywhere; }
-.document { min-width: 0; overflow: hidden; background: var(--cream); border: 1px solid var(--line); border-radius: 12px; }
+.document { box-shadow: var(--shadow-card); min-width: 0; overflow: hidden; background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-panel); }
 .document textarea {
   display: block; width: 100%; min-width: 0; min-height: 480px; resize: vertical; padding: 24px;
   color: var(--ink); background: transparent; border: 0; border-radius: 0;
@@ -56,12 +56,12 @@
 .correction del { color: var(--muted); border-left: 3px solid var(--danger); }
 .correction ins { color: var(--ink); border-left: 3px solid var(--success); margin-top: 8px; }
 .correction small { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; }
-.rewrite { margin-top: 20px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; }
-.rewrite summary { color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer; line-height: 1.7; }
+.rewrite { margin-top: 20px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-control); }
+.rewrite summary { min-height: 44px; color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer; line-height: 1.7; }
 .rewrite p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .notice { border-left: 3px solid var(--warning); padding: 12px; background: var(--warning-soft); }
 .history { display: grid; gap: 8px; margin: 20px 0; }
-.history button { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 44px; padding: 12px; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; text-align: left; font-size: 14px; cursor: pointer; }
+.history button { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 44px; padding: 12px; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: var(--radius-control); text-align: left; font-size: 14px; cursor: pointer; }
 .history button small { color: var(--muted); font-size: 13px; }
 .history button:hover { background: var(--page); }
 .history .selectedHistory { background: var(--leaf-soft); border-color: var(--leaf); }

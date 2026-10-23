@@ -2,39 +2,39 @@
 .briefing h2 { max-width: 620px; font-size: 30px; line-height: 1.35; }
 .briefing p { max-width: 640px; }
 .examSequence { display: grid; gap: 12px; }
-.examSequence > div { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 16px; background: var(--cream); border: 1px solid var(--line); border-radius: 8px; }
+.examSequence > div { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 16px; background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-control); }
 .examSequence span { color: var(--leaf); font-family: var(--font-mono); font-size: 13px; }
 .examSequence strong { font-size: 16px; font-weight: 600; }
 .examSequence small { color: var(--muted); font-size: 13px; }
-.examRoom { width: min(100%, 1500px); min-width: 0; margin: 0 auto; }
+.examRoom { width: 100%; min-width: 0; margin: 0 auto; }
 .examToolbar {
-  position: sticky; top: 0; z-index: 4;
+  position: sticky; top: var(--app-header-height, 64px); z-index: 4;
   display: grid; grid-template-columns: minmax(120px, 1fr) auto minmax(80px, 1fr);
   align-items: center; gap: 20px; min-height: 76px; margin-bottom: 16px; padding: 16px 20px;
-  color: var(--ink); background: var(--cream); border: 1px solid var(--line); border-radius: 12px;
+  color: var(--ink); background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-panel);
 }
 .examToolbar strong, .examToolbar small { display: block; }
 .examToolbar strong { font-size: 16px; font-weight: 600; }
 .examToolbar small { margin-top: 4px; color: var(--muted); font-size: 13px; text-transform: capitalize; }
 .examToolbar nav { display: flex; justify-content: center; gap: 8px; }
-.examToolbar nav span { padding: 8px 12px; color: var(--muted); background: var(--page); border-radius: 8px; font-size: 13px; text-transform: capitalize; }
+.examToolbar nav span { padding: 8px 12px; color: var(--muted); background: var(--page); border-radius: var(--radius-control); font-size: 13px; text-transform: capitalize; }
 .examToolbar nav span[data-state="current"] { color: var(--on-accent); background: var(--forest); font-weight: 600; }
 .examToolbar nav span[data-state="done"] { color: var(--success); background: var(--success-soft); }
 .examToolbar time { font-family: var(--font-mono); font-size: 24px; font-variant-numeric: tabular-nums; text-align: right; }
 .mockSplit { display: grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); gap: 20px; }
-.mockScroll { height: calc(100dvh - 288px); min-height: 320px; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scroll-padding-top: 16px; min-width: 0; }
+.mockScroll { height: calc(100dvh - var(--app-header-height, 64px) - var(--app-main-top, 32px) - var(--app-main-bottom, 48px) - 196px); min-height: 320px; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scroll-padding-top: 16px; min-width: 0; }
 .mockScroll > h1 { margin: 0 0 20px; font-size: 20px; line-height: 1.5; overflow-wrap: anywhere; }
 .mockScroll > h2 { margin: 0 0 20px; font-size: 18px; line-height: 1.5; }
 .mockScroll > label { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; color: var(--muted); font-size: 13px; }
 .mockScroll > label select { width: auto; max-width: 100%; }
 .audioExam { min-height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.audioExam > div { width: 80px; height: 80px; display: grid; place-items: center; color: var(--leaf); background: var(--leaf-soft); border: 1px solid var(--line); border-radius: 12px; }
+.audioExam > div { width: 80px; height: 80px; display: grid; place-items: center; color: var(--leaf); background: var(--leaf-soft); border: 1px solid var(--line); border-radius: var(--radius-panel); }
 .audioExam h1 { margin: 24px 0 8px; font-size: 30px; font-weight: 600; }
 .mockQuestions { display: grid; gap: 20px; margin-bottom: 24px; }
-.mockQuestions fieldset { min-width: 0; margin: 0; padding: 16px; background: var(--cream); border: 1px solid var(--line); border-radius: 8px; }
+.mockQuestions fieldset { min-width: 0; margin: 0; padding: 16px; background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-control); }
 .mockQuestions legend { max-width: 100%; padding: 0 8px; font-size: 16px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
 .mockQuestions fieldset > div { display: grid; gap: 8px; }
-.mockQuestions label { display: flex; align-items: flex-start; gap: 8px; min-height: 44px; padding: 12px; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 8px; font-size: 16px; line-height: 1.6; }
+.mockQuestions label { display: flex; align-items: flex-start; gap: 8px; min-height: 44px; padding: 12px; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-control); font-size: 16px; line-height: 1.6; }
 .mockQuestions label:has(input:checked) { color: var(--ink); background: var(--leaf-soft); border-color: var(--leaf); }
 .mockQuestions label input { margin-top: 5px; accent-color: var(--forest); }
 .mockQuestions p { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.75; overflow-wrap: anywhere; }
@@ -46,21 +46,21 @@
 .audioBox audio { width: 100%; min-width: 0; }
 .saveHint { margin: 16px 0 0; font-size: 13px; line-height: 1.75; color: var(--muted); overflow-wrap: anywhere; }
 .writingExam { display: grid; grid-template-columns: minmax(240px, .7fr) minmax(0, 1.7fr); grid-template-rows: 1fr auto; gap: 24px; min-height: 560px; }
-.writingExam > div:first-child { grid-row: 1 / 3; padding: 20px; background: var(--page); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.writingExam > div:first-child { grid-row: 1 / 3; padding: 20px; background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-control); min-width: 0; }
 .writingExam h1 { margin: 16px 0; color: var(--ink); font-family: var(--font-serif); font-size: 20px; font-weight: 500; line-height: 1.75; overflow-wrap: anywhere; }
-.writingExam > div:first-child > span { display: inline-flex; margin-top: 20px; padding: 8px 12px; color: var(--leaf); background: var(--leaf-soft); border-radius: 8px; font-size: 13px; font-weight: 600; }
-.writingExam textarea { width: 100%; min-width: 0; min-height: 500px; resize: vertical; padding: 24px; color: var(--ink); background: var(--cream); border: 1px solid var(--line); border-radius: 8px; font-family: var(--font-serif); font-size: 18px; line-height: 1.9; }
+.writingExam > div:first-child > span { display: inline-flex; margin-top: 20px; padding: 8px 12px; color: var(--leaf); background: var(--leaf-soft); border-radius: var(--radius-control); font-size: 13px; font-weight: 600; }
+.writingExam textarea { width: 100%; min-width: 0; min-height: 500px; resize: vertical; padding: 24px; color: var(--ink); background: var(--surface-input); border: 1px solid var(--line); border-radius: var(--radius-control); font-family: var(--font-serif); font-size: 18px; line-height: 1.9; }
 .writingExam > button { justify-self: end; }
 .resultHero { display: grid; grid-template-columns: minmax(120px, .6fr) minmax(0, 2fr) auto; align-items: center; gap: 24px; margin-bottom: 20px; padding: 28px; }
 .resultHero > div:first-child small, .resultHero > div:first-child strong { display: block; }
 .resultHero > div:first-child small { color: var(--muted); font-size: 13px; }
 .resultHero > div:first-child strong { margin-top: 8px; font-size: 48px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .resultSkills { display: flex; flex-wrap: wrap; gap: 12px; }
-.resultSkills span { flex: 1 1 120px; padding: 16px; color: var(--muted); background: var(--page); border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+.resultSkills span { flex: 1 1 120px; padding: 16px; color: var(--muted); background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-control); font-size: 13px; }
 .resultSkills b { display: block; margin-top: 8px; color: var(--ink); font-size: 24px; font-weight: 600; }
 
 @media (max-width: 1100px) {
-  .mockSplit { grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr); gap: 16px; }
+  .mockSplit { grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 16px; }
   .writingExam { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.4fr); gap: 16px; }
 }
 @media (max-width: 1000px) {
@@ -90,5 +90,3 @@
   .examSequence > div { grid-template-columns: 28px minmax(0, 1fr); }
   .examSequence small { grid-column: 2; }
 }
-
-@media(max-width:760px) { .examToolbar { top:64px; } }

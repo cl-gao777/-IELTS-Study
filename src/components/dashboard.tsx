@@ -30,7 +30,7 @@ export function Dashboard({initial}:{initial:DashboardSnapshot}) {
   };
   return <div className={ui.page}>
     <header className={ui.pageHeader}>
-      <div><p className={ui.eyebrow}>{initial.date} / YOUR STUDY DESK</p><h1>今天，继续向前一步。</h1><p>{initial.displayName}，专注下一项练习。目标 Overall {initial.targetBand.toFixed(1)}+。</p></div>
+      <div><p className={ui.eyebrow}>{initial.date} / YOUR STUDY DESK</p><h1>今日学习</h1><p>{initial.displayName}，专注下一项练习。目标 Overall {initial.targetBand.toFixed(1)}+。</p></div>
       <Link href="/settings" className={ui.buttonSecondary}><SlidersHorizontal size={16} aria-hidden="true"/>学习计划</Link>
     </header>
     {error && <p role="alert" className={ui.error}>{error}</p>}

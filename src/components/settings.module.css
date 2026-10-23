@@ -1,13 +1,13 @@
 .settingsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 24px; }
 .settingsGrid > * { min-width: 0; }
 .providerList { display: grid; gap: 12px; }
-.providerList > div { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 16px; padding: 16px; background: var(--page); border: 1px solid var(--line); border-radius: 8px; }
-.providerList > div > span { width: 40px; height: 40px; display: grid; place-items: center; color: var(--on-accent); background: var(--forest); border-radius: 8px; font-family: var(--font-sans); font-size: 14px; font-weight: 600; }
+.providerList > div { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 16px; padding: 16px; background: var(--surface-input); border: 1px solid var(--line); border-radius: var(--radius-control); }
+.providerList > div > span { width: 40px; height: 40px; display: grid; place-items: center; color: var(--ink); background: var(--panel); border-radius: var(--radius-control); font-family: var(--font-sans); font-size: 14px; font-weight: 600; }
 .providerList strong, .providerList small { display: block; }
 .providerList strong { font-size: 16px; font-weight: 600; line-height: 1.6; }
 .providerList small { margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
 .codeHint, .envList { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
-.codeHint code, .envList code, .path code { max-width: 100%; padding: 8px 12px; color: var(--leaf); background: var(--leaf-soft); border-radius: 6px; font-family: var(--font-mono); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.codeHint code, .envList code, .path code { max-width: 100%; padding: 8px 12px; color: var(--ink); background: var(--leaf-soft); border-radius: var(--radius-control); font-family: var(--font-mono); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
 .codeHint span { color: var(--muted); font-size: 13px; }
 .path { display: grid; min-width: 0; gap: 8px; margin-top: 20px; }
 .path small { color: var(--muted); font-size: 13px; line-height: 1.6; }
