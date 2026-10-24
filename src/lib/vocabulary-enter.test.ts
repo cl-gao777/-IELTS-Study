@@ -32,6 +32,15 @@ function fixture() {
 }
 
 describe("vocabulary Enter primary action", () => {
+  it("continues after clicking lesson text focuses the AppShell main container", () => {
+    const f = fixture();
+    const main = { ...f.body, inside: false, closest: () => null } as typeof f.body;
+    Object.assign(f.card, { closest: (selector: string) => selector === "main" ? main : null });
+    f.document.activeElement = main;
+    expect(f.key().defaultPrevented).toBe(true);
+    expect(f.button.click).toHaveBeenCalledOnce();
+  });
+
   it("checks once from the answer field, then uses the new primary after focus leaves the disabled input", () => {
     const f = fixture();
     f.document.activeElement = f.answer;

@@ -55,6 +55,8 @@ SQLite read scopes exist only for one request. Target definitions, target states
 
 The active vocabulary card maps an unmodified, non-repeated Enter to its enabled primary button: check/reveal, then ordinary Continue; learning introductions use their existing learning confirmation. It never queues input while saving or waiting for a forecast. IME confirmation, other focused controls, open menus/dialogs, background pages and unmounted/paused cards do not invoke this shortcut. The same button callbacks retain all existing grading, idempotency and recovery checks; no API or backup change is needed.
 
+The card's own focusable main container is a valid shortcut surface: clicking non-interactive lesson text can focus AppShell's main rather than body. Other controls outside the card remain excluded. Browser regressions must retain real click focus rather than blurring to body before pressing Enter.
+
 ## Optional assessment and imports
 
 Thirty frozen context questions sample five foundation frequency bands (four each) and ten academic entries. The first foundation band below three correct suggests its starting rank; otherwise suggest academic. Results are a course recommendation, never a total vocabulary estimate or FSRS update. Skipping defaults to academic.

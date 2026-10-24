@@ -18,7 +18,8 @@ export function bindVocabularyEnter(
       || document.querySelector('dialog[open], [role="dialog"][aria-modal="true"], [role="menu"], header details[open]')) return;
     const focused = document.activeElement;
     const button = primary();
-    if (!focused || (focused !== document.body && !card.contains(focused))) return;
+    // AppShell's focusable main receives focus after clicks on lesson text.
+    if (!focused || (focused !== document.body && focused !== card.closest("main") && !card.contains(focused))) return;
     const interactive = focused.closest('button, a, input, textarea, select, summary, [contenteditable]:not([contenteditable="false"]), [role="button"], [role="textbox"], [role="combobox"]');
     if (interactive && interactive !== button && focused !== answer()) return;
     // IME needs the unmodified event to confirm text. Some browsers report its
