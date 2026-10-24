@@ -57,6 +57,10 @@ The active vocabulary card maps an unmodified, non-repeated Enter to its enabled
 
 The card's own focusable main container is a valid shortcut surface: clicking non-interactive lesson text can focus AppShell's main rather than body. Other controls outside the card remain excluded. Browser regressions must retain real click focus rather than blurring to body before pressing Enter.
 
+## Compact workspace
+
+The vocabulary workspace keeps only navigation, today's elapsed time, Pause and More above the learning card. A modal side panel contains settings, targets, statistics, mode selection and retained answers; opening it does not end the round or change timing policy. Retained answers remain in browser recovery until explicitly cleared. Only complete known success notices leave the main flow; unknown messages, conflicts and pending saves remain visible. Native dialog isolation also prevents card Enter shortcuts inside the panel. No API, database or backup contract changes.
+
 ## Optional assessment and imports
 
 Thirty frozen context questions sample five foundation frequency bands (four each) and ten academic entries. The first foundation band below three correct suggests its starting rank; otherwise suggest academic. Results are a course recommendation, never a total vocabulary estimate or FSRS update. Skipping defaults to academic.

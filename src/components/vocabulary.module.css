@@ -1,4 +1,30 @@
 .reviewWorkspace { width: min(100%, 960px); margin: 0 auto; }
+.visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.compactToolbar { width: min(100%, 960px); margin: 0 auto 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.compactTabs, .compactActions { display: flex; align-items: center; gap: 8px; }
+.compactTabs button { min-height: 44px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--cream); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.compactTabs button[aria-pressed="true"] { color: var(--on-accent); background: var(--forest); border-color: var(--forest); }
+.compactTabs button:disabled { opacity: .5; cursor: default; }
+.compactTime { font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.compactTime strong { color: var(--ink); font-weight: 600; }
+.retainedDot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.workspaceFeedback { width: min(100%, 960px); margin: 0 auto; }
+.morePanel { position: fixed; inset: 0 0 0 auto; margin: 0; width: min(420px, 100%); max-width: 100%; height: 100dvh; max-height: 100dvh; border: 0; border-left: 1px solid var(--line); padding: 0; background: var(--cream); color: var(--ink); box-shadow: -8px 0 32px #0002; overflow-y: auto; overscroll-behavior: contain; }
+.morePanel::backdrop { background: #0005; }
+:global(body):has(.morePanel[open]) { overflow: hidden; }
+.moreHeader { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: var(--cream); border-bottom: 1px solid var(--line); }
+.moreHeader h2 { margin: 0; font-size: 20px; }
+.moreBody { display: grid; gap: 24px; padding: 20px; }
+.moreSection { min-width: 0; }
+.moreSection h3 { font-size: 16px; margin: 0 0 12px; }
+.moreSection p { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.moreSection progress { display: block; width: 100%; height: 6px; accent-color: var(--forest); margin: 12px 0; }
+.goalForm { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; margin-top: 16px; }
+.panelStats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0; font-size: 14px; }
+.panelStats dt { color: var(--muted); margin-bottom: 6px; }
+.panelStats dd { margin: 0; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.moreBody .memoryPlan, .moreBody .retainedAnswer { margin: 0; }
+@media(max-width:600px) { .compactToolbar { flex-wrap: wrap; gap: 8px; } .compactTabs, .compactActions { width: 100%; } .compactActions { justify-content: flex-end; } .compactTime { margin-right: auto; } .compactActions > button { padding: 10px 12px; } .moreHeader, .moreBody { padding: 16px; } }
 .reviewToolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin-bottom: 20px; }
 .focusPanel { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); align-items: center; gap: 16px; padding: 16px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: var(--radius-control); }
 .focusPanel p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.8; }
