@@ -78,5 +78,3 @@ npm run check
 程序使用 [MIT License](LICENSE)，保留上游作者和本项目维护者署名。NGSL/NAWL 词表、释义和本项目课包改编另按 **CC BY-SA 4.0** 分发，完整作者、下载来源、版本和 SHA-256 见 [词库许可说明](src/data/VOCABULARY-LICENSE.md) 及 [来源清单](src/data/vocabulary-source-manifest.json)。私人资料不因程序开源而获得再分发许可。
 
 词根词缀课程、来源摘录及改编另按 **CC BY-SA 4.0** 分发，逐项保留 Wiktionary 修订署名与公开词汇资料来源，见 [课程内容与许可](docs/morphology-curriculum.md)。仅有可核依据时标注 B2/C1，未标等级不等于基础词。
-
-本项目不是 IELTS 官方产品，词库不称为官方固定考纲；没有复制 Lingvist 课程内容。AI 反馈不代表正式 IELTS 成绩。
