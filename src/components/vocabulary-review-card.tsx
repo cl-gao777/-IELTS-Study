@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReviewRating } from "@/lib/srs";
 import type { VocabularyReviewPreview } from "@/lib/vocabulary-scheduler";
 import type { VocabularyCardDraft } from "@/lib/vocabulary-session";
@@ -10,6 +10,7 @@ import type { VocabularyRatingSource } from "@/lib/vocabulary-course";
 import { vocabularyIntervalLabel } from "@/lib/vocabulary-practice";
 import { useVocabularyCardAudio } from "./vocabulary-card-audio";
 import { VocabularyTargetDetails } from "./vocabulary-target-details";
+import { useVocabularyEnter } from "./use-vocabulary-enter";
 import ui from "./page-ui.module.css";
 import styles from "./vocabulary.module.css";
 
@@ -80,9 +81,7 @@ export function VocabularyReviewCard({ word: personalWord, mode, draft, sessionI
   const word = vocabularyCardWord(personalWord, target);
   const revealed = draft.phase === "revealed";
   const { supplemental, needsSchedulePreview, canSupplement } = vocabularyCardContinuation(mode, draft);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const composing = useRef(false);
-  const compositionEndedAt = useRef<number | null>(null);
+  const { cardRef, primaryRef, answerRef: inputRef } = useVocabularyEnter();
   const cue = vocabularyCardRecallCue(word, target, draft.exercise);
   const context = vocabularyCardContext(word, draft.exercise, target);
   const acceptedAnswers = vocabularyCardAnswers(word, mode, draft.exercise, target);
@@ -105,7 +104,7 @@ export function VocabularyReviewCard({ word: personalWord, mode, draft, sessionI
   const ready = !versionChanged && cueReady && audioReady;
   const cardIdentity = `${word.id}:${draft.wordVersion}:${mode}:${draft.exercise?.id ?? "personal"}:${draft.startedAt}`;
   const audio = useVocabularyCardAudio(cardIdentity);
-  useEffect(() => { if (!revealed && requiresTyping) inputRef.current?.focus(); }, [cardIdentity, revealed, requiresTyping]);
+  useEffect(() => { if (!revealed && requiresTyping) inputRef.current?.focus(); }, [cardIdentity, revealed, requiresTyping, inputRef]);
 
   function reveal(gaveUp = false) {
     if (busy || revealed || !ready || (!gaveUp && requiresTyping && !draft.answer.trim())) return;
@@ -123,7 +122,7 @@ export function VocabularyReviewCard({ word: personalWord, mode, draft, sessionI
     else audio.play(word.term, () => onDraftChange({ audioPlayed: true }));
   }
 
-  return <section className={`${ui.panel} ${styles.card}`} aria-label="当前词汇练习" data-vocabulary-card data-no-vocabulary>
+  return <section ref={cardRef} className={`${ui.panel} ${styles.card}`} aria-label="当前词汇练习" data-vocabulary-card data-no-vocabulary>
     <div className={styles.cardHeader}><span>{vocabularyModes.find((item) => item.value === mode)?.description}</span><div className={styles.cardHeaderActions}>{onPauseTerm && <button type="button" className={ui.buttonGhost} disabled={busy} onClick={onPauseTerm}>整词暂不学习</button>}{revealed && <button type="button" className={ui.buttonGhost} disabled={busy} onClick={onEdit}>{target ? "查看用法资料" : "编辑词条"}</button>}</div></div>
     {supplemental && <p className={styles.supplementalBadge}>{draft.purpose === "consolidation" ? "用法巩固" : "追加练习"} · 不改变复习计划</p>}
     {draft.purpose === "merged" && <p className={styles.supplementalBadge}>到期复习与用法巩固 · 本次只评分一次</p>}
@@ -138,12 +137,8 @@ export function VocabularyReviewCard({ word: personalWord, mode, draft, sessionI
     {!cueReady && <div className={styles.cardActions}><button type="button" className={ui.buttonGhost} disabled={busy} onClick={onEdit}>补充词条资料</button><button type="button" className={ui.buttonSecondary} disabled={busy} onClick={onSkip}>暂缓此词</button><p className={styles.small}>补充资料或暂缓不会新增评分记录。</p></div>}
     {mode === "spelling" && audio.error && !draft.audioPlayed && <div className={styles.cardActions}><button type="button" className={ui.buttonSecondary} disabled={busy} onClick={onSkip}>暂缓此词</button><p className={styles.small}>发音不可用时可暂缓，或切换练习方式。</p></div>}
     {cueReady && <>
-      {requiresTyping && <label className={styles.answer}><span>你的答案</span><input ref={inputRef} className={ui.input} value={draft.answer} onChange={(event) => onDraftChange({ answer: event.target.value, gaveUp: false, confirmedTypo: false, requestedRating: null, ratingSource: "automatic" })} onCompositionStart={() => { composing.current = true; compositionEndedAt.current = null; }} onCompositionEnd={(event) => { composing.current = false; compositionEndedAt.current = event.timeStamp; }} onKeyDown={(event) => {
-        const justComposed = compositionEndedAt.current !== null && event.timeStamp - compositionEndedAt.current < 50;
-        if (event.key !== "Enter" || composing.current || justComposed || event.nativeEvent.isComposing || event.keyCode === 229) return;
-        event.preventDefault(); reveal();
-      }} placeholder="输入英文单词或短语" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} maxLength={2000} disabled={revealed || busy || versionChanged} /></label>}
-      {!revealed ? <div className={styles.cardActions}><button type="button" className={ui.button} disabled={busy || !ready || (requiresTyping && !draft.answer.trim())} onClick={() => reveal()}>{requiresTyping ? "核对答案" : "显示答案"}</button><button type="button" className={ui.buttonSecondary} disabled={busy || !ready} onClick={() => reveal(true)}>想不起来，查看答案</button></div> : <div className={styles.back}>
+      {requiresTyping && <label className={styles.answer}><span>你的答案</span><input ref={inputRef} className={ui.input} value={draft.answer} onChange={(event) => onDraftChange({ answer: event.target.value, gaveUp: false, confirmedTypo: false, requestedRating: null, ratingSource: "automatic" })} placeholder="输入英文单词或短语" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} maxLength={2000} disabled={revealed || busy || versionChanged} /></label>}
+      {!revealed ? <><div className={styles.cardActions}><button ref={primaryRef} type="button" aria-keyshortcuts="Enter" className={ui.button} disabled={busy || !ready || (requiresTyping && !draft.answer.trim())} onClick={() => reveal()}>{requiresTyping ? "核对答案" : "显示答案"}</button><button type="button" className={ui.buttonSecondary} disabled={busy || !ready} onClick={() => reveal(true)}>想不起来，查看答案</button></div><p className={styles.shortcutHint}>按 <kbd>Enter</kbd> {requiresTyping ? "核对答案" : "显示答案"}</p></> : <div className={styles.back}>
         <h2>{word.term} <button type="button" className={ui.buttonGhost} aria-label="播放单词" disabled={busy || audio.status !== "idle"} onClick={() => audio.play(word.term)}>▶</button></h2>
         {word.partOfSpeech && <p className={styles.small}>{word.partOfSpeech}</p>}<strong>{target?.meaningZh ?? (mode === "context" && draft.exercise ? draft.exercise.meaningZh : word.meaningZh || "尚未补充中文释义")}</strong>{word.definitionEn && <p>{word.definitionEn}</p>}
         {draft.gaveUp ? <p className={styles.wrong} role="status">{supplemental ? "本次未能独立想起，只记录辅助练习结果。" : "本次未能独立想起，将安排短期巩固。"}</p> : requiresTyping && <p className={correct ? styles.correct : styles.wrong} role="status">{correct ? "✓ 回答正确" : `✗ 你的答案：${draft.answer}。此处答案：${answerSurface}。`}</p>}
@@ -152,7 +147,8 @@ export function VocabularyReviewCard({ word: personalWord, mode, draft, sessionI
         {(draft.exercise?.sentence || word.example || word.sourceSentence) && <blockquote>{draft.exercise?.sentence || word.example || word.sourceSentence}<button type="button" className={ui.buttonGhost} disabled={busy || audio.status !== "idle"} onClick={() => audio.play(draft.exercise?.sentence || word.example || word.sourceSentence)}>▶ 读例句</button></blockquote>}
         {needsSchedulePreview && previewError && <div role="alert"><p>{previewError}</p><button type="button" className={ui.buttonSecondary} disabled={busy} onClick={retryPreview}>重试复习时间</button></div>}
         {needsSchedulePreview && !preview && !previewError && <p role="status">正在计算下次复习时间…</p>}
-        <div className={styles.continueRow}><p>{supplemental ? <><strong>只保存这次练习结果</strong><small>原单词的到期时间和 FSRS 进度保持不变。</small></> : <><strong>{ratings.find((rating) => rating.value === selectedRating)?.label}</strong><span>{preview ? ` · ${vocabularyIntervalLabel(preview.ratings[selectedRating].intervalSeconds)}复习` : ""}</span><small>{ratingSource === "automatic" ? "根据本次答案建议" : "按你选择的回忆难度安排"}</small></>}</p><div className={styles.continueActions}><button type="button" className={ui.button} disabled={busy || (needsSchedulePreview && !preview) || !ready} onClick={() => review(selectedRating, Date.now())}>{busy ? "正在保存…" : "继续"}</button>{canSupplement && <button type="button" className={ui.buttonSecondary} disabled={busy || !preview || !ready} onClick={() => review(selectedRating, Date.now(), true)}>继续并再练一句</button>}</div></div>
+        <div className={styles.continueRow}><p>{supplemental ? <><strong>只保存这次练习结果</strong><small>原单词的到期时间和 FSRS 进度保持不变。</small></> : <><strong>{ratings.find((rating) => rating.value === selectedRating)?.label}</strong><span>{preview ? ` · ${vocabularyIntervalLabel(preview.ratings[selectedRating].intervalSeconds)}复习` : ""}</span><small>{ratingSource === "automatic" ? "根据本次答案建议" : "按你选择的回忆难度安排"}</small></>}</p><div className={styles.continueActions}><button ref={primaryRef} type="button" aria-keyshortcuts="Enter" className={ui.button} disabled={busy || (needsSchedulePreview && !preview) || !ready} onClick={() => review(selectedRating, Date.now())}>{busy ? "正在保存…" : "继续"}</button>{canSupplement && <button type="button" className={ui.buttonSecondary} disabled={busy || !preview || !ready} onClick={() => review(selectedRating, Date.now(), true)}>继续并再练一句</button>}</div></div>
+        <p className={styles.shortcutHint}>按 <kbd>Enter</kbd> 保存并继续</p>
         {!supplemental && <details className={styles.difficulty}><summary>调整这次回忆的难度</summary><div className={styles.ratings}>{ratings.map((rating) => <button type="button" aria-pressed={selectedRating === rating.value} disabled={busy || !preview || !ready || (needsRelearning && rating.value !== "again")} key={rating.value} onClick={() => onDraftChange({ requestedRating: rating.value, ratingSource: "self" })}><strong>{rating.label}</strong><span>{rating.description}</span><small>{versionChanged ? "需要同步" : preview ? vocabularyIntervalLabel(preview.ratings[rating.value].intervalSeconds) : "计算中"}</small></button>)}</div><p className={styles.small}>选择后点击“继续”保存。未能独立想起时使用 Again；预计间隔在保存时按实际作答时间计算。</p></details>}
         {target && <><VocabularyTargetDetails target={target} />{onKnowTarget && <div className={styles.cardActions}><button type="button" className={ui.buttonGhost} disabled={busy} onClick={onKnowTarget}>这个用法已会</button><p className={styles.small}>仅保存你的自报选择，不记为答对或实测掌握。</p></div>}</>}
         <details className={styles.wordDetails}><summary>词条资料与来源</summary><dl className={styles.details}>

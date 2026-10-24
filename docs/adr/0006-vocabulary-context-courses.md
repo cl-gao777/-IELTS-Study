@@ -51,6 +51,10 @@ Responses include a queue state (`ready`, `waiting` or `empty`) and the next eli
 
 SQLite read scopes exist only for one request. Target definitions, target states and term dispositions are indexed within that scope; mutations invalidate mutable reads, content changes invalidate definitions, and rollback invalidates the scope before recovery reads. Personal word history and learning metadata use batch queries. There is no new persisted cache or schema, and backup remains version 6.
 
+## Keyboard continuation
+
+The active vocabulary card maps an unmodified, non-repeated Enter to its enabled primary button: check/reveal, then ordinary Continue; learning introductions use their existing learning confirmation. It never queues input while saving or waiting for a forecast. IME confirmation, other focused controls, open menus/dialogs, background pages and unmounted/paused cards do not invoke this shortcut. The same button callbacks retain all existing grading, idempotency and recovery checks; no API or backup change is needed.
+
 ## Optional assessment and imports
 
 Thirty frozen context questions sample five foundation frequency bands (four each) and ten academic entries. The first foundation band below three correct suggests its starting rank; otherwise suggest academic. Results are a course recommendation, never a total vocabulary estimate or FSRS update. Skipping defaults to academic.

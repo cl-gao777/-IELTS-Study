@@ -163,6 +163,8 @@
 @media(max-width:600px) { .studySettings summary { min-height:44px; } .captureHeader button { min-width:44px; min-height:44px; } }
 
 .extraStats { color: var(--muted); font-size: 13px; }
+.card .shortcutHint { color: var(--muted); font-size: 13px; text-align: center; }
+.shortcutHint kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--line); border-radius: 6px; font: inherit; color: var(--ink); background: var(--page); }
 .extraStats summary { min-height: 44px; padding: 8px 0; }
 .extraStats .progressStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--cream); }
 @media(max-width:600px) { .reviewToolbar { grid-template-columns: minmax(0, 1fr); } }
