@@ -13,6 +13,7 @@ import { VocabularySessionConflict } from "./vocabulary-session-store";
 import { readVocabularySession, writeVocabularySession } from "./vocabulary-session-store";
 import { ensureVocabularyTargetTables, isVocabularyTargetSnapshotCurrent, isVocabularyTermPaused, vocabularyExerciseForTarget, readVocabularyTargetDefinitions, vocabularyTargetEligible, readVocabularyTargetState } from "./vocabulary-targets";
 import type { VocabularyFocus } from "@/lib/vocabulary-target";
+import { readVocabularyScoped, invalidateVocabularyReadScope } from "./vocabulary-read-scope";
 
 export function ensureVocabularyCourseTables(database: Database.Database = getDatabase()) {
   database.exec(`
@@ -46,6 +47,11 @@ export function ensureVocabularyCourseTables(database: Database.Database = getDa
 
 /** Register content only. Importing a word never creates a card, schedule, or review. */
 export function registerVocabularyCourse(courseInput: VocabularyCourse, entryInputs: readonly (Partial<VocabularyCatalogEntry> & { term: string })[], database = getDatabase(), replaceContent = false) {
+  invalidateVocabularyReadScope(database);
+  try { return registerVocabularyCourseContent(courseInput, entryInputs, database, replaceContent); }
+  finally { invalidateVocabularyReadScope(database); }
+}
+function registerVocabularyCourseContent(courseInput: VocabularyCourse, entryInputs: readonly (Partial<VocabularyCatalogEntry> & { term: string })[], database: Database.Database, replaceContent: boolean) {
   ensureVocabularyCourseTables(database);
   const course = vocabularyCourseSchema.parse(courseInput);
   return database.transaction(() => {
@@ -106,6 +112,7 @@ export function registerVocabularyCourse(courseInput: VocabularyCourse, entryInp
 let privateCatalogCache: { signature: string; catalog: VocabularyCatalog } | undefined;
 /** The private package is authoritative only for its own course memberships. */
 function retireMissingPrivateVocabularyTargets(courseId: string, inputs: VocabularyCatalogEntry[], database: Database.Database) {
+  invalidateVocabularyReadScope(database);
   const desiredEntries = new Map(inputs.map((entry) => [normaliseVocabularyAnswer(entry.term), entry]));
   const desired = new Map(inputs.map((entry) => [normaliseVocabularyAnswer(entry.term), new Set((entry.targets ?? [])
     .filter((target) => target.memberships.some((membership) => membership.courseId === courseId)).map((target) => target.id))]));
@@ -138,6 +145,9 @@ function isCurrentPrivateVocabularyMember(entry: VocabularyCatalogEntry, courseI
 }
 /** Optional private package is persisted in SQLite; it never replaces public rank or personal data. */
 export function loadPrivateVocabularyCatalog(database = getDatabase()) {
+  return readVocabularyScoped(database,"private-catalog-loaded",()=>loadPrivateVocabularyCatalogContent(database));
+}
+function loadPrivateVocabularyCatalogContent(database: Database.Database) {
   ensureVocabularyCourseTables(database);
   if (process.env.NODE_ENV === "test" && !process.env.VOCABULARY_PRIVATE_CATALOG_PATH) return;
   const filename = process.env.VOCABULARY_PRIVATE_CATALOG_PATH ?? path.join(/* turbopackIgnore: true */ process.cwd(), "data", "vocabulary-private-catalog.json");
@@ -179,6 +189,9 @@ export function loadPrivateVocabularyCatalog(database = getDatabase()) {
 
 let catalogCache: { signature: string; catalog: VocabularyCatalog } | undefined;
 export function loadVocabularyCatalog(database = getDatabase()) {
+  return readVocabularyScoped(database,"catalog-loaded",()=>loadVocabularyCatalogContent(database));
+}
+function loadVocabularyCatalogContent(database: Database.Database) {
   ensureVocabularyCourseTables(database);
   const filename = path.join(/* turbopackIgnore: true */ process.cwd(), "src", "data", "vocabulary-catalog.json");
   if (!existsSync(/* turbopackIgnore: true */ filename)) { loadPrivateVocabularyCatalog(database); return; }

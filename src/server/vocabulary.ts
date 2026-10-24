@@ -75,18 +75,20 @@ function metadata(input: VocabularyInput): VocabularyMetadata {
   };
 }
 
-function mergeMetadata(word: VocabularyWord, data?: string): VocabularyEntry {
+type VocabularyHistory = { first_at: string | null; total: number };
+type VocabularyLearning = { review_version: number; learning_started_at: string | null };
+function mergeMetadata(word: VocabularyWord, data?: string, loaded?: { history: VocabularyHistory; learning?: VocabularyLearning; createdAt?: string }): VocabularyEntry {
   let saved: Partial<VocabularyMetadata> = {};
   try { saved = data ? JSON.parse(data) : {}; } catch { /* A damaged optional metadata row must not hide the card. */ }
   const safe = vocabularyInputSchema.safeParse({ ...word, ...saved });
   const parsed = safe.success ? safe.data : vocabularyInputSchema.parse(word);
   const database = getDatabase();
-  const history = database.prepare("SELECT MIN(reviewed_at) AS first_at, COUNT(*) AS total FROM vocabulary_reviews WHERE word_id = ?").get(word.id) as { first_at: string | null; total: number };
-  const learning = hasTable(database, "vocabulary_learning_state")
+  const history = loaded?.history ?? database.prepare("SELECT MIN(reviewed_at) AS first_at, COUNT(*) AS total FROM vocabulary_reviews WHERE word_id = ?").get(word.id) as VocabularyHistory;
+  const learning = loaded ? loaded.learning : hasTable(database, "vocabulary_learning_state")
     ? database.prepare("SELECT review_version, learning_started_at FROM vocabulary_learning_state WHERE word_id = ?").get(word.id) as { review_version: number; learning_started_at: string | null } | undefined : undefined;
-  const created = word.repetitions > 0 ? database.prepare("SELECT created_at FROM vocabulary_words WHERE id = ?").get(word.id) as { created_at: string } : undefined;
+  const createdAt = loaded ? loaded.createdAt : word.repetitions > 0 ? (database.prepare("SELECT created_at FROM vocabulary_words WHERE id = ?").get(word.id) as { created_at: string }).created_at : undefined;
   return { ...word, ...metadata(parsed), scheduler: "fsrs", reviewVersion: learning?.review_version ?? 1,
-    learningStartedAt: learning?.learning_started_at ?? history.first_at ?? created?.created_at ?? null,
+    learningStartedAt: learning?.learning_started_at ?? history.first_at ?? createdAt ?? null,
     hasReviewHistory: history.total > 0 };
 }
 
@@ -95,7 +97,12 @@ export function listVocabularyEntries(query = ""): VocabularyEntry[] {
   ensureVocabularyTables(database);
   const rows = database.prepare("SELECT word_id, data_json FROM vocabulary_metadata").all() as Array<{ word_id: string; data_json: string }>;
   const extra = new Map(rows.map((row) => [row.word_id, row.data_json]));
-  const words = listVocabulary().map((word) => mergeMetadata(word, extra.get(word.id)));
+  const histories = new Map((database.prepare("SELECT word_id,MIN(reviewed_at) AS first_at,COUNT(*) AS total FROM vocabulary_reviews GROUP BY word_id").all() as (VocabularyHistory & {word_id:string})[]).map(row=>[row.word_id,row]));
+  const learning = new Map((database.prepare("SELECT word_id,review_version,learning_started_at FROM vocabulary_learning_state").all() as (VocabularyLearning & {word_id:string})[]).map(row=>[row.word_id,row]));
+  const created = new Map((database.prepare("SELECT id,created_at FROM vocabulary_words WHERE repetitions>0").all() as {id:string;created_at:string}[]).map(row=>[row.id,row.created_at]));
+  const words = listVocabulary().map((word) => mergeMetadata(word, extra.get(word.id), {
+    history: histories.get(word.id) ?? {first_at:null,total:0}, learning:learning.get(word.id), createdAt:created.get(word.id),
+  }));
   const search = query.trim().toLocaleLowerCase("en");
   return search ? words.filter((word) => [word.term, word.lemma, word.meaningZh, word.definitionEn, ...word.tags].join(" ").toLocaleLowerCase("en").includes(search)) : words;
 }

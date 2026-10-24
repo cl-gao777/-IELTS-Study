@@ -11,7 +11,9 @@ export function selectVocabularyTargetCard(session: VocabularySession, now: Date
   const settings = getVocabularyStudy(now, database), focus = settings.focus ?? "general";
   const allDefinitions = readVocabularyTargetDefinitions(database);
   const definitions = allDefinitions.filter(({ entry, target }) => vocabularyTargetEligible(entry, target, focus, database));
-  const words = listVocabularyEntries().filter((word) => !session.state.skippedIds.includes(word.id) && !isVocabularyTermPaused(word.term, database));
+  const allWords = listVocabularyEntries();
+  const allWordsByTerm = new Map(allWords.map(word => [normaliseVocabularyAnswer(word.term), word]));
+  const words = allWords.filter((word) => !session.state.skippedIds.includes(word.id) && !isVocabularyTermPaused(word.term, database));
   const isNew = (word: VocabularyEntry) => !word.learningStartedAt && !word.hasReviewHistory && word.repetitions <= 0;
   const states = listVocabularyTargetStates(database);
   const eligible = (word: VocabularyEntry) => definitions.filter(({ entry }) => normaliseVocabularyAnswer(entry.term) === normaliseVocabularyAnswer(word.term));
@@ -73,7 +75,7 @@ export function selectVocabularyTargetCard(session: VocabularySession, now: Date
     const firstRecallPending = word && !isNew(word) && !word.hasReviewHistory && word.repetitions <= 0
       && eligible(word).some(({ entry, target }) => readVocabularyTargetState(target.id, normaliseVocabularyAnswer(entry.term), database).introducedAt);
     if (word && (pending(word) || firstRecallPending)) continue;
-    const existing = listVocabularyEntries().find((item) => normaliseVocabularyAnswer(item.term) === normaliseVocabularyAnswer(definition.entry.term));
+    const existing = allWordsByTerm.get(normaliseVocabularyAnswer(definition.entry.term));
     if (existing && session.state.skippedIds.includes(existing.id)) continue;
     word ??= materializeVocabularyCatalogEntry(definition.entry, database) ?? undefined;
     if (word) return card(word, definition, isNew(word) ? "learn-word" : "learn-target");

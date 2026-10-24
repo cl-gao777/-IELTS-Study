@@ -5,6 +5,7 @@ import { isVocabularyCatalogEntryLearnable, vocabularyCatalogEntrySchema, vocabu
 import { getDatabase } from "./db";
 import { loadVocabularyCatalog, listVocabularyCatalogEntries } from "./vocabulary-courses";
 import { VocabularySessionConflict } from "./vocabulary-session-store";
+import { invalidateVocabularyReadScope } from "./vocabulary-read-scope";
 
 export const catalogReviewSchema = z.object({
   entryId: z.string().min(1).max(200), expectedVersion: z.number().int().positive(),
@@ -78,6 +79,7 @@ export function publishVocabularyCatalogReview(input: z.infer<typeof catalogRevi
       } : { ...reviewed, locallyReviewed: true, version: current.version + 1,
         example: exercises.find((exercise) => exercise.status === "published")?.sentence ?? current.example }) });
     database.prepare("UPDATE vocabulary_catalog_entries SET data_json=?,updated_at=? WHERE id=?").run(JSON.stringify(entry), new Date().toISOString(), entry.id);
+    invalidateVocabularyReadScope(database);
     return entry;
   })();
 }
