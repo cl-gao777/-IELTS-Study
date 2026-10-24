@@ -37,11 +37,24 @@ export function getVocabularySession(submissionId?: string): VocabularySessionRe
       revision: session.revision + 1, state: { ...session.state, current: { ...current, canSupplement } } }, new Date());
   }
   const definitions = readVocabularyTargetDefinitions(database);
+  const eligibleDefinitions = definitions.filter(({entry,target}) => vocabularyTargetEligible(entry,target,settings.focus ?? "general",database));
+  const eligibleTerms = new Set(eligibleDefinitions.map(({entry}) => normaliseVocabularyAnswer(entry.term)));
   const eligibleWordIds = words.filter((item) => !isVocabularyTermPaused(item.term, database) && (settings.focus !== "ielts-advanced"
-    || definitions.some(({ entry, target }) => normaliseVocabularyAnswer(entry.term) === normaliseVocabularyAnswer(item.term) && vocabularyTargetEligible(entry, target, "ielts-advanced", database)))).map((item) => item.id);
-  return { session, words, eligibleWordIds, targetStates: listVocabularyTargetStates(database), termDispositions: listVocabularyTermDispositions(database),
-    queuePreview: vocabularyQueuePreview(words.filter((item) => eligibleWordIds.includes(item.id)), session, new Date(), database),
-    targetCounts: getVocabularyTargetCounts(settings.focus ?? "general", new Date(), database), ...(error ? { error } : {}),
+    || eligibleTerms.has(normaliseVocabularyAnswer(item.term)))).map((item) => item.id);
+  const now = new Date(), targetStates = listVocabularyTargetStates(database);
+  const queuePreview = vocabularyQueuePreview(words.filter((item) => eligibleWordIds.includes(item.id)), session, now, database);
+  const eligibleTargets = new Set(eligibleDefinitions.map(({target})=>target.id));
+  const skipped = new Set(session?.status === "active" ? session.state.skippedIds : []);
+  const dates = [queuePreview.nextScheduledAt, ...(session?.state.mode === "context" ? targetStates
+    .filter(state=>state.wordId && !skipped.has(state.wordId) && !state.paused && [1,2].includes(state.step)
+      && eligibleTargets.has(state.targetId) && state.dueAt && Date.parse(state.dueAt)>now.getTime()).map(state=>state.dueAt) : [])]
+    .filter((date): date is string=>Boolean(date)).sort((a,b)=>Date.parse(a)-Date.parse(b));
+  const nextDueAt = dates[0] ?? null;
+  const queue: NonNullable<VocabularySessionResponse["queue"]> = session?.status === "active" && session.state.current
+    ? {status:"ready",nextDueAt} : nextDueAt ? {status:"waiting",nextDueAt}
+      : {status:"empty",nextDueAt:null,reason:!settings.activeCourseId ? "no-course" : skipped.size ? "deferred" : "no-eligible-content"};
+  return { session, words, eligibleWordIds, targetStates, termDispositions: listVocabularyTermDispositions(database), queue, queuePreview,
+    targetCounts: getVocabularyTargetCounts(settings.focus ?? "general", now, database), ...(error ? { error } : {}),
     ...(submissionId ? { submission: readVocabularyReviewSubmission(submissionId) } : {}) };
 }
 

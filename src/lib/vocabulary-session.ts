@@ -78,6 +78,14 @@ export interface VocabularySessionResponse {
   targetCounts?: VocabularyTargetCounts;
   eligibleWordIds?: string[];
   queuePreview?: { scheduledDue: number; nextScheduledAt: string | null };
+  queue?: VocabularyQueueState;
+  /** The previous operation committed; only drawing the next card needs retrying. */
+  nextError?: string;
+}
+export interface VocabularyQueueState {
+  status: "ready" | "waiting" | "empty";
+  nextDueAt: string | null;
+  reason?: "no-course" | "no-eligible-content" | "deferred";
 }
 export const vocabularyCardDraftSchema = z.object({
   wordId: z.string().min(1).max(200), wordVersion: z.number().int().positive(),

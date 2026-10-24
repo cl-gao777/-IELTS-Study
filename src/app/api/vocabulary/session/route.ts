@@ -4,21 +4,31 @@ import { reviewModes } from "@/lib/vocabulary";
 import { vocabularyCheckpointSchema } from "@/lib/vocabulary-session";
 import { changeVocabularySession, getVocabularySession } from "@/server/vocabulary-session";
 import { vocabularyConflictResponse } from "@/server/vocabulary-session-http";
+import { getDatabase } from "@/server/db";
+import { withVocabularyReadScope, invalidateVocabularyReadScope } from "@/server/vocabulary-read-scope";
+import { completeVocabularyTransition } from "@/server/vocabulary-transition";
+import { readVocabularySession } from "@/server/vocabulary-session-store";
 
 const sessionSchema = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("start"), id: z.uuid().optional(), restoreVersion: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER - 2), mode: z.enum(reviewModes).default("context"), courseId: z.string().min(1).max(200).nullable().optional() }).strict(),
-  z.object({ action: z.literal("checkpoint"), id: z.uuid(), expectedRevision: z.number().int().positive(), state: vocabularyCheckpointSchema }).strict(),
+  z.object({ action: z.literal("start"), id: z.uuid().optional(), restoreVersion: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER - 2), mode: z.enum(reviewModes).default("context"), courseId: z.string().min(1).max(200).nullable().optional(), advance: z.boolean().optional() }).strict(),
+  z.object({ action: z.literal("checkpoint"), id: z.uuid(), expectedRevision: z.number().int().positive(), state: vocabularyCheckpointSchema, advance: z.boolean().optional() }).strict(),
   z.object({ action: z.literal("end"), id: z.uuid(), expectedRevision: z.number().int().positive() }).strict(),
   z.object({ action: z.literal("next"), id: z.uuid(), expectedRevision: z.number().int().positive() }).strict(),
 ]);
 export async function GET(request: Request) {
   const submissionId = new URL(request.url).searchParams.get("submissionId") ?? undefined;
   if (submissionId && !z.uuid().safeParse(submissionId).success) return NextResponse.json({ error: "提交编号格式不正确。" }, { status: 400 });
-  return NextResponse.json(getVocabularySession(submissionId), { headers: { "Cache-Control": "no-store" } });
+  return withVocabularyReadScope(getDatabase(),()=>NextResponse.json(getVocabularySession(submissionId), { headers: { "Cache-Control": "no-store" } }));
 }
 export async function PUT(request: Request) {
   const parsed = sessionSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "练习状态格式不正确，请刷新页面后重试。" }, { status: 400 });
-  try { return NextResponse.json(changeVocabularySession(parsed.data)); }
-  catch (error) { return vocabularyConflictResponse(error); }
+  return withVocabularyReadScope(getDatabase(),()=>{
+    try {
+      const input=parsed.data;
+      const duplicate=input.action==="start" && Boolean(input.id && readVocabularySession(getDatabase(),input.id));
+      const result=changeVocabularySession(input);
+      return NextResponse.json(completeVocabularyTransition(result,"advance" in input && Boolean(input.advance),duplicate));
+    } catch (error) { invalidateVocabularyReadScope(getDatabase()); return vocabularyConflictResponse(error); }
+  });
 }
