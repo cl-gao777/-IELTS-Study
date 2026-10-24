@@ -43,6 +43,14 @@ A higher private-package version is authoritative only for its own memberships. 
 
 Live cards bind word, target, exercise, membership, target-state, session, restore and policy versions. Historical snapshots must have valid internal target/exercise/course references and valid PDF hashes, but need not equal today's meaning or membership after an edit or withdrawal. Backup v4 includes target states, term dispositions and operation ledgers; explicit v1/v2/v3 upgrades add known defaults without inventing missing target information or recalculating prior ratings, dates or FSRS. Restore keeps frozen inputs and minute events, advances invalidation tokens, and retains the attachment validation and rollback contract.
 
+## Continuous card transitions (2026-10-24)
+
+The vocabulary session, introduction and review endpoints accept an optional `advance` flag. New clients request one persisted next assignment in the successful save response; old clients retain the separate `next` action. Ordinary typing checkpoints do not advance. An idempotent replay returns the existing assignment, without grading or drawing again. The score or introduction commits before selection: a failed next-card read reports `nextError` while preserving the successful save. Recovery verifies the original operation/submission ID and retries only drawing when the save is known to exist.
+
+Responses include a queue state (`ready`, `waiting` or `empty`) and the next eligible due time. A background check leaves the current interface mounted and interactive, checks immediately when the known due time arrives, and otherwise checks no more often than every 30 seconds. Foreground-only timing and existing restore/version guards remain authoritative. No card is graded early and no basic word is inserted to fill a wait.
+
+SQLite read scopes exist only for one request. Target definitions, target states and term dispositions are indexed within that scope; mutations invalidate mutable reads, content changes invalidate definitions, and rollback invalidates the scope before recovery reads. Personal word history and learning metadata use batch queries. There is no new persisted cache or schema, and backup remains version 6.
+
 ## Optional assessment and imports
 
 Thirty frozen context questions sample five foundation frequency bands (four each) and ten academic entries. The first foundation band below three correct suggests its starting rank; otherwise suggest academic. Results are a course recommendation, never a total vocabulary estimate or FSRS update. Skipping defaults to academic.

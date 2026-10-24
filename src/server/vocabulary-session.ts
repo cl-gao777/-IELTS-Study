@@ -11,6 +11,7 @@ import { isVocabularyCatalogEntryLearnable } from "@/lib/vocabulary-course";
 import { selectVocabularyTargetCard, vocabularyQueuePreview } from "./vocabulary-target-selection";
 import { morphologySelectedTargetRanks } from "./vocabulary-selected-targets";
 import { listVocabularyTargetStates, listVocabularyTermDispositions, getVocabularyTargetCounts, isVocabularyTargetCardCurrent, isVocabularyTermPaused, readVocabularyTargetDefinitions, vocabularyTargetEligible } from "./vocabulary-targets";
+import { hasVocabularyReadScope, withVocabularyReadScope } from "./vocabulary-read-scope";
 
 export type VocabularySessionOperation =
   | { action: "start"; id?: string; mode: VocabularyReviewMode; courseId?: string | null; restoreVersion?: number }
@@ -19,8 +20,10 @@ export type VocabularySessionOperation =
   | { action: "next"; id: string; expectedRevision: number };
 
 export function getVocabularySession(submissionId?: string): VocabularySessionResponse {
+  const database = getDatabase();
+  if (!hasVocabularyReadScope(database)) return withVocabularyReadScope(database,()=>getVocabularySession(submissionId));
   ensureVocabularyTables();
-  const database = getDatabase(); loadVocabularyCatalog(database); let session = readVocabularySession(database); let error: string | undefined;
+  loadVocabularyCatalog(database); let session = readVocabularySession(database); let error: string | undefined;
   const words = listVocabularyEntries();
   const current = session?.state.current;
   const word = current ? words.find((item) => item.id === current.wordId) : undefined;

@@ -37,7 +37,7 @@ export function VocabularyLearningCard({ word: personalWord, exercise, draft, bu
       {word.sourceSentence && word.example && word.sourceSentence !== word.example && <blockquote>{word.sourceSentence}</blockquote>}
       {!usableMeaning && <p className={ui.notice}>请先补充可用释义，才能安排第一次回忆。</p>}
       <div className={styles.cardActions}>
-        {usableMeaning ? <button type="button" className={ui.button} disabled={busy} onClick={() => { audio.cancel(); onLearn(personalWord); }}>{intro ? "理解这个用法，1分钟后巩固" : "已学习，1分钟后回忆"}</button> : <button type="button" className={ui.button} disabled={busy} onClick={onEdit}>补充词条资料</button>}
+        {usableMeaning ? <button type="button" className={ui.button} disabled={busy} onClick={() => { audio.cancel(); onLearn(personalWord); }}>{busy ? "正在保存…" : intro ? "理解这个用法，1分钟后巩固" : "已学习，1分钟后回忆"}</button> : <button type="button" className={ui.button} disabled={busy} onClick={onEdit}>补充词条资料</button>}
         <button type="button" className={ui.buttonSecondary} disabled={busy} onClick={onSkip}>暂缓此词</button>
       </div>
       <p className={styles.small}>{intro ? "确认后安排 1 分钟、10 分钟语境巩固，原单词的 FSRS 和到期时间保持不变。未确认或暂缓不计入已学习。" : "学习只安排第一次回忆，不产生评分或错误记录。"}</p>

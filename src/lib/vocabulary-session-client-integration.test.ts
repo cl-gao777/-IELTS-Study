@@ -39,7 +39,9 @@ function setup(dueAt = "2030-01-01T00:01:05.000Z") {
   let lose: "learn" | "review" | "targets" | null = null;
   const calls: { url: string; body?: Record<string, unknown> }[] = [];
   const transport: VocabularyTransport = async (url, body) => {
-    const input = body as Record<string, unknown> | undefined; calls.push({ url, body: input });
+    const wire = body as Record<string, unknown> | undefined; calls.push({ url, body: wire });
+    // The HTTP adapter consumes advance; domain operations receive only their own fields.
+    const input = wire ? Object.fromEntries(Object.entries(wire).filter(([key]) => key !== "advance")) : undefined;
     let payload: Awaited<ReturnType<VocabularyTransport>>["payload"];
     try {
       if (!input && url.startsWith("/api/vocabulary/targets")) {

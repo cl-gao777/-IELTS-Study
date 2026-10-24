@@ -519,3 +519,120 @@ describe("durable vocabulary practice client", () => {
     expect(f.submissions.size).toBe(0);
   });
 });
+
+/** Model the HTTP completion adapter while retaining the legacy domain fixture. */
+function continuousFixture(words?: VocabularyEntry[]) {
+  const f = setup(words);
+  let nextFailure = "";
+  let holdReply: ((release: () => void) => void) | null = null;
+  const send: VocabularyTransport = async (url, body) => {
+    const data = body as Record<string, unknown> | undefined;
+    if (data?.action === "next" && nextFailure) throw new TypeError(nextFailure);
+    const reply = await f.transport(url, body);
+    if (reply.ok && data?.advance && f.server().status === "active" && !f.server().state.current) {
+      const next = vocabularyReviewQueue(f.words(), Date.now(), new Set(f.server().state.skippedIds))[0];
+      if (next) {
+        f.server().revision++;
+        f.server().state.current = { wordId: next.id, wordVersion: next.reviewVersion,
+          phase: isVocabularyNew(next) ? "learn" : "front", answer: "", gaveUp: false, confirmedTypo: false,
+          audioPlayed: false, requestedRating: null, ratingSource: "automatic", exercise: null,
+          startedAt: new Date(Date.now()).toISOString() };
+      }
+    }
+    if (reply.ok) {
+      const session = structuredClone(f.server());
+      const nextDueAt = f.words().filter((item) => !session.state.skippedIds.includes(item.id) && Date.parse(item.dueAt) > Date.now()).sort((a, b) => Date.parse(a.dueAt) - Date.parse(b.dueAt))[0]?.dueAt ?? null;
+      reply.payload = { ...reply.payload, session, words: structuredClone(f.words()), queue: {
+        status: session.state.current ? "ready" : nextDueAt ? "waiting" : "empty", nextDueAt,
+      }, ...(data?.advance && nextFailure ? { nextError: nextFailure } : {}) };
+    }
+    if (data?.advance && holdReply) { const hold = holdReply; holdReply = null; await new Promise<void>((resolve) => hold(resolve)); }
+    return reply;
+  };
+  return { ...f, client: () => f.client(send), failNext: (message: string) => { nextFailure = message; },
+    holdReply: (hold: (release: () => void) => void) => { holdReply = hold; } };
+}
+
+describe("continuous vocabulary cards", () => {
+  it("draws immediately after a pure GET even when that GET includes empty queue metadata", async () => {
+    const f = continuousFixture(); const client = f.client(); await client.initialize(f.cache);
+    expect(client.getSnapshot().session!.state.current?.wordId).toBe("economy");
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(1);
+  });
+  it("keeps the scored card until saving completes and adopts the next card without another next request", async () => {
+    const f = continuousFixture(); const client = f.client(); await client.initialize(f.cache);
+    client.changeDraft({ answer: "economy", phase: "revealed" }); await client.flush();
+    let release!: () => void; f.holdReply((resolve) => { release = resolve; });
+    const saving = client.reviewWord(f.words()[0], input);
+    await vi.waitFor(() => expect(release).toBeTypeOf("function"));
+    expect(client.getSnapshot()).toMatchObject({ busy: true, session: { state: { current: { wordId: "economy", answer: "economy" } } } });
+    release(); await saving;
+    expect(client.getSnapshot()).toMatchObject({ busy: false, session: { state: { current: { wordId: "evidence" }, reviewed: 1 } } });
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(1);
+    expect(f.calls.find((call) => call.url.endsWith("/review"))?.body?.advance).toBe(true);
+    expect(f.calls.filter((call) => call.body?.action === "checkpoint").every((call) => call.body?.advance === undefined)).toBe(true);
+  });
+  it("advances learned cards and starts in the same response", async () => {
+    const f = continuousFixture([word("economy", true), word("evidence", true)]); const client = f.client(); await client.initialize(f.cache);
+    await client.learnWord(f.words()[0]);
+    expect(client.getSnapshot().session!.state.current?.wordId).toBe("evidence");
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(1);
+    await client.enterLibrary(); await client.startRound();
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(1);
+    expect(f.calls.find((call) => call.body?.action === "start")?.body?.advance).toBe(true);
+  });
+  it.each(["skip", "mode"])("freezes the previous visible card during %s and switches only after the checkpoint saves", async (action) => {
+    const f = continuousFixture(); const client = f.client(); await client.initialize(f.cache);
+    client.changeDraft({ answer: "retained input" }); await client.flush();
+    let release!: () => void; f.holdReply((resolve) => { release = resolve; });
+    const saving = action === "skip" ? client.skipCard() : client.changeMode("spelling");
+    await vi.waitFor(() => expect(release).toBeTypeOf("function"));
+    expect(client.getSnapshot().transitionSession).toMatchObject({ state: { mode: "recall", current: { wordId: "economy", answer: "retained input" } } });
+    release(); await saving;
+    expect(client.getSnapshot().transitionSession).toBeNull();
+    expect(client.getSnapshot().session!.state.current?.wordId).toBe("evidence");
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(1);
+  });
+  it("checks an empty queue in the background at most once every 30 seconds", async () => {
+    const f = continuousFixture([]); const client = f.client(); await client.initialize(f.cache);
+    for (let second = 1; second < 30; second++) client.tick(now + second * 1000);
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(1);
+    client.tick(now + 30_000);
+    expect(client.getSnapshot()).toMatchObject({ busy: false, checkingNext: true });
+    await vi.waitFor(() => expect(client.getSnapshot().checkingNext).toBe(false));
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(2);
+  });
+  it("checks at the due boundary without waiting for the 30-second interval", async () => {
+    const future = { ...word("evidence"), dueAt: new Date(now + 10_000).toISOString() };
+    const f = continuousFixture([future]); const client = f.client(); await client.initialize(f.cache);
+    vi.setSystemTime(now + 10_000); client.tick(now + 10_000);
+    await vi.waitFor(() => expect(client.getSnapshot().session!.state.current?.wordId).toBe("evidence"));
+    expect(f.calls.filter((call) => call.body?.action === "next")).toHaveLength(2);
+  });
+  it("preserves a successful score when fetching the next card fails and retries only drawing", async () => {
+    const f = continuousFixture([word("economy")]); const client = f.client(); await client.initialize(f.cache);
+    client.changeDraft({ answer: "economy", phase: "revealed" }); await client.flush();
+    f.failNext("queue unavailable"); await client.reviewWord(f.words()[0], input);
+    expect(client.getSnapshot()).toMatchObject({ pending: null, nextError: "queue unavailable", session: { state: { reviewed: 1 } } });
+    expect(f.submissions.size).toBe(1);
+    f.failNext(""); await client.retryNextCard();
+    expect(client.getSnapshot().nextError).toBe("");
+    expect(f.calls.filter((call) => call.url.endsWith("/review"))).toHaveLength(1);
+    expect(f.submissions.size).toBe(1);
+  });
+});
+
+
+describe("continuous card transition invalidation", () => {
+  it.each(["dispose", "restore"])("clears an in-memory mode transition on %s and ignores its old response", async (kind) => {
+    const f = continuousFixture(); const client = f.client(); await client.initialize(f.cache);
+    let release!: () => void; f.holdReply((resolve) => { release = resolve; });
+    const changing = client.changeMode("spelling");
+    await vi.waitFor(() => expect(client.getSnapshot().transitionSession).not.toBeNull());
+    if (kind === "dispose") client.dispose(); else client.resetAfterRestore();
+    expect(client.getSnapshot().transitionSession).toBeNull();
+    release(); await changing;
+    expect(client.getSnapshot().transitionSession).toBeNull();
+    if (kind === "restore") await vi.waitFor(() => expect(client.getSnapshot().ready).toBe(true));
+  });
+});

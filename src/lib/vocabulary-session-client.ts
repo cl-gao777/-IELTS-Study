@@ -18,6 +18,8 @@ export interface VocabularyClientSnapshot {
   pendingOperation: VocabularyPendingOperation | null;
   targetStates: VocabularyTargetState[]; termDispositions: VocabularyTermDisposition[]; targetCounts: VocabularyTargetCounts | null;
   queuePreview: { scheduledDue: number; nextScheduledAt: string | null } | null;
+  queue: VocabularySessionResponse["queue"] | null; nextError: string; checkingNext: boolean;
+  transitionSession: VocabularySession | null;
 }
 
 export const vocabularyTransport: VocabularyTransport = async (url, body) => {
@@ -48,7 +50,7 @@ export class VocabularySessionClient {
   constructor(words: VocabularyEntry[], now: number, private transport = vocabularyTransport) {
     this.snapshot = { words, session: null, mode: "context", view: "review", ready: false,
       busy: false, saving: false, message: "", clock: now, pending: null, conflicted: null, pendingOperation: null,
-      targetStates: [], termDispositions: [], targetCounts: null, queuePreview: null };
+      targetStates: [], termDispositions: [], targetCounts: null, queuePreview: null, queue: null, nextError: "", checkingNext: false, transitionSession: null };
   }
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
@@ -63,18 +65,23 @@ export class VocabularySessionClient {
     try { this.storage.setItem(vocabularyRecoveryKey, JSON.stringify({ format: 2, session, view, pending, conflicted, pendingOperation, attempted: this.attempted, startAttempt: this.startAttempt, dirty: this.dirty || Boolean(this.attempted) })); }
     catch { /* A failed browser cache does not stop SQLite checkpoints. */ }
   }
-  private retainConflicted(card = this.snapshot.session?.state.current, mode = this.snapshot.mode) {
+  private retainConflicted(card = this.snapshot.transitionSession?.state.current ?? this.snapshot.session?.state.current, mode = this.snapshot.transitionSession?.state.mode ?? this.snapshot.mode) {
     if (!card || (!card.answer.trim() && !card.gaveUp)) return;
     this.update({ conflicted: { mode, card: structuredClone(card), retainedAt: new Date().toISOString() } });
   }
   clearConflicted() { this.update({ conflicted: null }); }
-  private adopt(payload: Reply, preserveUnsaved = false) {
+  private adopt(payload: Reply, preserveUnsaved = false, drawChecked = false) {
     if (preserveUnsaved) this.retainConflicted();
     this.dirty = false;
     this.attempted = null;
     const words = payload.words ?? (payload.word ? this.snapshot.words.map((word) => word.id === payload.word!.id ? payload.word! : word) : this.snapshot.words);
     const session = payload.session === undefined ? this.snapshot.session : payload.session;
+    if (drawChecked && payload.queue && session) {
+      this.lastNextKey = session.id + ":" + session.revision;
+      this.lastNextCheck = this.snapshot.clock;
+    }
     this.update({ words, session, mode: session?.status === "active" ? session.state.mode : this.snapshot.mode, saving: false,
+      queue: payload.queue ?? null, nextError: payload.nextError ?? "",
       targetStates: payload.targetStates ?? this.snapshot.targetStates, termDispositions: payload.termDispositions ?? this.snapshot.termDispositions,
       targetCounts: payload.targetCounts ?? this.snapshot.targetCounts, queuePreview: payload.queuePreview ?? this.snapshot.queuePreview });
   }
@@ -109,7 +116,7 @@ export class VocabularySessionClient {
     } : this.recoveryFromStorage();
     this.startAttempt = recovery?.startAttempt ?? null;
     this.update({ conflicted: recovery?.conflicted ?? null });
-    this.update({ busy: true, ready: keepReady, message: "" });
+    this.update({ busy: true, ready: keepReady, message: "", checkingNext: false, transitionSession: null });
     try {
       const suffix = recovery?.pending ? `?submissionId=${encodeURIComponent(recovery.pending.input.submissionId)}` : "";
       const result = await this.transport(recovery?.pendingOperation
@@ -165,7 +172,7 @@ export class VocabularySessionClient {
   }
   tick(now: number) { this.update({ clock: now }); void this.selectCard(); }
   private selectCard(): Promise<void> {
-    const { session, words, ready, busy, pending, pendingOperation, clock, view } = this.snapshot;
+    const { session, words, ready, busy, pending, pendingOperation, clock, view, queue } = this.snapshot;
     if (this.nextInFlight) return this.nextInFlight;
     if (!ready || busy || pending || pendingOperation || view !== "review" || session?.status !== "active") return Promise.resolve();
     const current = session.state.current;
@@ -175,13 +182,12 @@ export class VocabularySessionClient {
       return Promise.resolve();
     }
     const key = session.id + ":" + session.revision;
-    const due = this.snapshot.queuePreview ? this.snapshot.queuePreview.scheduledDue > 0
-      || session.state.mode === "context" && Boolean(this.snapshot.targetCounts?.nextConsolidationAt && Date.parse(this.snapshot.targetCounts.nextConsolidationAt) <= clock)
-      : words.some((word) => Date.parse(word.dueAt) <= clock && !session.state.skippedIds.includes(word.id));
-    if (key === this.lastNextKey && clock - this.lastNextCheck < (due ? 1000 : 15_000)) return Promise.resolve();
+    const nextDueAt = queue?.nextDueAt ?? this.snapshot.queuePreview?.nextScheduledAt;
+    const dueJustReached = nextDueAt && Date.parse(nextDueAt) > this.lastNextCheck && Date.parse(nextDueAt) <= clock;
+    if (key === this.lastNextKey && !dueJustReached && clock - this.lastNextCheck < 30_000) return Promise.resolve();
     this.lastNextKey = key; this.lastNextCheck = clock;
     const epoch = this.epoch;
-    this.update({ busy: true });
+    this.update({ checkingNext: true });
     const draw = async () => {
       try {
         await this.flush(); this.requireEpoch(epoch);
@@ -191,7 +197,7 @@ export class VocabularySessionClient {
           if (reply.status === 409) this.adopt(reply.payload, true);
           throw new Error(reply.payload.error || "下一张词卡暂时无法读取，请重试。");
         }
-        this.adopt(reply.payload);
+        this.adopt(reply.payload, false, true);
       } catch (error) {
         if (epoch !== this.epoch) return;
         // Drawing a card is idempotent: after a lost response read the fixed
@@ -202,9 +208,9 @@ export class VocabularySessionClient {
             this.adopt(check.payload); return;
           }
         } catch { if (epoch !== this.epoch) return; }
-        this.update({ message: error instanceof TypeError ? "连接中断，下一张词卡尚未读取。恢复连接后可重试。" : error instanceof Error ? error.message : "下一张词卡尚未读取，请重试。" });
+        this.update({ nextError: error instanceof TypeError ? "连接中断，下一张词卡尚未读取。恢复连接后可重试。" : error instanceof Error ? error.message : "下一张词卡尚未读取，请重试。" });
       } finally {
-        if (epoch === this.epoch) this.update({ busy: false });
+        if (epoch === this.epoch) this.update({ checkingNext: false });
       }
     };
     const task = draw(); this.nextInFlight = task;
@@ -226,7 +232,7 @@ export class VocabularySessionClient {
     clearTimeout(this.checkpointTimer);
     this.checkpointTimer = setTimeout(() => { void this.flush().catch(() => undefined); }, 400);
   }
-  flush() {
+  flush(advance = false) {
     clearTimeout(this.checkpointTimer);
     const epoch = this.epoch;
     const run = async () => {
@@ -250,7 +256,7 @@ export class VocabularySessionClient {
         let conflicted = false;
         try {
           const result = await this.request("/api/vocabulary/session", { action: "checkpoint", id: session.id,
-            expectedRevision: sent.revision, state: sent.state }, epoch);
+            expectedRevision: sent.revision, state: sent.state, ...(advance && !sent.state.current ? { advance: true } : {}) }, epoch);
           if (!result.ok) {
             if (result.status === 409) {
               conflicted = true;
@@ -269,7 +275,7 @@ export class VocabularySessionClient {
               learned: server.state.learned, supplementalReviewed: server.state.supplementalReviewed,
               lastSubmissionId: server.state.lastSubmissionId } },
               words: result.payload.words ?? this.snapshot.words, saving: false });
-          } else this.adopt(result.payload);
+          } else this.adopt(result.payload, false, advance);
         } catch (error) {
           if (epoch !== this.epoch) throw error;
           if (!conflicted) this.dirty = true;
@@ -310,9 +316,12 @@ export class VocabularySessionClient {
     if (this.snapshot.busy || !this.snapshot.ready || ((this.snapshot.pending || this.snapshot.pendingOperation) && !allowPending)) return;
     this.update({ busy: true, message: "" });
     const epoch = this.epoch;
-    try { await work(epoch); }
-    catch (error) { if (epoch === this.epoch) this.update({ message: error instanceof TypeError ? "连接中断，当前状态已保留，请恢复连接后重试。" : error instanceof Error ? error.message : "操作未保存，请重试。" }); }
-    finally { if (epoch === this.epoch) { this.update({ busy: false }); await this.selectCard(); } }
+    try { await this.nextInFlight; this.requireEpoch(epoch); await work(epoch); }
+    catch (error) { if (epoch === this.epoch) {
+      if (this.snapshot.transitionSession) this.retainConflicted();
+      this.update({ message: error instanceof TypeError ? "连接中断，当前状态已保留，请恢复连接后重试。" : error instanceof Error ? error.message : "操作未保存，请重试。" });
+    } }
+    finally { if (epoch === this.epoch) { this.update({ busy: false, transitionSession: null }); await this.selectCard(); } }
   }
   async startRound(courseId?: string | null, restoreVersion = 1) {
     await this.operation(async (epoch) => {
@@ -320,12 +329,12 @@ export class VocabularySessionClient {
       this.startAttempt ??= { id: crypto.randomUUID(), mode: this.snapshot.mode, ...(courseId === undefined ? {} : { courseId }) };
       this.remember();
       try {
-        const result = await this.request("/api/vocabulary/session", { action: "start", ...this.startAttempt, restoreVersion }, epoch);
+        const result = await this.request("/api/vocabulary/session", { action: "start", ...this.startAttempt, restoreVersion, advance: true }, epoch);
         if (!result.ok) {
           if (result.status === 409) { this.startAttempt = null; this.adopt(result.payload); }
           throw new Error(result.payload.error || "无法开始本轮复习。");
         }
-        this.startAttempt = null; this.adopt(result.payload); this.update({ view: "review" });
+        this.startAttempt = null; this.adopt(result.payload, false, true); this.update({ view: "review" });
       } catch (error) {
         this.requireEpoch(epoch);
         if (this.startAttempt) {
@@ -347,8 +356,9 @@ export class VocabularySessionClient {
     await this.operation(async (epoch) => {
       await this.flush(); this.requireEpoch(epoch);
       const state = this.snapshot.session!.state;
+      this.update({ transitionSession: structuredClone(this.snapshot.session) });
       this.patch({ mode, current: null, skippedIds: state.current ? [...new Set([...state.skippedIds, state.current.wordId])] : state.skippedIds });
-      await this.flush(); this.requireEpoch(epoch);
+      await this.flush(true); this.requireEpoch(epoch);
       this.update({ message: "已切换练习方式，原词本轮暂缓，没有评分。" });
     });
   }
@@ -358,8 +368,9 @@ export class VocabularySessionClient {
       await this.flush(); this.requireEpoch(epoch);
       const state = this.snapshot.session!.state;
       if (!state.current) return;
+      this.update({ transitionSession: structuredClone(this.snapshot.session) });
       this.patch({ current: null, skippedIds: [...new Set([...state.skippedIds, state.current.wordId])] });
-      await this.flush(); this.requireEpoch(epoch); this.update({ message: "已暂缓此词，没有改变熟练度或原复习安排。" });
+      await this.flush(true); this.requireEpoch(epoch); this.update({ message: "已暂缓此词，没有改变熟练度或原复习安排。" });
     });
   }
   async enterManagement(view: "courses" | "library") {
@@ -404,9 +415,9 @@ export class VocabularySessionClient {
         this.update({ pendingOperation: pending }); await this.sendOperation(pending, epoch); return;
       }
       const result = await this.request(`/api/vocabulary/${encodeURIComponent(word.id)}/learn`, {
-        expectedVersion: word.reviewVersion, sessionId: session.id, expectedSessionRevision: session.revision }, epoch);
+        expectedVersion: word.reviewVersion, sessionId: session.id, expectedSessionRevision: session.revision, advance: true }, epoch);
       if (!result.ok) { if (result.status === 409) this.adopt(result.payload); throw new Error(result.payload.error || "学习安排未保存，请重试。"); }
-      this.adopt(result.payload);
+      this.adopt(result.payload, false, true);
       this.update({ message: "已学习，1 分钟后的首次回忆已安排。这次学习没有计入答题成绩。" });
     });
   }
@@ -441,12 +452,12 @@ export class VocabularySessionClient {
     try {
       const { wordId, ...learning } = pending.kind === "learn" ? pending.input : { wordId: "" };
       const result = await this.request(pending.kind === "learn" ? `/api/vocabulary/${encodeURIComponent(wordId)}/learn` : "/api/vocabulary/targets",
-        pending.kind === "learn" ? learning : pending.input, epoch);
+        pending.kind === "learn" ? { ...learning, advance: true } : pending.input, epoch);
       if (!result.ok) {
         if (result.status < 500) { this.update({ pendingOperation: null }); if (result.status === 409) this.adopt(result.payload, true); }
         throw new Error(result.payload.error || "学习选择尚未保存。");
       }
-      this.adopt(result.payload);
+      this.adopt(result.payload, false, pending.kind === "learn");
       const message = pending.kind === "learn" ? pending.intro
         ? "已确认学习这个用法，1 分钟后的语境巩固已安排；原复习计划保持不变。"
         : "已学习，1 分钟后的首次回忆已安排，没有计入答题成绩。"
@@ -498,12 +509,12 @@ export class VocabularySessionClient {
   private async sendReview(pending: NonNullable<VocabularyRecovery["pending"]>, epoch: number) {
     const label = submissionLabel(pending);
     try {
-      const result = await this.request(`/api/vocabulary/${encodeURIComponent(pending.wordId)}/review`, pending.input, epoch);
+      const result = await this.request(`/api/vocabulary/${encodeURIComponent(pending.wordId)}/review`, { ...pending.input, advance: true }, epoch);
       if (!result.ok) {
         if (result.status < 500) { this.update({ pending: null }); if (result.status === 409) this.adopt(result.payload, true); }
         throw new Error(result.payload.error || `${label}尚未保存。`);
       }
-      this.adopt(result.payload); this.update({ pending: null,
+      this.adopt(result.payload, false, true); this.update({ pending: null,
         message: result.payload.review?.supplemental
           ? `${label}已保存，复习计划保持不变。`
           : `评分已保存，下次复习：${new Date(result.payload.word!.dueAt).toLocaleString("zh-CN")}。${result.payload.session?.state.current?.supplemental ? "可以再练一句，这次练习不会重复安排复习。" : ""}` });
@@ -560,6 +571,11 @@ export class VocabularySessionClient {
       });
     }
   }
+  async retryNextCard() {
+    if (this.snapshot.busy || this.nextInFlight) return;
+    this.lastNextKey = "";
+    await this.selectCard();
+  }
   async saveWord(data: Record<string, string | string[]>, editing?: VocabularyEntry) {
     let saved = false;
     await this.operation(async (epoch) => {
@@ -582,8 +598,8 @@ export class VocabularySessionClient {
   resetAfterRestore() {
     clearTimeout(this.checkpointTimer); this.dirty = false; this.attempted = null; this.startAttempt = null; this.nextInFlight = null; this.lastNextKey = ""; ++this.epoch;
     try { this.storage?.removeItem(vocabularyRecoveryKey); } catch { /* Remote state is authoritative. */ }
-    this.snapshot = { ...this.snapshot, ready: false, pending: null, conflicted: null, pendingOperation: null, targetStates: [], termDispositions: [], targetCounts: null, queuePreview: null, session: null };
+    this.snapshot = { ...this.snapshot, ready: false, pending: null, conflicted: null, pendingOperation: null, targetStates: [], termDispositions: [], targetCounts: null, queuePreview: null, queue: null, nextError: "", checkingNext: false, transitionSession: null, session: null };
     void this.initialize(this.storage);
   }
-  dispose() { clearTimeout(this.checkpointTimer); ++this.epoch; }
+  dispose() { clearTimeout(this.checkpointTimer); ++this.epoch; this.snapshot = { ...this.snapshot, transitionSession: null, checkingNext: false }; }
 }
